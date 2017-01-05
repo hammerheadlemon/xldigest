@@ -24,10 +24,9 @@ setup(
     url='https://github.com/hammerheadlemon/xldigest',
     packages=['xldigest', 'xldigest.images',
               'xldigest.tests'],
-    package_data={'xldigest.images': ['*.png']},
     entry_points={
         'console_scripts': [
-            'Template=xldigest.xldigest:main'
+            'xldigest = xldigest.main:main'
         ]
     },
     install_requires=requirements,
