@@ -1,5 +1,5 @@
 import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
 
@@ -121,7 +121,8 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
             "Cell Descriptor",
             "Cell Ref",
             "Sheet",
-            "Dropdown Text"
+            "Dropdown Text",
+            "Conditional Formatting Rule",
         ]
 
         if role == QtCore.Qt.DisplayRole:
@@ -168,14 +169,14 @@ class DatamapWindow(QtWidgets.QWidget):
     def __init__(self, *args):
         super(DatamapWindow, self).__init__(*args)
         self.setWindowTitle('Configure Datamaps')
-        self.resize(700, 300)
+        self.resize(900, 600)
         # create objects
         table_data = [
-            ["Programme/Project", "B1", "Summary", None],
-            ["SRO Name", "C2", "Summary", None],
-            ["SRO Role", "D2", "Finance & Benefits", "Roles"],
-            ["DfT Group", "G2", "Finance & Benefits", "DfT Groups"],
-            ["DfT Division", "T2", "Basics", "DfT Divisions"],
+            ["Programme/Project", "B1", "Summary", None, "Red"],
+            ["SRO Name", "C2", "Summary", None, "Orange"],
+            ["SRO Role", "D2", "Finance & Benefits", "Roles", "Red"],
+            ["DfT Group", "G2", "Finance & Benefits", "DfT Groups", "Blue"],
+            ["DfT Division", "T2", "Basics", "DfT Divisions", "Yellow"],
              ]
 
         # practicing the dropdown text
@@ -184,7 +185,8 @@ class DatamapWindow(QtWidgets.QWidget):
         tableModel = DatamapTableModel(table_data, self)
         tv = QtWidgets.QTableView()
         tv.setModel(tableModel)
-        tv.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+#       tv.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        tv.horizontalHeader().setStretchLastSection(True)
 
         # creating a combox with the dropdown_data in it
         dropdownModel = DropDownModel(dropdown_data)
