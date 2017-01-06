@@ -169,10 +169,10 @@ class DatamapWindow(QtWidgets.QWidget):
     def __init__(self, *args):
         super(DatamapWindow, self).__init__(*args)
         self.setWindowTitle('Configure Datamaps')
+        self.resize(900, 600)
         desktop = QtWidgets.QDesktopWidget().availableGeometry()
         width = (desktop.width() - self.width()) / 2
         height = (desktop.height() - self.height()) / 2
-        self.resize(900, 600)
         self.move(width, height)
         # create objects
         table_data = [
