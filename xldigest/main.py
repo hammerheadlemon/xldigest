@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
                              QDialog, QFileDialog, QHBoxLayout, QLabel,
                              QMainWindow, QToolBar, QVBoxLayout, QWidget)
 
-from xldigest.widgets import DatamapWindow
+from widgets import DatamapWindow
 
 
 class MainWindow(QMainWindow):
