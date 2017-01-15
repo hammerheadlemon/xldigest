@@ -34,11 +34,17 @@ def digest_source_files() -> list:
         for f in source_files:
             future_data.append(executor.submit(
                 parse_source_cells, f, DATAMAP_MASTER_TO_RETURN))
+            print("Processing {}".format(f))
         for future in futures.as_completed(future_data):
             flattened_data.append(flatten_project(future))
     return flattened_data
 
 
 d = digest_source_files()
+print("{0:<60}{1:>20}{2:>30}".format('Imported Project', 'Data Length', 'DfT Group'))
+print("{:*<110}".format(""))
 for proj in d:
-    print("Imported project: {:<}".format(proj['Project/Programme Name']))
+    print("{0:<60}{1:>20}{2:>30}".format(
+        proj['Project/Programme Name'],
+        len(proj),
+        proj['DfT Group']))
