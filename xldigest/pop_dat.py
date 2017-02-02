@@ -116,5 +116,5 @@ def merge_gmpp_datamap(source_file):
 
 
 create_tables()
-import_csv('/home/lemon/Documents/bcompiler/source/datamap-returns-to-master')
+import_csv('/home/lemon/Documents/bcompiler/source/datamap-returns-to-master-WITH_HEADER_FORSQLITE')
 merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/datamap-master-to-gmpp')

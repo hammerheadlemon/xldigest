@@ -1,4 +1,6 @@
 import sys
+import sqlite3
+
 from PyQt5 import QtCore, QtWidgets
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
@@ -118,11 +120,13 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
     def headerData(self, section, orientation, role):
 
         headers = [
-            "Cell Descriptor",
-            "Cell Ref",
-            "Sheet",
-            "Dropdown Text",
-            "Conditional Formatting Rule",
+            "Index",
+            "Key",
+            "BICC Sheet",
+            "BICC Cell Reference",
+            "GMPP Sheet",
+            "GMPP Cell Reference",
+            "Verification Rule"
         ]
 
         if role == QtCore.Qt.DisplayRole:
@@ -165,6 +169,15 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
         return True
 
 
+def pull_all_data_from_db():
+    conn = sqlite3.connect('db.sqlite')
+    c = conn.cursor()
+    d = list(c.execute("SELECT * FROM datamap"))
+    c.close()
+    conn.close()
+    return d
+
+
 class DatamapWindow(QtWidgets.QWidget):
     def __init__(self, *args):
         super(DatamapWindow, self).__init__(*args)
@@ -175,13 +188,9 @@ class DatamapWindow(QtWidgets.QWidget):
         height = (desktop.height() - self.height()) / 2
         self.move(width, height)
         # create objects
-        table_data = [
-            ["Programme/Project", "B1", "Summary", None, "Red"],
-            ["SRO Name", "C2", "Summary", None, "Orange"],
-            ["SRO Role", "D2", "Finance & Benefits", "Roles", "Red"],
-            ["DfT Group", "G2", "Finance & Benefits", "DfT Groups", "Blue"],
-            ["DfT Division", "T2", "Basics", "DfT Divisions", "Yellow"],
-             ]
+
+        # convert from tuples to list
+        table_data = [list(item) for item in pull_all_data_from_db()]
 
         # practicing the dropdown text
         dropdown_data = ["One", "Two", "Three"]
