@@ -131,6 +131,7 @@ class DatamapWindow(QtWidgets.QWidget):
         self.proxyModel = QtCore.QSortFilterProxyModel()
         self.tv.setModel(self.proxyModel)
         self.proxyModel.setSourceModel(self.tableModel)
+        self.tv.setSortingEnabled(True)
 
         self.tv.resize(900, 400)
         self.tv.horizontalHeader().setStretchLastSection(True)
@@ -199,7 +200,7 @@ class DatamapWindow(QtWidgets.QWidget):
         mainLayout.addWidget(proxyGroupBox)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle("Basic Sort/Filter Model")
+        self.setWindowTitle("xldigest Datamap")
 
         self.tv.sortByColumn(1, Qt.AscendingOrder)
         self.filterColumnCombo.setCurrentIndex(1)
