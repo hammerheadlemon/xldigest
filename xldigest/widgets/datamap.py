@@ -125,14 +125,15 @@ class DatamapWindow(QtWidgets.QWidget):
         # convert from tuples to list
         table_data = [list(item) for item in pull_all_data_from_db()]
 
-        tableModel = DatamapTableModel(table_data, self)
-        tv = QtWidgets.QTableView()
-        tv.setModel(tableModel)
-        tv.resize(900, 400)
-        tv.horizontalHeader().setStretchLastSection(True)
+        self.tv = QtWidgets.QTableView()
 
+        self.tableModel = DatamapTableModel(table_data, self)
         self.proxyModel = QtCore.QSortFilterProxyModel()
-        self.proxyModel.setSourceModel(tableModel)
+        self.tv.setModel(self.proxyModel)
+        self.proxyModel.setSourceModel(self.tableModel)
+
+        self.tv.resize(900, 400)
+        self.tv.horizontalHeader().setStretchLastSection(True)
 
         self.sortCaseSensitivityCheckBox = QtWidgets.QCheckBox(
             "Case sensitive sorting")
@@ -154,10 +155,13 @@ class DatamapWindow(QtWidgets.QWidget):
         self.filterSyntaxLabel.setBuddy(self.filterSyntaxCombo)
 
         self.filterColumnCombo = QtWidgets.QComboBox()
+        self.filterColumnCombo.addItem("Index")
         self.filterColumnCombo.addItem("Key")
-        self.filterColumnCombo.addItem("Sheet")
-        self.filterColumnCombo.addItem("Cell Reference")
-        self.filterColumnCombo.addItem("Date")
+        self.filterColumnCombo.addItem("BICC Sheet")
+        self.filterColumnCombo.addItem("BICC Cell Reference")
+        self.filterColumnCombo.addItem("GMPP Sheet")
+        self.filterColumnCombo.addItem("GMPP Cell Reference")
+        self.filterColumnCombo.addItem("Verification Rule")
         self.filterColumnLabel = QtWidgets.QLabel("Filter column:")
         self.filterColumnLabel.setBuddy(self.filterColumnCombo)
 
@@ -179,7 +183,7 @@ class DatamapWindow(QtWidgets.QWidget):
         proxyGroupBox = QtWidgets.QGroupBox("Sorted Filtered Model")
 
         proxyLayout = QtWidgets.QGridLayout()
-        proxyLayout.addWidget(tv, 0, 0, 1, 3)
+        proxyLayout.addWidget(self.tv, 0, 0, 1, 3)
         proxyLayout.addWidget(self.filterPatternLabel, 1, 0)
         proxyLayout.addWidget(self.filterPatternLineEdit, 1, 1, 1, 2)
         proxyLayout.addWidget(self.filterSyntaxLabel, 2, 0)
@@ -197,7 +201,7 @@ class DatamapWindow(QtWidgets.QWidget):
 
         self.setWindowTitle("Basic Sort/Filter Model")
 
-        tv.sortByColumn(1, Qt.AscendingOrder)
+        self.tv.sortByColumn(1, Qt.AscendingOrder)
         self.filterColumnCombo.setCurrentIndex(1)
 
         self.filterPatternLineEdit.setText("")
