@@ -2,75 +2,9 @@ import sys
 import sqlite3
 
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import Qt
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
-
-
-class DropDownModel(QtCore.QAbstractListModel):
-    def __init__(self, data_in, parent=None, *args):
-        super(DropDownModel, self).__init__(parent, *args)
-
-        self.data = data_in
-
-    def rowCount(self, parent=QtCore.QModelIndex()):
-        return len(self.data)
-
-    def data(self, index, role):
-        if index.isValid() and role == QtCore.Qt.DisplayRole:
-            row = index.row()
-            return self.data[row]
-
-        # making sure we don't remove the test completely when we edit
-        # before pressing enter
-        if role == QtCore.Qt.EditRole:
-            row = index.row()
-            return self.data[row]
-
-    # need this to make it editable
-    def flags(self, index):
-        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | \
-            QtCore.Qt.ItemIsSelectable
-
-    # need this to make it editable
-    def setData(self, index, value, role=QtCore.Qt.EditRole):
-        if role == QtCore.Qt.EditRole:
-            row = index.row()
-            self.data[row] = value
-            # send the signal so we automatically update
-            self.dataChanged.emit(index, index)
-            return True
-        return False
-
-    # INSERTING and REMOVING
-    # explained in https://www.youtube.com/watch?v=EmYby3BB3Kk&t=57s
-    def insertRows(self, position, rows, parent=QtCore.QModelIndex()):
-        # this must be called before inserting rows
-        # this emit signals which are handled by views
-        self.beginInsertRows(
-            parent, position, position + rows-1)
-
-        # DO INSERTING HERE!
-        for i in range(rows):
-            self.data.insert(position, "Default Value")
-
-        # this must be called after inserting rows
-        self.endInsertRows()
-        return True
-
-    def removeRows(self, position, rows, parent=QtCore.QModelIndex()):
-        # this must be called before removing rows
-        # this emit signals which are handled by views
-        self.beginRemoveRows(
-            parent, position, position + rows-1)
-
-        # REMOVE ROWS HERE!
-        for i in range(rows):
-            self.data.remove(self.data[position])
-
-        # this must be called after inserting rows
-        self.endRemoveRows()
-        return True
-
 
 class DatamapTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data_in=[[]], parent=None, *args):
@@ -187,42 +121,104 @@ class DatamapWindow(QtWidgets.QWidget):
         width = (desktop.width() - self.width()) / 2
         height = (desktop.height() - self.height()) / 2
         self.move(width, height)
-        # create objects
 
         # convert from tuples to list
         table_data = [list(item) for item in pull_all_data_from_db()]
 
-        # practicing the dropdown text
-        dropdown_data = ["One", "Two", "Three"]
-
         tableModel = DatamapTableModel(table_data, self)
         tv = QtWidgets.QTableView()
         tv.setModel(tableModel)
-#       tv.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        tv.resize(900, 400)
         tv.horizontalHeader().setStretchLastSection(True)
 
-        # creating a combox with the dropdown_data in it
-        dropdownModel = DropDownModel(dropdown_data)
-        comboBox = QtWidgets.QComboBox()
-        comboBox.setModel(dropdownModel)
+        self.proxyModel = QtCore.QSortFilterProxyModel()
+        self.proxyModel.setSourceModel(tableModel)
 
-        # if we want to insert rows
-        # dropdownModel.insertRows(2, 5)
+        self.sortCaseSensitivityCheckBox = QtWidgets.QCheckBox(
+            "Case sensitive sorting")
+        self.filterCaseSensitivityCheckBox = QtWidgets.QCheckBox(
+            "Case sensitive filter")
 
-        # if we want to remove rows
-        dropdownModel.removeRows(1, 1)
+        self.filterPatternLineEdit = QtWidgets.QLineEdit()
+        self.filterPatternLabel = QtWidgets.QLabel("Filter pattern")
+        self.filterPatternLabel.setBuddy(self.filterPatternLineEdit)
 
-        # we will create a simple list view of the model too
-        listView = QtWidgets.QListView()
-        listView.resize(100, 100)
-        listView.setModel(dropdownModel)
+        self.filterSyntaxCombo = QtWidgets.QComboBox()
+        self.filterSyntaxCombo.addItem(
+            "Regular Expression", QtCore.QRegExp.RegExp)
+        self.filterSyntaxCombo.addItem(
+            "Wildcard", QtCore.QRegExp.Wildcard)
+        self.filterSyntaxCombo.addItem(
+            "Fixed string", QtCore.QRegExp.FixedString)
+        self.filterSyntaxLabel = QtWidgets.QLabel("Filter syntax:")
+        self.filterSyntaxLabel.setBuddy(self.filterSyntaxCombo)
 
-        # layout
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.addWidget(tv)
-        self.layout.addWidget(comboBox)
-        self.layout.addWidget(listView)
-        self.setLayout(self.layout)
+        self.filterColumnCombo = QtWidgets.QComboBox()
+        self.filterColumnCombo.addItem("Key")
+        self.filterColumnCombo.addItem("Sheet")
+        self.filterColumnCombo.addItem("Cell Reference")
+        self.filterColumnCombo.addItem("Date")
+        self.filterColumnLabel = QtWidgets.QLabel("Filter column:")
+        self.filterColumnLabel.setBuddy(self.filterColumnCombo)
+
+        # SIGNALS
+        self.filterPatternLineEdit.textChanged.connect(
+            self.filterRegExChanged)
+
+        self.filterSyntaxCombo.currentIndexChanged.connect(
+            self.filterRegExChanged)
+
+        self.filterColumnCombo.currentIndexChanged.connect(
+            self.filterColumnChanged)
+
+        self.filterCaseSensitivityCheckBox.toggled.connect(
+            self.filterRegExChanged)
+
+        self.sortCaseSensitivityCheckBox.toggled.connect(self.sortChanged)
+
+        proxyGroupBox = QtWidgets.QGroupBox("Sorted Filtered Model")
+
+        proxyLayout = QtWidgets.QGridLayout()
+        proxyLayout.addWidget(tv, 0, 0, 1, 3)
+        proxyLayout.addWidget(self.filterPatternLabel, 1, 0)
+        proxyLayout.addWidget(self.filterPatternLineEdit, 1, 1, 1, 2)
+        proxyLayout.addWidget(self.filterSyntaxLabel, 2, 0)
+        proxyLayout.addWidget(self.filterSyntaxCombo, 2, 1, 1, 2)
+        proxyLayout.addWidget(self.filterColumnLabel, 3, 0)
+        proxyLayout.addWidget(self.filterColumnCombo, 3, 1, 1, 2)
+        proxyLayout.addWidget(self.filterCaseSensitivityCheckBox, 4, 0, 1, 2)
+        proxyLayout.addWidget(self.sortCaseSensitivityCheckBox, 4, 2)
+        proxyGroupBox.setLayout(proxyLayout)
+
+        mainLayout = QtWidgets.QVBoxLayout()
+
+        mainLayout.addWidget(proxyGroupBox)
+        self.setLayout(mainLayout)
+
+        self.setWindowTitle("Basic Sort/Filter Model")
+
+        tv.sortByColumn(1, Qt.AscendingOrder)
+        self.filterColumnCombo.setCurrentIndex(1)
+
+        self.filterPatternLineEdit.setText("")
+        self.filterCaseSensitivityCheckBox.setChecked(False)
+        self.sortCaseSensitivityCheckBox.setChecked(False)
+
+    def filterRegExChanged(self):
+        syntax = QtCore.QRegExp.PatternSyntax(self.filterSyntaxCombo.itemData(
+            self.filterSyntaxCombo.currentIndex()))
+        caseSensitivity = self.filterCaseSensitivityCheckBox.isChecked()
+        regex = QtCore.QRegExp(
+            self.filterPatternLineEdit.text(), caseSensitivity, syntax)
+        self.proxyModel.setFilterRegExp(regex)
+
+    def filterColumnChanged(self):
+        self.proxyModel.setFilterKeyColumn(
+            self.filterColumnCombo.currentIndex())
+
+    def sortChanged(self):
+        self.proxyModel.setSortCaseSensitivity(
+            self.sortCaseSensitivityCheckBox.isChecked())
 
 
 def main():
