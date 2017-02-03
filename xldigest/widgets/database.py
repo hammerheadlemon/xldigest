@@ -48,6 +48,7 @@ class DatabaseTable(QWidget):
         db_table.hideColumn(0)  # don't want the index
         db_table.horizontalHeader().setStretchLastSection(True)
 
+
         self.layout = QHBoxLayout()
         self.layout.addWidget(db_table)
         self.setLayout(self.layout)

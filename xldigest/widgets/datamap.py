@@ -181,7 +181,7 @@ class DatamapWindow(QtWidgets.QWidget):
 
         self.sortCaseSensitivityCheckBox.toggled.connect(self.sortChanged)
 
-        proxyGroupBox = QtWidgets.QGroupBox("Sorted Filtered Model")
+        proxyGroupBox = QtWidgets.QGroupBox("Datamap Configuration")
 
         proxyLayout = QtWidgets.QGridLayout()
         proxyLayout.addWidget(self.tv, 0, 0, 1, 3)
