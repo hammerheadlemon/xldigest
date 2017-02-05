@@ -1,8 +1,7 @@
 import csv
 import datetime
-import time
-
 import sqlite3
+import time
 
 conn = sqlite3.connect('db.sqlite')
 c = conn.cursor()

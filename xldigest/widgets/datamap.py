@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
 
+
 class DatamapTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data_in=[[]], parent=None, *args):
         super(DatamapTableModel, self).__init__(parent, *args)
