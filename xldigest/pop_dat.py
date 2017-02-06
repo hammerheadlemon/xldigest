@@ -52,6 +52,7 @@ def create_tables():
               value TEXT,
               project INTEGER REFERENCES project (id),
               quarter INTEGER REFERENCES quarter (id),
+              key INTEGER REFERENCES datamap_item (id),
               timestamp TEXT
               )
               """)
@@ -130,11 +131,27 @@ def merge_gmpp_datamap(source_file):
     conn.close()
 
 
+def populate_projects_table():
+    conn = sqlite3.connect('db.sqlite')
+    c = conn.cursor()
+    with open('/home/lemon/Documents/bcompiler/source/master_transposed.csv'
+              ) as f:
+        reader = csv.DictReader(f)
+        project_list = [row['Project/Programme Name'] for row in reader]
+        print(project_list)
+        for p in project_list:
+            print(p)
+            c.execute("INSERT INTO project (name) VALUES (?)", (p, ))
+    conn.commit()
+    c.close()
+    conn.close()
+
+
 def import_single_bicc_return_using_database():
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
     BICC = ('/home/lemon/Documents/bcompiler/source/returns/'
-            'SARH_Q3_Return_Final.xlsx')
+            'Crossrail _Q3_Return_Final.xlsx')
     template = BICCTemplate(BICC)
     datamap = Datamap(template,
                       '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
@@ -143,15 +160,27 @@ def import_single_bicc_return_using_database():
     # here we need to go through the datamap, use the cell_key and
     # cell_reference to populate the cell_value of the Cell object
     digest.read_template()
+    project_name = [
+        item.cell_value for item in datamap.cell_map
+        if item.cell_key == 'Project/Programme Name'
+    ]
+    project_id = c.execute("SELECT id FROM project WHERE project.name=?",
+                           project_name)
+    project_id = tuple(project_id)[0][0]
+    quarter = [
+        item.cell_value for item in datamap.cell_map
+        if item.cell_key == 'Reporting period (GMPP - Snapshot Date)'
+    ]
     print("\n")
     for cell in digest.data:
         c.execute("""\
                   INSERT INTO returns (
+                  key,
                   value,
                   project,
                   quarter
-                  ) VALUES (?, ?, ?)
-                  """, (cell.cell_value, 100, "Q4"))
+                  ) VALUES (?, ?, ?, ?)
+                  """, (1, cell.cell_value, project_id, 1))
         try:
             print("{0:<70}{1:<30}{2:<70}".format(
                 cell.cell_key, cell.template_sheet, cell.cell_value))
@@ -167,4 +196,5 @@ def import_single_bicc_return_using_database():
 #                    'to-master-WITH_HEADER_FORSQLITE')
 # merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source'
 #                    '/datamap-master-to-gmpp')
+# populate_projects_table()
 import_single_bicc_return_using_database()
