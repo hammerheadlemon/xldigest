@@ -1,7 +1,9 @@
 import csv
-# import datetime
 import sqlite3
-# import time
+
+from bcompiler.datamap import Datamap
+from bcompiler.process.digest import Digest
+from bcompiler.template import BICCTemplate
 
 conn = sqlite3.connect('db.sqlite')
 c = conn.cursor()
@@ -58,7 +60,22 @@ def create_tables():
     conn.close()
 
 
-def import_csv(source_file):
+def change_dict_val(target, replacement, dictionary):
+    for k, v in dictionary.items():
+        if v == target:
+            dictionary[k] = replacement
+    return dictionary
+
+
+def strip_trailing_whitespace(dictionary):
+    for k, v in dictionary.items():
+        # probably a string
+        if isinstance(v, str):
+            dictionary[k] = v.rstrip()
+    return dictionary
+
+
+def import_datamap_csv(source_file):
 
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
@@ -72,6 +89,8 @@ def import_csv(source_file):
         #           datetime.datetime.fromtimestamp(time_stamp).strftime(
         #               '%d-%m-%Y %H:%M:%S'))
         for row in reader:
+            row = change_dict_val("", None, row)
+            row = strip_trailing_whitespace(row)
             c.execute("""\
                       INSERT INTO datamap_item (
                       key,
@@ -96,6 +115,8 @@ def merge_gmpp_datamap(source_file):
     with open(source_file, 'r') as f:
         reader = csv.DictReader(f)
         for row in reader:
+            row = change_dict_val("", None, row)
+            row = strip_trailing_whitespace(row)
             if row['master_cellname'] in keys:
                 c.execute("""\
                           UPDATE datamap_item
@@ -109,8 +130,41 @@ def merge_gmpp_datamap(source_file):
     conn.close()
 
 
-create_tables()
-import_csv('/home/lemon/Documents/bcompiler/source/datamap-returns-'
-           'to-master-WITH_HEADER_FORSQLITE')
-merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source'
-                   '/datamap-master-to-gmpp')
+def import_single_bicc_return_using_database():
+    conn = sqlite3.connect('db.sqlite')
+    c = conn.cursor()
+    BICC = ('/home/lemon/Documents/bcompiler/source/returns/'
+            'SARH_Q3_Return_Final.xlsx')
+    template = BICCTemplate(BICC)
+    datamap = Datamap(template,
+                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    datamap.cell_map_from_database()
+    digest = Digest(datamap)
+    # here we need to go through the datamap, use the cell_key and
+    # cell_reference to populate the cell_value of the Cell object
+    digest.read_template()
+    print("\n")
+    for cell in digest.data:
+        c.execute("""\
+                  INSERT INTO returns (
+                  value,
+                  project,
+                  quarter
+                  ) VALUES (?, ?, ?)
+                  """, (cell.cell_value, 100, "Q4"))
+        try:
+            print("{0:<70}{1:<30}{2:<70}".format(
+                cell.cell_key, cell.template_sheet, cell.cell_value))
+        except Exception:
+            pass
+    conn.commit()
+    c.close()
+    conn.close()
+
+
+# create_tables()
+# import_datamap_csv('/home/lemon/Documents/bcompiler/source/datamap-returns-'
+#                    'to-master-WITH_HEADER_FORSQLITE')
+# merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source'
+#                    '/datamap-master-to-gmpp')
+import_single_bicc_return_using_database()
