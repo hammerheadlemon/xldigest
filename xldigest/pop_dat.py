@@ -1,18 +1,20 @@
 import csv
+import os
 import sqlite3
+import sys
 
 from bcompiler.datamap import Datamap
 from bcompiler.process.digest import Digest
 from bcompiler.template import BICCTemplate
 
-conn = sqlite3.connect('db.sqlite')
-c = conn.cursor()
 
 CURRENT_QUARTER = "Q3 2016/17"
 
-
 def create_tables():
     """Drop table before creation"""
+
+    conn = sqlite3.connect('db.sqlite')
+    c = conn.cursor()
 
     c.execute('DROP TABLE IF EXISTS project')
     c.execute("""\
@@ -79,7 +81,9 @@ def strip_trailing_whitespace(dictionary):
 
 
 def import_datamap_csv(source_file):
-
+    """
+    Import a csv-based datamap into a sqlite database.
+    """
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
 
@@ -109,7 +113,10 @@ def import_datamap_csv(source_file):
 
 
 def merge_gmpp_datamap(source_file):
-    # first we get a lost of all keys from db
+    """
+    Merge-in relevant cell references from a GMPP-based datamap, based on
+    values from the returns-to-master datamap.
+    """
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
 
@@ -134,6 +141,9 @@ def merge_gmpp_datamap(source_file):
 
 
 def populate_quarters_table():
+    """
+    Populate basic Quarter information.
+    """
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
     c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q3 2016/17",))
@@ -150,6 +160,10 @@ def populate_quarters_table():
 
 
 def populate_projects_table():
+    """
+    Populate the project table in the database. The master_transposed.csv
+    file is used as the source for this.
+    """
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
     with open('/home/lemon/Documents/bcompiler/source/master_transposed.csv'
@@ -163,12 +177,14 @@ def populate_projects_table():
     conn.close()
 
 
-def import_single_bicc_return_using_database():
+def import_single_bicc_return_using_database(source_file):
+    """
+    Import a single BICC return based on a source template. Use the datamap
+    from database, rather than the csv file.
+    """
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
-    BICC = ('/home/lemon/Documents/bcompiler/source/returns/'
-            'Crossrail _Q3_Return_Final.xlsx')
-    template = BICCTemplate(BICC)
+    template = BICCTemplate(source_file)
     datamap = Datamap(template,
                       '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.cell_map_from_database()
@@ -206,11 +222,27 @@ def import_single_bicc_return_using_database():
     conn.close()
 
 
-# create_tables()
-# import_datamap_csv('/home/lemon/Documents/bcompiler/source/datamap-returns-'
-#                    'to-master-WITH_HEADER_FORSQLITE')
-# merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source'
-#                    '/datamap-master-to-gmpp')
-#populate_projects_table()
-#populate_quarters_table()
-import_single_bicc_return_using_database()
+def import_all_returns_to_database():
+    returns_dir = os.path.dirname('/home/lemon/Documents/bcompiler/source/'
+                                  'returns/')
+    for f in os.listdir(returns_dir):
+        import_single_bicc_return_using_database(os.path.join(returns_dir, f))
+
+
+def main():
+    try:
+        if sys.argv[1]:
+            create_tables()
+            import_datamap_csv(
+                '/home/lemon/Documents/bcompiler/source/'
+                'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+            merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source'
+                               '/datamap-master-to-gmpp')
+            populate_projects_table()
+            populate_quarters_table()
+    except:
+        import_all_returns_to_database()
+
+
+if __name__ == "__main__":
+    main()
