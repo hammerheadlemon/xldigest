@@ -157,13 +157,12 @@ def import_single_bicc_return_using_database():
                       '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.cell_map_from_database()
     digest = Digest(datamap)
-    # here we need to go through the datamap, use the cell_key and
-    # cell_reference to populate the cell_value of the Cell object
     digest.read_template()
     project_name = [
         item.cell_value for item in datamap.cell_map
         if item.cell_key == 'Project/Programme Name'
     ]
+
     project_id = c.execute("SELECT id FROM project WHERE project.name=?",
                            project_name)
     project_id = tuple(project_id)[0][0]
@@ -173,6 +172,11 @@ def import_single_bicc_return_using_database():
     ]
     print("\n")
     for cell in digest.data:
+        print(cell.cell_key)
+        cell_val_id = c.execute(
+            "SELECT id from datamap_item WHERE datamap_item.key=?",
+            (cell.cell_key,))
+        cell_val_id = tuple(cell_val_id)[0][0]
         c.execute("""\
                   INSERT INTO returns (
                   key,
@@ -180,7 +184,7 @@ def import_single_bicc_return_using_database():
                   project,
                   quarter
                   ) VALUES (?, ?, ?, ?)
-                  """, (1, cell.cell_value, project_id, 1))
+                  """, (cell_val_id, cell.cell_value, project_id, 1))
         try:
             print("{0:<70}{1:<30}{2:<70}".format(
                 cell.cell_key, cell.template_sheet, cell.cell_value))
