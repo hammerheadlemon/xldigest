@@ -28,9 +28,9 @@ def create_tables():
               )
               """)
 
-    c.execute('DROP TABLE IF EXISTS datamap')
+    c.execute('DROP TABLE IF EXISTS datamap_item')
     c.execute("""\
-              CREATE TABLE datamap
+              CREATE TABLE datamap_item
               (
               id INTEGER PRIMARY KEY,
               key TEXT,
@@ -47,7 +47,6 @@ def create_tables():
               CREATE TABLE returns
               (
               id INTEGER PRIMARY KEY,
-              key TEXT,
               value TEXT,
               project INTEGER REFERENCES project (id),
               quarter INTEGER REFERENCES quarter (id),
@@ -74,7 +73,7 @@ def import_csv(source_file):
         #               '%d-%m-%Y %H:%M:%S'))
         for row in reader:
             c.execute("""\
-                      INSERT INTO datamap (
+                      INSERT INTO datamap_item (
                       key,
                       bicc_sheet,
                       bicc_cellref,
@@ -92,14 +91,14 @@ def merge_gmpp_datamap(source_file):
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
 
-    keys = [result[0] for result in c.execute("SELECT key FROM datamap")]
+    keys = [result[0] for result in c.execute("SELECT key FROM datamap_item")]
 
     with open(source_file, 'r') as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row['master_cellname'] in keys:
                 c.execute("""\
-                          UPDATE datamap
+                          UPDATE datamap_item
                           SET gmpp_cellref=(?), gmpp_sheet=(?)
                           WHERE key=(?)""",
                           (row['gmpp_template_cell_reference'],

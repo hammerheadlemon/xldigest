@@ -107,7 +107,7 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
 def pull_all_data_from_db():
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
-    d = list(c.execute("SELECT * FROM datamap"))
+    d = list(c.execute("SELECT * FROM datamap_item"))
     c.close()
     conn.close()
     return d
