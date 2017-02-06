@@ -8,6 +8,8 @@ from bcompiler.template import BICCTemplate
 conn = sqlite3.connect('db.sqlite')
 c = conn.cursor()
 
+CURRENT_QUARTER = "Q3 2016/17"
+
 
 def create_tables():
     """Drop table before creation"""
@@ -16,7 +18,7 @@ def create_tables():
     c.execute("""\
               CREATE TABLE project
               (
-              id INTEGER PRIMARY KEY,
+              project_id INTEGER PRIMARY KEY,
               name TEXT
               )
               """)
@@ -25,7 +27,7 @@ def create_tables():
     c.execute("""\
               CREATE TABLE quarter
               (
-              id INTEGER PRIMARY KEY,
+              quarter_id INTEGER PRIMARY KEY,
               name TEXT
               )
               """)
@@ -34,7 +36,7 @@ def create_tables():
     c.execute("""\
               CREATE TABLE datamap_item
               (
-              id INTEGER PRIMARY KEY,
+              datamap_item_id INTEGER PRIMARY KEY,
               key TEXT,
               bicc_sheet TEXT,
               bicc_cellref TEXT,
@@ -48,11 +50,11 @@ def create_tables():
     c.execute("""\
               CREATE TABLE returns
               (
-              id INTEGER PRIMARY KEY,
+              returns_id INTEGER PRIMARY KEY,
               value TEXT,
-              project INTEGER REFERENCES project (id),
-              quarter INTEGER REFERENCES quarter (id),
-              key INTEGER REFERENCES datamap_item (id),
+              project_id INTEGER REFERENCES project (project_id),
+              quarter_id INTEGER REFERENCES quarter (quarter_id),
+              datamap_id INTEGER REFERENCES datamap_item (datamap_id),
               timestamp TEXT
               )
               """)
@@ -131,6 +133,22 @@ def merge_gmpp_datamap(source_file):
     conn.close()
 
 
+def populate_quarters_table():
+    conn = sqlite3.connect('db.sqlite')
+    c = conn.cursor()
+    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q3 2016/17",))
+    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q4 2016/17",))
+    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q1 2017/18",))
+    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q2 2017/18",))
+    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q3 2017/18",))
+    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q4 2017/18",))
+    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q1 2018/19",))
+    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q2 2018/19",))
+    conn.commit()
+    c.close()
+    conn.close()
+
+
 def populate_projects_table():
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
@@ -138,9 +156,7 @@ def populate_projects_table():
               ) as f:
         reader = csv.DictReader(f)
         project_list = [row['Project/Programme Name'] for row in reader]
-        print(project_list)
         for p in project_list:
-            print(p)
             c.execute("INSERT INTO project (name) VALUES (?)", (p, ))
     conn.commit()
     c.close()
@@ -163,33 +179,28 @@ def import_single_bicc_return_using_database():
         if item.cell_key == 'Project/Programme Name'
     ]
 
-    project_id = c.execute("SELECT id FROM project WHERE project.name=?",
-                           project_name)
+    project_id = c.execute(
+        "SELECT project_id FROM project WHERE project.name=(?)", project_name)
     project_id = tuple(project_id)[0][0]
-    quarter = [
-        item.cell_value for item in datamap.cell_map
-        if item.cell_key == 'Reporting period (GMPP - Snapshot Date)'
-    ]
+    quarter_id = c.execute(
+        "SELECT quarter_id FROM quarter WHERE "
+        "quarter.name=(?)", (CURRENT_QUARTER,))
+    quarter_id = tuple(quarter_id)[0][0]
     print("\n")
     for cell in digest.data:
-        print(cell.cell_key)
         cell_val_id = c.execute(
-            "SELECT id from datamap_item WHERE datamap_item.key=?",
+            "SELECT datamap_item_id from datamap_item WHERE "
+            "datamap_item.key=?",
             (cell.cell_key,))
         cell_val_id = tuple(cell_val_id)[0][0]
         c.execute("""\
                   INSERT INTO returns (
-                  key,
+                  datamap_id,
                   value,
-                  project,
-                  quarter
+                  project_id,
+                  quarter_id
                   ) VALUES (?, ?, ?, ?)
-                  """, (cell_val_id, cell.cell_value, project_id, 1))
-        try:
-            print("{0:<70}{1:<30}{2:<70}".format(
-                cell.cell_key, cell.template_sheet, cell.cell_value))
-        except Exception:
-            pass
+                  """, (cell_val_id, cell.cell_value, project_id, quarter_id))
     conn.commit()
     c.close()
     conn.close()
@@ -200,5 +211,6 @@ def import_single_bicc_return_using_database():
 #                    'to-master-WITH_HEADER_FORSQLITE')
 # merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source'
 #                    '/datamap-master-to-gmpp')
-# populate_projects_table()
+#populate_projects_table()
+#populate_quarters_table()
 import_single_bicc_return_using_database()
