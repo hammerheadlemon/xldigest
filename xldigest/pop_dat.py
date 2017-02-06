@@ -66,12 +66,12 @@ def import_csv(source_file):
 
     with open(source_file, 'r') as f:
         reader = csv.DictReader(f)
-#       # DON'T NEED TIMESTAMP STUFF HERE BUT LEAVING IF FOR
-#       # IMPORT FROM RETURN FUNCTION WHEN CREATED
-#       time_stamp = time.time()
-#       date = str(
-#           datetime.datetime.fromtimestamp(time_stamp).strftime(
-#               '%d-%m-%Y %H:%M:%S'))
+        #       # DON'T NEED TIMESTAMP STUFF HERE BUT LEAVING IF FOR
+        #       # IMPORT FROM RETURN FUNCTION WHEN CREATED
+        #       time_stamp = time.time()
+        #       date = str(
+        #           datetime.datetime.fromtimestamp(time_stamp).strftime(
+        #               '%d-%m-%Y %H:%M:%S'))
         for row in reader:
             c.execute("""\
                       INSERT INTO datamap (
@@ -80,11 +80,8 @@ def import_csv(source_file):
                       bicc_cellref,
                       bicc_verification_formula
                       ) VALUES (?, ?, ?, ?)
-                      """,
-                      (row['key'],
-                       row['bicc_sheet'],
-                       row['bicc_cellref'],
-                       row['bicc_verification_formula']))
+                      """, (row['key'], row['bicc_sheet'], row['bicc_cellref'],
+                            row['bicc_verification_formula']))
         conn.commit()
         c.close()
         conn.close()
@@ -104,11 +101,10 @@ def merge_gmpp_datamap(source_file):
                 c.execute("""\
                           UPDATE datamap
                           SET gmpp_cellref=(?), gmpp_sheet=(?)
-                          WHERE key=(?)""", (
-                              row['gmpp_template_cell_reference'],
-                              row['gmpp_template_sheet_reference'],
-                              row['master_cellname']
-                          ))
+                          WHERE key=(?)""",
+                          (row['gmpp_template_cell_reference'],
+                           row['gmpp_template_sheet_reference'],
+                           row['master_cellname']))
     conn.commit()
     c.close()
     conn.close()
