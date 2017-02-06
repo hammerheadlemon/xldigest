@@ -1,10 +1,9 @@
 import sys
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QMainWindow, QApplication, QTableView, QWidget,
-                             QTableWidget, QHBoxLayout)
-
 from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
+from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QMainWindow,
+                             QTableView, QTableWidget, QWidget)
 
 
 class MainWindow(QMainWindow):
@@ -47,7 +46,6 @@ class DatabaseTable(QWidget):
         db_table.setModel(self.model)
         db_table.hideColumn(0)  # don't want the index
         db_table.horizontalHeader().setStretchLastSection(True)
-
 
         self.layout = QHBoxLayout()
         self.layout.addWidget(db_table)

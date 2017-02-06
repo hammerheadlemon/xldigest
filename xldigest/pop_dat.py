@@ -1,7 +1,7 @@
 import csv
-import datetime
+# import datetime
 import sqlite3
-import time
+# import time
 
 conn = sqlite3.connect('db.sqlite')
 c = conn.cursor()
@@ -115,5 +115,7 @@ def merge_gmpp_datamap(source_file):
 
 
 create_tables()
-import_csv('/home/lemon/Documents/bcompiler/source/datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/datamap-master-to-gmpp')
+import_csv('/home/lemon/Documents/bcompiler/source/datamap-returns-'
+           'to-master-WITH_HEADER_FORSQLITE')
+merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source'
+                   '/datamap-master-to-gmpp')

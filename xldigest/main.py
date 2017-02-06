@@ -1,9 +1,9 @@
 import sys
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
-                             QDialog, QFileDialog, QHBoxLayout, QLabel,
-                             QMainWindow, QToolBar, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, QDialog,
+                             QFileDialog, QHBoxLayout, QLabel, QMainWindow,
+                             QToolBar, QVBoxLayout, QWidget)
 
 from widgets import DatamapWindow
 
