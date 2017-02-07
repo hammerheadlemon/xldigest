@@ -8,7 +8,11 @@ from bcompiler.process.digest import Digest
 from bcompiler.template import BICCTemplate
 
 
+# Hard-coded for now - this matches the current quarter with the same
+# value in the database so we're not relying on how it's written in
+# BICC template.
 CURRENT_QUARTER = "Q3 2016/17"
+
 
 def create_tables():
     """Drop table before creation"""
@@ -65,14 +69,16 @@ def create_tables():
     conn.close()
 
 
-def change_dict_val(target, replacement, dictionary):
+def _change_dict_val(target, replacement, dictionary):
+    "Helper script to strip or change values in a dict."
     for k, v in dictionary.items():
         if v == target:
             dictionary[k] = replacement
     return dictionary
 
 
-def strip_trailing_whitespace(dictionary):
+def _strip_trailing_whitespace(dictionary):
+    "Helper script to strip trailing whitespace from string values in dict."
     for k, v in dictionary.items():
         # probably a string
         if isinstance(v, str):
@@ -96,8 +102,8 @@ def import_datamap_csv(source_file):
         #           datetime.datetime.fromtimestamp(time_stamp).strftime(
         #               '%d-%m-%Y %H:%M:%S'))
         for row in reader:
-            row = change_dict_val("", None, row)
-            row = strip_trailing_whitespace(row)
+            row = _change_dict_val("", None, row)
+            row = _strip_trailing_whitespace(row)
             c.execute("""\
                       INSERT INTO datamap_item (
                       key,
@@ -125,8 +131,8 @@ def merge_gmpp_datamap(source_file):
     with open(source_file, 'r') as f:
         reader = csv.DictReader(f)
         for row in reader:
-            row = change_dict_val("", None, row)
-            row = strip_trailing_whitespace(row)
+            row = _change_dict_val("", None, row)
+            row = _strip_trailing_whitespace(row)
             if row['master_cellname'] in keys:
                 c.execute("""\
                           UPDATE datamap_item
@@ -146,6 +152,7 @@ def populate_quarters_table():
     """
     conn = sqlite3.connect('db.sqlite')
     c = conn.cursor()
+    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q2 2016/17",))
     c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q3 2016/17",))
     c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q4 2016/17",))
     c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q1 2017/18",))
@@ -187,22 +194,35 @@ def import_single_bicc_return_using_database(source_file):
     template = BICCTemplate(source_file)
     datamap = Datamap(template,
                       '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    # call the bcompiler class here
     datamap.cell_map_from_database()
     digest = Digest(datamap)
     digest.read_template()
+
+    # we need project_names to build the tables
     project_name = [
-        item.cell_value for item in datamap.cell_map
+        item.cell_value.rstrip() for item in datamap.cell_map
         if item.cell_key == 'Project/Programme Name'
     ]
 
+    # we need project_id to build the tables
     project_id = c.execute(
-        "SELECT project_id FROM project WHERE project.name=(?)", project_name)
-    project_id = tuple(project_id)[0][0]
+        "SELECT project_id FROM project WHERE project.name=(?)",
+        (project_name[0],))
+    try:
+        project_id = tuple(project_id)[0][0]
+    except IndexError:
+        print("{} may not be in project table in database. Check it."
+              " Will not import this time".format(project_name[0]))
+        project_id = None
+
+    # we need quarter_id to build the tables
     quarter_id = c.execute(
         "SELECT quarter_id FROM quarter WHERE "
         "quarter.name=(?)", (CURRENT_QUARTER,))
     quarter_id = tuple(quarter_id)[0][0]
-    print("\n")
+
+    # go through the cell_map in the Digest object and drop into database
     for cell in digest.data:
         cell_val_id = c.execute(
             "SELECT datamap_item_id from datamap_item WHERE "
@@ -223,13 +243,23 @@ def import_single_bicc_return_using_database(source_file):
 
 
 def import_all_returns_to_database():
+    """
+    Runs through a directory of files and calls
+    import_single_bicc_return_using_database on each one. Does not distinguish
+    between xlsx files and not so ensure no extraenneous files in there.
+    """
     returns_dir = os.path.dirname('/home/lemon/Documents/bcompiler/source/'
                                   'returns/')
     for f in os.listdir(returns_dir):
+        print("Importing {}".format(f))
         import_single_bicc_return_using_database(os.path.join(returns_dir, f))
 
 
 def main():
+    """
+    This is here to allow us to call the importation stuff from the
+    command line.
+    """
     try:
         if sys.argv[1]:
             create_tables()
