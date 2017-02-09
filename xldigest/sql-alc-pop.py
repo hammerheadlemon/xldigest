@@ -86,20 +86,21 @@ def populate_quarters_table():
     """
     Populate basic Quarter information.
     """
-    conn = sqlite3.connect('db.sqlite')
-    c = conn.cursor()
-    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q2 2016/17",))
-    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q3 2016/17",))
-    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q4 2016/17",))
-    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q1 2017/18",))
-    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q2 2017/18",))
-    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q3 2017/18",))
-    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q4 2017/18",))
-    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q1 2018/19",))
-    c.execute("INSERT INTO quarter (name) VALUES (?)", ("Q2 2018/19",))
-    conn.commit()
-    c.close()
-    conn.close()
+    session.add_all([
+        Quarter(name='Q2 2016/17'),
+        Quarter(name='Q3 2016/17'),
+        Quarter(name='Q4 2016/17'),
+        Quarter(name='Q1 2017/18'),
+        Quarter(name='Q2 2017/18'),
+        Quarter(name='Q3 2017/18'),
+        Quarter(name='Q4 2017/18'),
+        Quarter(name='Q1 2018/19'),
+        Quarter(name='Q2 2018/19'),
+        Quarter(name='Q3 2018/19'),
+        Quarter(name='Q4 2018/19'),
+        Quarter(name='Q5 2019/20')
+    ])
+    session.commit()
 
 
 def populate_projects_table():
@@ -194,10 +195,10 @@ def import_all_returns_to_database():
 def main():
 #    import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
 #                       'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-    merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
-                       'datamap-master-to-gmpp')
+#    merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
+#                       'datamap-master-to-gmpp')
     #populate_projects_table()
-    #populate_quarters_table()
+    populate_quarters_table()
 
 
 if __name__ == "__main__":
