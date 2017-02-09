@@ -108,17 +108,14 @@ def populate_projects_table():
     Populate the project table in the database. The master_transposed.csv
     file is used as the source for this.
     """
-    conn = sqlite3.connect('db.sqlite')
-    c = conn.cursor()
     with open('/home/lemon/Documents/bcompiler/source/master_transposed.csv'
               ) as f:
         reader = csv.DictReader(f)
         project_list = [row['Project/Programme Name'] for row in reader]
         for p in project_list:
-            c.execute("INSERT INTO project (name) VALUES (?)", (p, ))
-    conn.commit()
-    c.close()
-    conn.close()
+            p = Project(name=p)
+            session.add(p)
+    session.commit()
 
 
 def import_single_bicc_return_using_database(source_file):
@@ -197,8 +194,8 @@ def main():
 #                       'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
 #    merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
 #                       'datamap-master-to-gmpp')
-    #populate_projects_table()
-    populate_quarters_table()
+    populate_projects_table()
+    #populate_quarters_table()
 
 
 if __name__ == "__main__":
