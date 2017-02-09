@@ -26,7 +26,7 @@ setup(
               'xldigest.tests'],
     entry_points={
         'console_scripts': [
-            'xldigest = xldigest.main:main'
+            'xldigest-populate = xldigest.database.populate:main'
         ]
     },
     install_requires=requirements,
