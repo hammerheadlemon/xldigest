@@ -1,4 +1,5 @@
 import csv
+import os
 import sys
 
 from sqlalchemy import create_engine
@@ -46,12 +47,6 @@ def import_datamap_csv(source_file):
 
     with open(source_file, 'r') as f:
         reader = csv.DictReader(f)
-        #       # DON'T NEED TIMESTAMP STUFF HERE BUT LEAVING IF FOR
-        #       # IMPORT FROM RETURN FUNCTION WHEN CREATED
-        #       time_stamp = time.time()
-        #       date = str(
-        #           datetime.datetime.fromtimestamp(time_stamp).strftime(
-        #               '%d-%m-%Y %H:%M:%S'))
         for row in reader:
             row = _change_dict_val("", None, row)
             row = _strip_trailing_whitespace(row)
@@ -70,10 +65,7 @@ def merge_gmpp_datamap(source_file):
     Merge-in relevant cell references from a GMPP-based datamap, based on
     values from the returns-to-master datamap.
     """
-    conn = sqlite3.connect('db.sqlite')
-    c = conn.cursor()
-
-    keys = [result[0] for result in c.execute("SELECT key FROM datamap_item")]
+    keys = [instance.key for instance in session.query(DatamapItem)]
 
     with open(source_file, 'r') as f:
         reader = csv.DictReader(f)
@@ -81,16 +73,13 @@ def merge_gmpp_datamap(source_file):
             row = _change_dict_val("", None, row)
             row = _strip_trailing_whitespace(row)
             if row['master_cellname'] in keys:
-                c.execute("""\
-                          UPDATE datamap_item
-                          SET gmpp_cellref=(?), gmpp_sheet=(?)
-                          WHERE key=(?)""",
-                          (row['gmpp_template_cell_reference'],
-                           row['gmpp_template_sheet_reference'],
-                           row['master_cellname']))
-    conn.commit()
-    c.close()
-    conn.close()
+                target_instance = session.query(DatamapItem).filter_by(
+                    key=row['master_cellname']).first()
+                target_instance.gmpp_sheet = row[
+                    'gmpp_template_sheet_reference']
+                target_instance.gmpp_cellref = row[
+                    'gmpp_template_cell_reference']
+    session.commit()
 
 
 def populate_quarters_table():
@@ -207,18 +196,17 @@ def main():
     This is here to allow us to call the importation stuff from the
     command line.
     """
-    try:
-        if sys.argv[1]:
-            import_datamap_csv(
-                '/home/lemon/Documents/bcompiler/source/'
-                'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-            #merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source'
-            #                   '/datamap-master-to-gmpp')
-            #populate_projects_table()
-            #populate_quarters_table()
-    except:
-        import_all_returns_to_database()
-
+    if sys.argv[0]:
+        #       import_datamap_csv(
+        #           '/home/lemon/Documents/bcompiler/source/'
+        #           'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+        merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source'
+                            '/datamap-master-to-gmpp')
+        #populate_projects_table()
+        #populate_quarters_table()
+    #   except:
+    #       import_all_returns_to_database()
+    #
 
 if __name__ == "__main__":
     main()
