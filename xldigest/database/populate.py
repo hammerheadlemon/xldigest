@@ -1,13 +1,14 @@
 import csv
 import os
 import sys
+import sqlite3
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from bcompiler.datamap import Datamap
-from bcompiler.process.digest import Digest
-from bcompiler.template import BICCTemplate
+from xldigest.process import Datamap
+from xldigest.process.digest import Digest
+from xldigest.template import BICCTemplate
 
 from xldigest.models import DatamapItem, Project, Quarter, Base
 
@@ -159,8 +160,8 @@ def import_single_bicc_return_using_database(source_file):
     # go through the cell_map in the Digest object and drop into database
     for cell in digest.data:
         cell_val_id = c.execute(
-            "SELECT datamap_item_id from datamap_item WHERE "
-            "datamap_item.key=?",
+            "SELECT id from datamap_items WHERE "
+            "datamap_items.key=?",
             (cell.cell_key,))
         cell_val_id = tuple(cell_val_id)[0][0]
         c.execute("""\
@@ -194,8 +195,12 @@ def main():
 #                       'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
 #    merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
 #                       'datamap-master-to-gmpp')
-    populate_projects_table()
-    #populate_quarters_table()
+#    populate_projects_table()
+#   populate_quarters_table()
+    import_single_bicc_return_using_database('/home/lemon/Documents/bcompiler/'
+                                             'source/returns/East Midlands'
+                                             ' Franchise_Q3_Return_Final.xlsx')
+
 
 
 if __name__ == "__main__":
