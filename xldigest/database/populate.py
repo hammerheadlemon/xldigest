@@ -6,11 +6,12 @@ import sqlite3
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from xldigest.process import Datamap
+from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
-from xldigest.template import BICCTemplate
+from xldigest.process.template import BICCTemplate
 
-from xldigest.models import DatamapItem, Project, Quarter, Base
+from xldigest.database.models import (DatamapItem, Project, Quarter, Base,
+                                      ReturnItem)
 
 engine = create_engine('sqlite:///db.sqlite')
 
@@ -21,7 +22,7 @@ session = Session()
 # Hard-coded for now - this matches the current quarter with the same
 # value in the database so we're not relying on how it's written in
 # BICC template.
-CURRENT_QUARTER = "Q3 2016/17"
+CURRENT_QUARTER = "Q2 2016/17"
 
 
 def _change_dict_val(target, replacement, dictionary):
@@ -88,18 +89,12 @@ def populate_quarters_table():
     Populate basic Quarter information.
     """
     session.add_all([
-        Quarter(name='Q2 2016/17'),
-        Quarter(name='Q3 2016/17'),
-        Quarter(name='Q4 2016/17'),
-        Quarter(name='Q1 2017/18'),
-        Quarter(name='Q2 2017/18'),
-        Quarter(name='Q3 2017/18'),
-        Quarter(name='Q4 2017/18'),
-        Quarter(name='Q1 2018/19'),
-        Quarter(name='Q2 2018/19'),
-        Quarter(name='Q3 2018/19'),
-        Quarter(name='Q4 2018/19'),
-        Quarter(name='Q5 2019/20')
+        Quarter(name='Q2 2016/17'), Quarter(name='Q3 2016/17'),
+        Quarter(name='Q4 2016/17'), Quarter(name='Q1 2017/18'),
+        Quarter(name='Q2 2017/18'), Quarter(name='Q3 2017/18'),
+        Quarter(name='Q4 2017/18'), Quarter(name='Q1 2018/19'),
+        Quarter(name='Q2 2018/19'), Quarter(name='Q3 2018/19'),
+        Quarter(name='Q4 2018/19'), Quarter(name='Q5 2019/20')
     ])
     session.commit()
 
@@ -124,8 +119,6 @@ def import_single_bicc_return_using_database(source_file):
     Import a single BICC return based on a source template. Use the datamap
     from database, rather than the csv file.
     """
-    conn = sqlite3.connect('db.sqlite')
-    c = conn.cursor()
     template = BICCTemplate(source_file)
     datamap = Datamap(template,
                       '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
@@ -141,40 +134,30 @@ def import_single_bicc_return_using_database(source_file):
     ]
 
     # we need project_id to build the tables
-    project_id = c.execute(
-        "SELECT project_id FROM project WHERE project.name=(?)",
-        (project_name[0],))
     try:
-        project_id = tuple(project_id)[0][0]
+        project_id = session.query(Project.id).filter(
+            Project.name == project_name[0]).all()[0][0]
     except IndexError:
-        print("{} may not be in project table in database. Check it."
-              " Will not import this time".format(project_name[0]))
+        print("Project {} not in projects table. Fix it!".format(project_name))
         project_id = None
 
     # we need quarter_id to build the tables
-    quarter_id = c.execute(
-        "SELECT quarter_id FROM quarter WHERE "
-        "quarter.name=(?)", (CURRENT_QUARTER,))
-    quarter_id = tuple(quarter_id)[0][0]
+    quarter_id = session.query(Quarter.id).filter(
+        Quarter.name == CURRENT_QUARTER).all()[0][0]
 
     # go through the cell_map in the Digest object and drop into database
     for cell in digest.data:
-        cell_val_id = c.execute(
-            "SELECT id from datamap_items WHERE "
-            "datamap_items.key=?",
-            (cell.cell_key,))
-        cell_val_id = tuple(cell_val_id)[0][0]
-        c.execute("""\
-                  INSERT INTO returns (
-                  datamap_id,
-                  value,
-                  project_id,
-                  quarter_id
-                  ) VALUES (?, ?, ?, ?)
-                  """, (cell_val_id, cell.cell_value, project_id, quarter_id))
-    conn.commit()
-    c.close()
-    conn.close()
+
+        cell_val_id = session.query(DatamapItem.id).filter(
+            DatamapItem.key == cell.cell_key).all()[0][0]
+
+        return_item = ReturnItem(
+            project_id=project_id,
+            quarter_id=quarter_id,
+            datamap_item_id=cell_val_id,
+            value=cell.cell_value)
+        session.add(return_item)
+    session.commit()
 
 
 def import_all_returns_to_database():
@@ -196,11 +179,8 @@ def main():
 #    merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
 #                       'datamap-master-to-gmpp')
 #    populate_projects_table()
-#   populate_quarters_table()
-    import_single_bicc_return_using_database('/home/lemon/Documents/bcompiler/'
-                                             'source/returns/East Midlands'
-                                             ' Franchise_Q3_Return_Final.xlsx')
-
+#    populate_quarters_table()
+    import_all_returns_to_database()
 
 
 if __name__ == "__main__":
