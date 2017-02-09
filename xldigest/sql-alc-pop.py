@@ -11,7 +11,7 @@ from bcompiler.template import BICCTemplate
 
 from xldigest.models import DatamapItem, Project, Quarter, Base
 
-engine = create_engine('sqlite:///test_sqa.db')
+engine = create_engine('sqlite:///db.sqlite')
 
 Session = sessionmaker(bind=engine)
 
@@ -192,21 +192,13 @@ def import_all_returns_to_database():
 
 
 def main():
-    """
-    This is here to allow us to call the importation stuff from the
-    command line.
-    """
-    if sys.argv[0]:
-        #       import_datamap_csv(
-        #           '/home/lemon/Documents/bcompiler/source/'
-        #           'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-        merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source'
-                            '/datamap-master-to-gmpp')
-        #populate_projects_table()
-        #populate_quarters_table()
-    #   except:
-    #       import_all_returns_to_database()
-    #
+#    import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
+#                       'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+    merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
+                       'datamap-master-to-gmpp')
+    #populate_projects_table()
+    #populate_quarters_table()
+
 
 if __name__ == "__main__":
     main()
