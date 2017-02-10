@@ -249,37 +249,62 @@ def bicc_return():
 @pytest.fixture
 def mock_datamap_source_file():
     data = [
-        ['Project/Programme Name', 'Summary', 'B5', 'red', 'white', '', 'Yes/No'],
-        ['SRO Sign-Off', 'Summary', 'B49', 'red', 'white', '', 'Yes/No'],
+        [
+            'Project/Programme Name', 'Summary', 'B5', 'red', 'white', '',
+            'Yes/No'
+        ], ['SRO Sign-Off', 'Summary', 'B49', 'red', 'white', '', 'Yes/No'],
         ['GMPP - FD Sign-Off', 'Summary'],
         ['GMPP - Person completing this return'],
         ['GMPP - Single Point of Contact Email Address'],
-        ['GMPP - Single Point of Contact (SPOC)'],
-        ['GMPP - Email Address'],
-        ['Reporting period (GMPP - Snapshot Date)', 'Summary', 'G3', 'red', 'white', '', 'Yes/No'],
-        ['Quarter Joined', 'Summary', 'I3', 'red', 'white', '', 'Yes/No'],
-        ['GMPP - Sub-portfolio'],
-        ['Index Year', 'Finance & Benefits', 'B19', 'red', 'white', '', 'Yes/No'],
-        ['Real or Nominal - Baseline', 'Finance & Benefits', 'C18', 'red', 'white', '', 'Yes/No'],
-        ['GMPP/quarter formally joined'],
-        ['GMPP (GMPP – formally joined GMPP)', 'Summary', 'G5', 'red', 'white', '', 'Yes/No'],
-        ['IUK top 40', 'Summary', 'G6', 'red', 'white', '', 'Yes/No'],
+        ['GMPP - Single Point of Contact (SPOC)'], ['GMPP - Email Address'], [
+            'Reporting period (GMPP - Snapshot Date)', 'Summary', 'G3', 'red',
+            'white', '', 'Yes/No'
+        ], ['Quarter Joined', 'Summary', 'I3', 'red', 'white', '', 'Yes/No'],
+        ['GMPP - Sub-portfolio'], [
+            'Index Year', 'Finance & Benefits', 'B19', 'red', 'white', '',
+            'Yes/No'
+        ], [
+            'Real or Nominal - Baseline', 'Finance & Benefits', 'C18', 'red',
+            'white', '', 'Yes/No'
+        ], ['GMPP/quarter formally joined'], [
+            'GMPP (GMPP – formally joined GMPP)', 'Summary', 'G5', 'red',
+            'white', '', 'Yes/No'
+        ], ['IUK top 40', 'Summary', 'G6', 'red', 'white', '', 'Yes/No'],
         ['Top 37', 'Summary', 'I5', 'red', 'white', '', 'Yes/No'],
-        ['DfT Business Plan', 'Summary', 'I6', 'red', 'white', '', 'Yes/No'],
-        ['GMPP - IPA ID Number', 'Summary', 'C6', 'red', 'white', '', 'Yes/No'],
-        ['DFT ID Number', 'Summary', 'B6', 'red', 'white', '', 'Yes/No'],
-        ['Working Contact Name', 'Summary', 'H8', 'red', 'white', '', 'Yes/No'],
-        ['Working Contact Telephone', 'Summary', 'H9', 'red', '', ''],
-        ['Working Contact Email', 'Summary', 'H10', 'red', 'white', '', 'Yes/No'],
-        ['DfT Group', 'Summary', 'B8', 'red', 'yellow', '', 'DfT Group'],
-        ['Significant Steel Requirement', 'Finance & Benefits', 'D15', 'blue', 'yello', '', 'Yes/No'],
-        ['SRO Finance confidence', 'Finance & Benefits', 'C6', 'green', 'red', '',  'RAG_Short'],
-        ['BICC approval point', 'Finance & Benefits', 'E9', 'orange', 'red', '', 'Business Cases'],
-        ['Assurance MM2 Latest Approved Baseline', 'Assurance planning', 'C10', 'red', 'white', '', 'Yes/No'],
-        ['Approval MM11 Notes','Approval & Project milestones', 'F19', 'red', 'yellow', '', 'Yes/No'],
-        ['SCS PB2 No public sector', 'Resources', 'C7', 'red', 'white', '', 'Yes/No'],
-        ['Project MM31 Original Baseline', 'Approval & Project milestones', 'B39', 'red', 'white', 'd/mm/yy', 'Yes/No'],
-        ['Change Implementation - Now', 'Resources', 'I30', 'black', 'yellow', 'd/mm/yy', 'Capability RAG']
+        ['DfT Business Plan', 'Summary', 'I6', 'red', 'white', '', 'Yes/No'], [
+            'GMPP - IPA ID Number', 'Summary', 'C6', 'red', 'white', '',
+            'Yes/No'
+        ], ['DFT ID Number', 'Summary', 'B6', 'red', 'white', '', 'Yes/No'], [
+            'Working Contact Name', 'Summary', 'H8', 'red', 'white', '',
+            'Yes/No'
+        ], ['Working Contact Telephone', 'Summary', 'H9', 'red', '', ''], [
+            'Working Contact Email', 'Summary', 'H10', 'red', 'white', '',
+            'Yes/No'
+        ], ['DfT Group', 'Summary', 'B8', 'red', 'yellow', '', 'DfT Group'], [
+            'Significant Steel Requirement', 'Finance & Benefits', 'D15',
+            'blue', 'yello', '', 'Yes/No'
+        ], [
+            'SRO Finance confidence', 'Finance & Benefits', 'C6', 'green',
+            'red', '', 'RAG_Short'
+        ], [
+            'BICC approval point', 'Finance & Benefits', 'E9', 'orange', 'red',
+            '', 'Business Cases'
+        ], [
+            'Assurance MM2 Latest Approved Baseline', 'Assurance planning',
+            'C10', 'red', 'white', '', 'Yes/No'
+        ], [
+            'Approval MM11 Notes', 'Approval & Project milestones', 'F19',
+            'red', 'yellow', '', 'Yes/No'
+        ], [
+            'SCS PB2 No public sector', 'Resources', 'C7', 'red', 'white', '',
+            'Yes/No'
+        ], [
+            'Project MM31 Original Baseline', 'Approval & Project milestones',
+            'B39', 'red', 'white', 'd/mm/yy', 'Yes/No'
+        ], [
+            'Change Implementation - Now', 'Resources', 'I30', 'black',
+            'yellow', 'd/mm/yy', 'Capability RAG'
+        ]
     ]
     with open('/tmp/mock_datamap.csv', 'w') as f:
         datamap_writer = csv.writer(f, delimiter=',')
