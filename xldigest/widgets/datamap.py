@@ -1,10 +1,18 @@
 import sys
 import sqlite3
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
+
+engine = create_engine('sqlite:///db.sqlite')
+
+Session = sessionmaker(bind=engine)
+
+session = Session()
 
 
 class DatamapTableModel(QtCore.QAbstractTableModel):
@@ -105,24 +113,18 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
 
 
 def pull_all_data_from_db():
-    conn = sqlite3.connect('db.sqlite')
-    c = conn.cursor()
-    d = list(c.execute("SELECT * FROM datamap_item"))
-    c.close()
-    conn.close()
-    return d
+#    conn = sqlite3.connect('db.sqlite')
+#    c = conn.cursor()
+#    d = list(c.execute("SELECT * FROM datamap_item"))
+#    c.close()
+#    conn.close()
+#    return d
+
 
 
 class DatamapWindow(QtWidgets.QWidget):
     def __init__(self, *args):
         super(DatamapWindow, self).__init__(*args)
-        self.setWindowTitle('Configure Datamaps')
-        self.resize(900, 600)
-        desktop = QtWidgets.QDesktopWidget().availableGeometry()
-        width = (desktop.width() - self.width()) / 2
-        height = (desktop.height() - self.height()) / 2
-        self.move(width, height)
-
         # convert from tuples to list
         table_data = [list(item) for item in pull_all_data_from_db()]
 
