@@ -28,7 +28,7 @@
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
-      <string>Datamap</string>
+      <string>Project Summary</string>
      </attribute>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -38,7 +38,7 @@
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
-      <string>Portfolio Summary</string>
+      <string>Datamap</string>
      </attribute>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>

@@ -1,6 +1,12 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from xldigest.widgets.datamap import DatamapWindow
+# -*- coding: utf-8 -*-
 
+# Form implementation generated from reading ui file 'main_test.ui'
+#
+# Created by: PyQt5 UI code generator 5.7.1
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -27,7 +33,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
-        self.datamapConfig = DatamapWindow(self.tab_2)
+        self.datamapConfig = QtWidgets.QTableView(self.tab_2)
         self.datamapConfig.setObjectName("datamapConfig")
         self.verticalLayout.addWidget(self.datamapConfig)
         self.pushButton = QtWidgets.QPushButton(self.tab_2)
@@ -60,13 +66,8 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "xldigest"))
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab),
-            _translate("MainWindow", "Datamap"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Project Summary"))
         self.pushButton.setText(_translate("MainWindow", "PushButton"))
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab_2),
-            _translate("MainWindow", "Portfolio Summary"))
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab_5),
-            _translate("MainWindow", "Returns"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Datamap"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("MainWindow", "Returns"))
+

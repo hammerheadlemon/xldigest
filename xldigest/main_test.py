@@ -8,7 +8,19 @@
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from xldigest.widgets.main_window import Ui_MainWindow
+from xldigest.widgets.main_test import Ui_MainWindow
+from xldigest.widgets.datamap import DatamapTableModel
+
+
+class DatamapTable(QtWidgets.QTableView):
+    def __init__(self, *args):
+        super(DatamapTable, self).__init__(*args)
+        table_data = [["Hi", "Hi", "Hi", "Hi", "Hi", "Hi", "Hi"],
+                      ["Hi", "Hi", "Hi", "Hi", "Hi", "Hi", "Hi"],
+                      ["Hi", "Hi", "Hi", "Hi", "Hi", "Hi", "Hi"]]
+        self.tableModel = DatamapTableModel(table_data, self)
+        self.setModel(self.tableModel)
+        self.setSortingEnabled(True)
 
 
 def main():
@@ -16,6 +28,7 @@ def main():
     window = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(window)
+    ui.datamapConfig = DatamapTable()
     desktop = QtWidgets.QDesktopWidget().availableGeometry()
     width = (desktop.width() - window.width()) / 2
     height = (desktop.height() - window.height()) / 3

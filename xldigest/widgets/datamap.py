@@ -111,15 +111,19 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
         self.endInsertRows()
         return True
 
-
 def pull_all_data_from_db():
+    """Using sqlalchemy this time."""
+    data = [""]
+    return data
+
+
+#def pull_all_data_from_db():
 #    conn = sqlite3.connect('db.sqlite')
 #    c = conn.cursor()
 #    d = list(c.execute("SELECT * FROM datamap_item"))
 #    c.close()
 #    conn.close()
 #    return d
-
 
 
 class DatamapWindow(QtWidgets.QWidget):
@@ -233,43 +237,7 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     w = DatamapWindow()
     w.show()
-#    data = ["one", "two", "three", "four"]
-#
-#    listView = QtWidgets.QListView()
-#    listView.show()
-#
-#    # model! better way to do things
-#    model = QtCore.QStringListModel(data)
-#
-#    listView.setModel(model)
-#
-#    comboBox = QtWidgets.QComboBox()
-#    comboBox.setModel(model)
-#    comboBox.show()
-#
-#    listView2 = QtWidgets.QListView()
-#    listView2.show()
-#    listView2.setModel(model)
-
-#    # list widget - this is not good
-#    listWidget = QtWidgets.QListWidget()
-#    listWidget.show()
-#    listWidget.addItems(data)
-#
-#
-#    # make the list items editable
-#    count = listWidget.count()
-#    for i in range(count):
-#        item = listWidget.item(i)
-#        print(item.flags())
-#        item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-#
-#    comboBox = QtWidgets.QComboBox()
-#    comboBox.show()
-#    comboBox.addItems(data)
-
     sys.exit(app.exec_())
-
 
 if __name__ == "__main__":
     main()
