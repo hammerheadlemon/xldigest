@@ -7,8 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 import sys
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from xldigest.widgets.main_test import Ui_MainWindow
+from PyQt5 import QtGui, QtWidgets
+from xldigest.widgets.main_test import Ui_MainXldigestWindow
 from xldigest.widgets.datamap import DatamapTableModel
 
 
@@ -23,12 +23,26 @@ class DatamapTable(QtWidgets.QTableView):
         self.setSortingEnabled(True)
 
 
+class TableViewWidgetTest(QtWidgets.QTableWidget):
+    def __init__(self, parent=None):
+        super(TableViewWidgetTest, self).__init__(parent)
+        self.setColumnCount(5)
+        self.setRowCount(200)
+
+
+class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
+    def __init__(self, parent=None):
+        super(XldigestMainWindow, self).__init__(parent)
+        self.setupUi(self)
+        self.tableWidget = TableViewWidgetTest(self.tab_5)
+        self.datamapConfig = DatamapTable(self.tab_2)
+        self.datamapConfig.setEnabled(True)
+        self.verticalLayout.addWidget(self.datamapConfig)
+
+
 def main():
     application = QtWidgets.QApplication(sys.argv)
-    window = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(window)
-    ui.datamapConfig = DatamapTable()
+    window = XldigestMainWindow()
     desktop = QtWidgets.QDesktopWidget().availableGeometry()
     width = (desktop.width() - window.width()) / 2
     height = (desktop.height() - window.height()) / 3

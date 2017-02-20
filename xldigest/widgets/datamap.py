@@ -19,13 +19,13 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data_in=[[]], parent=None, *args):
         super(DatamapTableModel, self).__init__(parent, *args)
 
-        self.data = data_in
+        self.data_in = data_in
 
     def rowCount(self, parent=QtCore.QModelIndex()):
-        return len(self.data)
+        return len(self.data_in)
 
     def columnCount(self, parent=QtCore.QModelIndex()):
-        return len(self.data[0])
+        return len(self.data_in[0])
 
     def data(self, index, role):
 
@@ -34,16 +34,16 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.EditRole:
             row = index.row()
             col = index.column()
-            return self.data[row][col]
+            return self.data_in[row][col]
 
         if role == QtCore.Qt.ToolTipRole:
             row = index.row()
-            return "{} item".format(self.data[row][0])
+            return "{} item".format(self.data_in[row][0])
 
         if index.isValid() and role == QtCore.Qt.DisplayRole:
             row = index.row()
             col = index.column()
-            value = self.data[row][col]
+            value = self.data_in[row][col]
             return value
 
         # HERE WE INCLUDE A COLOURED ICON!
@@ -88,7 +88,7 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.EditRole:
             row = index.row()
             col = index.column()
-            self.data[row][col] = value
+            self.data_in[row][col] = value
             self.dataChanged.emit(index, index)
             return True
         return False
@@ -105,7 +105,7 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
             default_values = [
                 "Default Value" for i in range(self.columnCount(None))]
 
-            self.data.insert(position, default_values)
+            self.data_in.insert(position, default_values)
 
         # this must be called after inserting rows
         self.endInsertRows()
