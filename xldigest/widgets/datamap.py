@@ -6,9 +6,12 @@ from sqlalchemy.orm import sessionmaker
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
+from xldigest.database.models import DatamapItem
+
 # from https://www.youtube.com/watch?v=2sRoLN337cs
 
-engine = create_engine('sqlite:///../db.sqlite')
+engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
+                       'db.sqlite')
 
 Session = sessionmaker(bind=engine)
 
@@ -114,15 +117,23 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
 
 def pull_all_data_from_db():
     """Using sqlalchemy this time."""
-    data = [""]
-    return data
+    db_items = session.query(DatamapItem).all()
+    db_items_lst = [[
+        item.id,
+        item.key,
+        item.bicc_sheet,
+        item.bicc_cellref,
+        item.gmpp_sheet,
+        item.gmpp_cellref,
+        item.bicc_ver_form] for item in db_items]
+    return db_items_lst
 
 
 class DatamapWindow(QtWidgets.QWidget):
     def __init__(self, *args):
         super(DatamapWindow, self).__init__(*args)
         # convert from tuples to list
-        table_data = [list(item) for item in pull_all_data_from_db()]
+        table_data = pull_all_data_from_db()
 
         self.tv = QtWidgets.QTableView()
 

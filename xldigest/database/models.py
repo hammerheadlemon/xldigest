@@ -2,9 +2,10 @@ from sqlalchemy import Column, Integer, String, create_engine, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-engine = create_engine('sqlite:///db.sqlite', echo=True)
-
 Base = declarative_base()
+
+engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
+                       'db.sqlite')
 
 
 class Project(Base):
