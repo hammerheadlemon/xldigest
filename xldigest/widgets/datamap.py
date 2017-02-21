@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
 
-engine = create_engine('sqlite:///db.sqlite')
+engine = create_engine('sqlite:///../db.sqlite')
 
 Session = sessionmaker(bind=engine)
 
@@ -111,19 +111,11 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
         self.endInsertRows()
         return True
 
+
 def pull_all_data_from_db():
     """Using sqlalchemy this time."""
     data = [""]
     return data
-
-
-#def pull_all_data_from_db():
-#    conn = sqlite3.connect('db.sqlite')
-#    c = conn.cursor()
-#    d = list(c.execute("SELECT * FROM datamap_item"))
-#    c.close()
-#    conn.close()
-#    return d
 
 
 class DatamapWindow(QtWidgets.QWidget):
