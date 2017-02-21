@@ -1,5 +1,4 @@
 import sys
-import sqlite3
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -23,6 +22,15 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
         super(DatamapTableModel, self).__init__(parent, *args)
 
         self.data_in = data_in
+        self.header_model_map = [
+            ('Index', 'id', 0),
+            ('Key', 'key', 1),
+            ('BICC Sheet', 'bicc_sheet', 2),
+            ('BICC Cell Reference', 'bicc_cellref', 3),
+            ('GMPP Sheet', 'gmpp_sheet', 4),
+            ('GMPP Cell Reference', 'gmpp_cellref', 5),
+            ('Verification Rule', 'bicc_ver_form', 6)
+        ]
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.data_in)
@@ -90,8 +98,17 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
     def setData(self, index, value, role=QtCore.Qt.EditRole):
         if role == QtCore.Qt.EditRole:
             row = index.row()
+            db_index = row + 1
             col = index.column()
             self.data_in[row][col] = value
+            print("New val: {}".format(value))
+            db_item_to_change = session.query(DatamapItem).filter(
+                DatamapItem.id == db_index).first()
+            print("Item to change: {}".format(db_item_to_change))
+            print("index to change: {}".format(db_index))
+            col_field = [item[1] for item in self.header_model_map if item[2] == col][0]
+            db_item_to_change.__setattr__(col_field, value)
+            session.commit()
             self.dataChanged.emit(index, index)
             return True
         return False
