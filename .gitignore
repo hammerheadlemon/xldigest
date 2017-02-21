@@ -60,3 +60,4 @@ docs/_build/
 # PyBuilder
 target/
 xldigest/db.sqlite
+db.sqlite

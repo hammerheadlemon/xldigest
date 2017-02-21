@@ -11,11 +11,16 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainXldigestWindow(object):
     def setupUi(self, MainXldigestWindow):
         MainXldigestWindow.setObjectName("MainXldigestWindow")
-        MainXldigestWindow.resize(665, 480)
+        MainXldigestWindow.resize(811, 547)
         self.centralwidget = QtWidgets.QWidget(MainXldigestWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget.setGeometry(QtCore.QRect(19, 19, 631, 371))
+        self.tabWidget.setGeometry(QtCore.QRect(19, 19, 781, 481))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tabWidget.sizePolicy().hasHeightForWidth())
+        self.tabWidget.setSizePolicy(sizePolicy)
         self.tabWidget.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.tabWidget.setObjectName("tabWidget")
         self.tab = QtWidgets.QWidget()
@@ -35,13 +40,9 @@ class Ui_MainXldigestWindow(object):
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
-        self.datamapConfig = QtWidgets.QTableView(self.tab_2)
-        self.datamapConfig.setEnabled(True)
-        self.datamapConfig.setObjectName("datamapConfig")
-        self.verticalLayout.addWidget(self.datamapConfig)
-        self.pushButton = QtWidgets.QPushButton(self.tab_2)
-        self.pushButton.setObjectName("pushButton")
-        self.verticalLayout.addWidget(self.pushButton)
+        self.widget = DatamapWindow(self.tab_2)
+        self.widget.setObjectName("widget")
+        self.verticalLayout.addWidget(self.widget)
         self.horizontalLayout_2.addLayout(self.verticalLayout)
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_5 = QtWidgets.QWidget()
@@ -57,7 +58,7 @@ class Ui_MainXldigestWindow(object):
         self.tabWidget.addTab(self.tab_5, "")
         MainXldigestWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainXldigestWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 665, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 811, 19))
         self.menubar.setObjectName("menubar")
         MainXldigestWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainXldigestWindow)
@@ -65,14 +66,14 @@ class Ui_MainXldigestWindow(object):
         MainXldigestWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainXldigestWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainXldigestWindow)
 
     def retranslateUi(self, MainXldigestWindow):
         _translate = QtCore.QCoreApplication.translate
         MainXldigestWindow.setWindowTitle(_translate("MainXldigestWindow", "xldigest"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainXldigestWindow", "Project Summary"))
-        self.pushButton.setText(_translate("MainXldigestWindow", "PushButton"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainXldigestWindow", "Datamap"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("MainXldigestWindow", "Returns"))
 
+from xldigest.widgets.datamap import DatamapWindow
