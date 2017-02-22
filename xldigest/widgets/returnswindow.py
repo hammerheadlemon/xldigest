@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtCore
 
 from xldigest.widgets.returns_tab_ui import Ui_ReturnsUI
+from xldigest.database.base_queries import project_names_per_quarter
 
 #  All this from https://www.youtube.com/watch?v=VcN94yMOkyU&t=71s
 
@@ -15,7 +16,7 @@ class Node:
             parent.addChild(self)
 
     def typeInfo(self):
-        return "NODE"
+        return "Node"
 
     def addChild(self, child):
         self._children.append(child)
@@ -59,15 +60,27 @@ class QuarterNode(Node):
         super(QuarterNode, self).__init__(name, parent)
 
     def typeInfo(self):
-        return "QUARTER"
+        return "Quarter"
 
 
 class ProjectNode(Node):
-    def __init__(self, name, parent):
+    def __init__(self, name, parent, db_index=None):
         super(ProjectNode, self).__init__(name, parent)
+        self.db_index = db_index
 
     def typeInfo(self):
-        return "PROJECT"
+        return "Project"
+
+    def __str__(self):
+        return "Project: db_index: {}".format(self.db_index)
+
+
+class ReturnNode(Node):
+    def __init__(self, name, parent):
+        super(ReturnNode, self).__init__(name, parent)
+
+    def typeInfo(self):
+        return "Return"
 
 
 class SelectionTreeModel(QtCore.QAbstractItemModel):
@@ -172,7 +185,14 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
         self.rootNode = Node("Quarters")
         self.childNode0 = QuarterNode("Q1", self.rootNode)
         self.childNode1 = QuarterNode("Q2", self.rootNode)
-        self.childNode2 = ProjectNode("Projects", self.childNode1)
-        print(self.rootNode)
+        self.project_names(1)
+#        print(self.rootNode)
         model = SelectionTreeModel(self.rootNode)
         self.seletionTree.setModel(model)
+
+    def project_names(self, quarter_id):
+        projects = project_names_per_quarter(quarter_id)
+        for project in projects:
+            ProjectNode(
+                name=project[1], parent=self.childNode1, db_index=project[0])
+            print(self.childNode1.child)
