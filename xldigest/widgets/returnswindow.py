@@ -18,6 +18,9 @@ class Node:
     def typeInfo(self):
         return "Node"
 
+    def projectIndex(self):
+        return ""
+
     def addChild(self, child):
         self._children.append(child)
 
@@ -71,6 +74,9 @@ class ProjectNode(Node):
     def typeInfo(self):
         return "Project"
 
+    def projectIndex(self):
+        return self.db_index
+
     def __str__(self):
         return "Project: db_index: {}".format(self.db_index)
 
@@ -123,6 +129,8 @@ class SelectionTreeModel(QtCore.QAbstractItemModel):
         if role == QtCore.Qt.DisplayRole:
             if index.column() == 0:
                 return node.name()
+            elif index.column() == 1:
+                return node.projectIndex()
             else:
                 return node.typeInfo()
 
@@ -134,6 +142,8 @@ class SelectionTreeModel(QtCore.QAbstractItemModel):
         if role == QtCore.Qt.DisplayRole:
             if section == 0:
                 return "Portfolio Viewer"
+            if section == 1:
+                return "Project Index"
             else:
                 return "TypeInfo"
 
@@ -193,6 +203,6 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
     def project_names(self, quarter_id):
         projects = project_names_per_quarter(quarter_id)
         for project in projects:
-            ProjectNode(
+            pn = ProjectNode(
                 name=project[1], parent=self.childNode1, db_index=project[0])
-            print(self.childNode1.child)
+            print(pn.db_index)
