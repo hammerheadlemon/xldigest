@@ -14,6 +14,9 @@ class Node:
         if parent is not None:
             parent.addChild(self)
 
+    def typeInfo(self):
+        return "NODE"
+
     def addChild(self, child):
         self._children.append(child)
 
@@ -51,6 +54,22 @@ class Node:
         return self.log()
 
 
+class QuarterNode(Node):
+    def __init__(self, name, parent):
+        super(QuarterNode, self).__init__(name, parent)
+
+    def typeInfo(self):
+        return "QUARTER"
+
+
+class ProjectNode(Node):
+    def __init__(self, name, parent):
+        super(ProjectNode, self).__init__(name, parent)
+
+    def typeInfo(self):
+        return "PROJECT"
+
+
 class SelectionTreeModel(QtCore.QAbstractItemModel):
     def __init__(self, root, parent=None):
         """
@@ -76,7 +95,7 @@ class SelectionTreeModel(QtCore.QAbstractItemModel):
         Input: QModelIndex
         Output: int
         """
-        return 1
+        return 2
 
     def data(self, index, role):
         """
@@ -89,14 +108,21 @@ class SelectionTreeModel(QtCore.QAbstractItemModel):
         node = index.internalPointer()
 
         if role == QtCore.Qt.DisplayRole:
-            return node.name()
+            if index.column() == 0:
+                return node.name()
+            else:
+                return node.typeInfo()
 
     def headerData(self, section, orientation, role):
         """
         Input: int, QOrientation, int
         Output: QVariant, strings are cast to QString which is a QVariant.
         """
-        return "Portfolio Viewer"
+        if role == QtCore.Qt.DisplayRole:
+            if section == 0:
+                return "Portfolio Viewer"
+            else:
+                return "TypeInfo"
 
     def flags(self, index):
         """
@@ -144,9 +170,9 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
         super(ReturnsWindow, self).__init__(parent)
         self.setupUi(self)
         self.rootNode = Node("Quarters")
-        self.childNode0 = Node("Q1", self.rootNode)
-        self.childNode1 = Node("Q2", self.rootNode)
-        self.childNode2 = Node("Projects", self.childNode1)
+        self.childNode0 = QuarterNode("Q1", self.rootNode)
+        self.childNode1 = QuarterNode("Q2", self.rootNode)
+        self.childNode2 = ProjectNode("Projects", self.childNode1)
         print(self.rootNode)
         model = SelectionTreeModel(self.rootNode)
         self.seletionTree.setModel(model)
