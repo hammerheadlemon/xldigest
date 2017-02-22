@@ -12,13 +12,6 @@ from xldigest.widgets.main_ui import Ui_MainXldigestWindow
 from xldigest.widgets.datamap import DatamapTableModel
 
 
-class TableViewWidgetTest(QtWidgets.QTableWidget):
-    def __init__(self, parent=None):
-        super(TableViewWidgetTest, self).__init__(parent)
-        self.setColumnCount(5)
-        self.setRowCount(200)
-
-
 class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
     def __init__(self, parent=None):
         super(XldigestMainWindow, self).__init__(parent)

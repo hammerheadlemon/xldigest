@@ -14,7 +14,7 @@
    <string>xldigest</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -36,7 +36,7 @@
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
@@ -72,7 +72,7 @@
         </attribute>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QTableWidget" name="tableWidget"/>
+          <widget class="ReturnsWindow" name="returnsWidget" native="true"/>
          </item>
         </layout>
        </widget>
@@ -122,6 +122,12 @@
    <class>DatamapWindow</class>
    <extends>QWidget</extends>
    <header>xldigest.widgets.datamap.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ReturnsWindow</class>
+   <extends>QWidget</extends>
+   <header>xldigest.widgets.returnswindow.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
