@@ -19,10 +19,6 @@ class Node(QtWidgets.QWidget):
 
     trigger = QtCore.pyqtSignal(int, int)
 
-    def mousePressEvent(self, event):
-        print("YAYAYAYAYA")
-        event.accept()
-
     def typeInfo(self):
         return "Node"
 
@@ -74,9 +70,10 @@ class QuarterNode(Node):
         return "Quarter"
 
 
-class ProjectNode(Node):
+class ProjectNode(Node, QtWidgets.QWidget):
     def __init__(self, name, parent, db_index=None):
         super(ProjectNode, self).__init__(name, parent)
+        QtWidgets.QWidgetItem.__init__(self)
         self.db_index = db_index
 
     def mousePressEvent(self, event):
@@ -208,25 +205,29 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
     def __init__(self, parent=None):
         super(ReturnsWindow, self).__init__(parent)
         self.setupUi(self)
-        self.rootNode = Node("Quarters")
-        self.childNode0 = QuarterNode("Q1", self.rootNode)
-        self.childNode1 = QuarterNode("Q2", self.rootNode)
+        self.selectionTree.rootNode = Node("Quarters")
+        self.selectionTree.childNode0 = QuarterNode(
+            "Q1", self.selectionTree.rootNode)
+        self.selectionTree.childNode1 = QuarterNode(
+            "Q2", self.selectionTree.rootNode)
 
         # gather the data
         self.project_names(1)  # used for the tree widget
 
-#        print(self.rootNode) # only for logging purposes
+        #        print(self.rootNode) # only for logging purposes
 
-        model = SelectionTreeModel(self.rootNode)
+        model = SelectionTreeModel(self.selectionTree.rootNode)
         model_simple_return = SimpleReturnModel()
-        self.seletionTree.setModel(model)
+        self.selectionTree.setModel(model)
         self.returnsTable.setModel(model_simple_return)
 
     def project_names(self, quarter_id):
         projects = project_names_per_quarter(quarter_id)
         for project in projects:
             pn = ProjectNode(
-                name=project[1], parent=self.childNode1, db_index=project[0])
+                name=project[1],
+                parent=self.selectionTree.childNode1,
+                db_index=project[0])
             pn.trigger.connect(self.get_single_return_data)
 
     def get_single_return_data(self, quarter_id, project_id):
