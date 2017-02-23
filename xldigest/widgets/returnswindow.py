@@ -1,19 +1,27 @@
 from PyQt5 import QtWidgets, QtCore
 
 from xldigest.widgets.returns_tab_ui import Ui_ReturnsUI
-from xldigest.database.base_queries import project_names_per_quarter
+from xldigest.database.base_queries import (project_names_per_quarter,
+                                            single_project_data)
 
 #  All this from https://www.youtube.com/watch?v=VcN94yMOkyU&t=71s
 
 
-class Node:
+class Node(QtWidgets.QWidget):
     def __init__(self, name, parent=None):
+        super(Node, self).__init__(parent)
         self._name = name
         self._children = []
         self._parent = parent
 
         if parent is not None:
             parent.addChild(self)
+
+    trigger = QtCore.pyqtSignal(int, int)
+
+    def mousePressEvent(self, event):
+        print("YAYAYAYAYA")
+        event.accept()
 
     def typeInfo(self):
         return "Node"
@@ -70,6 +78,14 @@ class ProjectNode(Node):
     def __init__(self, name, parent, db_index=None):
         super(ProjectNode, self).__init__(name, parent)
         self.db_index = db_index
+
+    def mousePressEvent(self, event):
+        if event == QtCore.Qt.LeftButton:
+            self.trigger.emit(self.db_index, 1)
+            print("Mouse on project node pressed")
+            event.accept()
+        else:
+            event.ignore()
 
     def typeInfo(self):
         return "Project"
@@ -195,14 +211,66 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
         self.rootNode = Node("Quarters")
         self.childNode0 = QuarterNode("Q1", self.rootNode)
         self.childNode1 = QuarterNode("Q2", self.rootNode)
-        self.project_names(1)
-#        print(self.rootNode)
+
+        # gather the data
+        self.project_names(1)  # used for the tree widget
+
+#        print(self.rootNode) # only for logging purposes
+
         model = SelectionTreeModel(self.rootNode)
+        model_simple_return = SimpleReturnModel()
         self.seletionTree.setModel(model)
+        self.returnsTable.setModel(model_simple_return)
 
     def project_names(self, quarter_id):
         projects = project_names_per_quarter(quarter_id)
         for project in projects:
             pn = ProjectNode(
                 name=project[1], parent=self.childNode1, db_index=project[0])
-            print(pn.db_index)
+            pn.trigger.connect(self.get_single_return_data)
+
+    def get_single_return_data(self, quarter_id, project_id):
+        """
+        Return a list or lists consisting of key/values from a
+        single return. This then gets fed to the model to populate the
+        tableview.
+        """
+        print("Signal triggered")
+        return single_project_data(quarter_id, project_id)
+
+
+class SimpleReturnModel(QtCore.QAbstractItemModel):
+    """
+    The model for the right hand table in the returns window which shows
+    a simple display of return data for a single project.
+    """
+    def __init__(self, data_in=[[]], parent=None, *args):
+        super(SimpleReturnModel, self).__init__(parent, *args)
+        self.data_in = data_in
+
+    def rowCount(self, parent=QtCore.QModelIndex()):
+        return len(self.data_in)
+
+    def columnCount(self, parent=QtCore.QModelIndex()):
+        return len(self.data_in[0])
+
+    def headerData(self, section, orientation, role):
+        headers = [
+            "Key",
+            "Value"
+        ]
+        if role == QtCore.Qt.DisplayRole:
+            if orientation == QtCore.Qt.Horizontal:
+                return headers[section]
+            else:
+                return section + 1
+
+    def flags(self, index):
+        return QtCore.Qt.ItemIsEnabled
+
+    def data(self, index, role):
+        if index.isValid() and role == QtCore.Qt.DisplayRole:
+            row = index.row()
+            col = index.colum()
+            value = self.data_in[row][col]
+            return value
