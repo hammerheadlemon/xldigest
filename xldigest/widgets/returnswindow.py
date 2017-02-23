@@ -70,10 +70,9 @@ class QuarterNode(Node):
         return "Quarter"
 
 
-class ProjectNode(Node, QtWidgets.QWidget):
+class ProjectNode(Node):
     def __init__(self, name, parent, db_index=None):
         super(ProjectNode, self).__init__(name, parent)
-        QtWidgets.QWidgetItem.__init__(self)
         self.db_index = db_index
 
     def mousePressEvent(self, event):
