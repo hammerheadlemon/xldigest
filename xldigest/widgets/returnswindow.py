@@ -7,17 +7,14 @@ from xldigest.database.base_queries import (project_names_per_quarter,
 #  All this from https://www.youtube.com/watch?v=VcN94yMOkyU&t=71s
 
 
-class Node(QtWidgets.QWidget):
+class Node:
     def __init__(self, name, parent=None):
-        super(Node, self).__init__(parent)
         self._name = name
         self._children = []
         self._parent = parent
 
         if parent is not None:
             parent.addChild(self)
-
-    trigger = QtCore.pyqtSignal(int, int)
 
     def typeInfo(self):
         return "Node"
@@ -75,14 +72,6 @@ class ProjectNode(Node):
         super(ProjectNode, self).__init__(name, parent)
         self.db_index = db_index
 
-    def mousePressEvent(self, event):
-        if event == QtCore.Qt.LeftButton:
-            self.trigger.emit(self.db_index, 1)
-            print("Mouse on project node pressed")
-            event.accept()
-        else:
-            event.ignore()
-
     def typeInfo(self):
         return "Project"
 
@@ -91,14 +80,6 @@ class ProjectNode(Node):
 
     def __str__(self):
         return "Project: db_index: {}".format(self.db_index)
-
-
-class ReturnNode(Node):
-    def __init__(self, name, parent):
-        super(ReturnNode, self).__init__(name, parent)
-
-    def typeInfo(self):
-        return "Return"
 
 
 class SelectionTreeModel(QtCore.QAbstractItemModel):
@@ -219,24 +200,21 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
         model_simple_return = SimpleReturnModel()
         self.selectionTree.setModel(model)
         self.returnsTable.setModel(model_simple_return)
+        self.selectionTree.clicked.connect(self.get_single_return_data)
 
     def project_names(self, quarter_id):
         projects = project_names_per_quarter(quarter_id)
         for project in projects:
-            pn = ProjectNode(
-                name=project[1],
-                parent=self.selectionTree.childNode1,
-                db_index=project[0])
-            pn.trigger.connect(self.get_single_return_data)
+            pn = ProjectNode(project[1], self.selectionTree.childNode1, project[0])
 
-    def get_single_return_data(self, quarter_id, project_id):
+    def get_single_return_data(self, index):
         """
         Return a list or lists consisting of key/values from a
         single return. This then gets fed to the model to populate the
         tableview.
         """
         print("Signal triggered")
-        return single_project_data(quarter_id, project_id)
+        return None
 
 
 class SimpleReturnModel(QtCore.QAbstractItemModel):
