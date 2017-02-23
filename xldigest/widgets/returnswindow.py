@@ -68,7 +68,7 @@ class QuarterNode(Node):
 
 
 class ProjectNode(Node):
-    def __init__(self, name, parent, db_index=None):
+    def __init__(self, name, parent, db_index=None, mod_index=None):
         super(ProjectNode, self).__init__(name, parent)
         self.db_index = db_index
 
@@ -183,29 +183,37 @@ class SelectionTreeModel(QtCore.QAbstractItemModel):
 
 class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
     def __init__(self, parent=None):
-        super(ReturnsWindow, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
         self.selectionTree.rootNode = Node("Quarters")
         self.selectionTree.childNode0 = QuarterNode(
             "Q1", self.selectionTree.rootNode)
         self.selectionTree.childNode1 = QuarterNode(
             "Q2", self.selectionTree.rootNode)
+        self.model = SelectionTreeModel(self.selectionTree.rootNode)
 
         # gather the data
         self.project_names(1)  # used for the tree widget
 
-        #        print(self.rootNode) # only for logging purposes
-
-        model = SelectionTreeModel(self.selectionTree.rootNode)
-        model_simple_return = SimpleReturnModel()
-        self.selectionTree.setModel(model)
-        self.returnsTable.setModel(model_simple_return)
+        self.selectionTree.setModel(self.model)
         self.selectionTree.clicked.connect(self.get_single_return_data)
+        # REMOVE TWO LINES
+        self.model_simple_return = SimpleReturnModel([["Hell", 2]], self)
+        self.returnsTable.setModel(self.model_simple_return)
 
     def project_names(self, quarter_id):
         projects = project_names_per_quarter(quarter_id)
         for project in projects:
-            pn = ProjectNode(project[1], self.selectionTree.childNode1, project[0])
+            row_count = 0
+            column = 0
+            pn = ProjectNode(
+                project[1],  # name
+                self.selectionTree.childNode1,  # parent
+                project[0])  # db_index
+            project_index = self.model.index(row_count, 0,
+                                             QtCore.QModelIndex())
+            pn.mod_index = project_index
+            row_count += 1
 
     def get_single_return_data(self, index):
         """
@@ -213,8 +221,9 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
         single return. This then gets fed to the model to populate the
         tableview.
         """
-        print("Signal triggered")
-        return None
+        print("Signal triggered", index.row(), index.column())
+        self.model_simple_return = SimpleReturnModel([["Hell", 2]])
+        self.returnsTable.setModel(self.model_simple_return)
 
 
 class SimpleReturnModel(QtCore.QAbstractItemModel):
@@ -249,6 +258,6 @@ class SimpleReturnModel(QtCore.QAbstractItemModel):
     def data(self, index, role):
         if index.isValid() and role == QtCore.Qt.DisplayRole:
             row = index.row()
-            col = index.colum()
+            col = index.column()
             value = self.data_in[row][col]
             return value
