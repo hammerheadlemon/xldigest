@@ -221,7 +221,7 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
         single return. This then gets fed to the model to populate the
         tableview.
         """
-        print("Signal triggered", index.row(), index.column())
+        print("Signal triggered", index.internalPointer())
         self.model_simple_return = SimpleReturnModel(
             [["Hell", 2], ["Smersh", 3], ["Dickles", 23]])
         self.returnsTable.setModel(self.model_simple_return)
