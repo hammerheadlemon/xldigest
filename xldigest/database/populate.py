@@ -174,12 +174,12 @@ def import_all_returns_to_database():
 
 
 def main():
-#    import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
-#                       'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-#    merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
-#                       'datamap-master-to-gmpp')
-#    populate_projects_table()
-#    populate_quarters_table()
+#   import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
+#                      'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+#   merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
+#                      'datamap-master-to-gmpp')
+#   populate_projects_table()
+#   populate_quarters_table()
     import_all_returns_to_database()
 
 

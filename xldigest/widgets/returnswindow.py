@@ -193,14 +193,10 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
         self.model = SelectionTreeModel(self.selectionTree.rootNode)
 
         # gather the data
-        self.project_names(1)  # used for the tree widget
+        self.project_names(2)  # used for the tree widget
 
         self.selectionTree.setModel(self.model)
         self.selectionTree.clicked.connect(self.get_single_return_data)
-
-        # REMOVE TWO LINES
-        self.model_simple_return = SimpleReturnModel([["Hell", 2]], self)
-        self.returnsTable.setModel(self.model_simple_return)
 
     def project_names(self, quarter_id):
         projects = project_names_per_quarter(quarter_id)
@@ -218,7 +214,7 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
         """
         print("Signal triggered", index.internalPointer())
         p = index.internalPointer()
-        d = single_project_data(1, p.db_index)
+        d = single_project_data(2, p.db_index)
         self.model_simple_return = SimpleReturnModel(d)
         self.returnsTable.setModel(self.model_simple_return)
 
