@@ -32,6 +32,8 @@ class Ui_ReturnsUI(object):
         self.returnsTable.setAlternatingRowColors(True)
         self.returnsTable.setSortingEnabled(True)
         self.returnsTable.setObjectName("returnsTable")
+        self.returnsTable.horizontalHeader().setStretchLastSection(True)
+        self.returnsTable.verticalHeader().setStretchLastSection(False)
         self.horizontalLayout.addWidget(self.splitter)
 
         self.retranslateUi(ReturnsUI)
