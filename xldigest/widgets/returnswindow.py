@@ -205,15 +205,10 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
     def project_names(self, quarter_id):
         projects = project_names_per_quarter(quarter_id)
         for project in projects:
-            row_count = 0
-            column = 0
             pn = ProjectNode(
                 project[1],  # name
                 self.selectionTree.childNode1,  # parent
                 project[0])  # db_index
-            project_index = self.model.createIndex(row_count, column)
-            pn.mod_index = project_index
-            row_count += 1
 
     def get_single_return_data(self, index):
         """
@@ -222,8 +217,9 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
         tableview.
         """
         print("Signal triggered", index.internalPointer())
-        self.model_simple_return = SimpleReturnModel(
-            [["Hell", 2], ["Smersh", 3], ["Dickles", 23]])
+        p = index.internalPointer()
+        d = single_project_data(1, p.db_index)
+        self.model_simple_return = SimpleReturnModel(d)
         self.returnsTable.setModel(self.model_simple_return)
 
 
