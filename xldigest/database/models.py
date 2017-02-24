@@ -2,9 +2,10 @@ from sqlalchemy import Column, Integer, String, create_engine, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-engine = create_engine('sqlite:///db.sqlite', echo=True)
-
 Base = declarative_base()
+
+engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
+                       'db.sqlite')
 
 
 class Project(Base):
@@ -51,8 +52,9 @@ class ReturnItem(Base):
     value = Column(String)
 
     def __repr__(self):
-        return "<ReturnItem(Project: {0}, Return for {1}, \ for Quarter: {2}>".format(
-            self.id, self.datamap_item_id, self.project_id)
+        return ("<ReturnItem(Project: {0}, Quarter for {1}, "
+                "for DMI: {2}>").format(self.project_id, self.quarter_id,
+                                        self.datamap_item_id)
 
 
 Base.metadata.create_all(engine)

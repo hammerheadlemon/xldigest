@@ -1,23 +1,42 @@
 import sys
-import sqlite3
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
+from xldigest.database.models import DatamapItem
+
 # from https://www.youtube.com/watch?v=2sRoLN337cs
+
+engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
+                       'db.sqlite')
+
+Session = sessionmaker(bind=engine)
+
+session = Session()
 
 
 class DatamapTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data_in=[[]], parent=None, *args):
         super(DatamapTableModel, self).__init__(parent, *args)
 
-        self.data = data_in
+        self.data_in = data_in
+        self.header_model_map = [
+            ('Index', 'id', 0),
+            ('Key', 'key', 1),
+            ('BICC Sheet', 'bicc_sheet', 2),
+            ('BICC Cell Reference', 'bicc_cellref', 3),
+            ('GMPP Sheet', 'gmpp_sheet', 4),
+            ('GMPP Cell Reference', 'gmpp_cellref', 5),
+            ('Verification Rule', 'bicc_ver_form', 6)
+        ]
 
     def rowCount(self, parent=QtCore.QModelIndex()):
-        return len(self.data)
+        return len(self.data_in)
 
     def columnCount(self, parent=QtCore.QModelIndex()):
-        return len(self.data[0])
+        return len(self.data_in[0])
 
     def data(self, index, role):
 
@@ -26,32 +45,32 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.EditRole:
             row = index.row()
             col = index.column()
-            return self.data[row][col]
+            return self.data_in[row][col]
 
         if role == QtCore.Qt.ToolTipRole:
             row = index.row()
-            return "{} item".format(self.data[row][0])
+            return "{} item".format(self.data_in[row][0])
 
         if index.isValid() and role == QtCore.Qt.DisplayRole:
             row = index.row()
             col = index.column()
-            value = self.data[row][col]
+            value = self.data_in[row][col]
             return value
 
         # HERE WE INCLUDE A COLOURED ICON!
-#        if index.isValid() and role == QtCore.Qt.DecorationRole:
-#            row = index.row()
-#            col = index.column()
-#            value = self.data[row][col]
-#
-#            # making a colour icon for a laugh
-#            pixmap = QtGui.QPixmap(26, 26)
-#            pixmap.fill(QtGui.QColor(233, 23, 233))
-#
-#            icon = QtGui.QIcon(pixmap)
-#            return icon
+        #        if index.isValid() and role == QtCore.Qt.DecorationRole:
+        #            row = index.row()
+        #            col = index.column()
+        #            value = self.data[row][col]
+        #
+        #            # making a colour icon for a laugh
+        #            pixmap = QtGui.QPixmap(26, 26)
+        #            pixmap.fill(QtGui.QColor(233, 23, 233))
+        #
+        #            icon = QtGui.QIcon(pixmap)
+        #            return icon
 
-    # we want headers for our table
+        # we want headers for our table
     def headerData(self, section, orientation, role):
 
         headers = [
@@ -80,7 +99,18 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.EditRole:
             row = index.row()
             col = index.column()
-            self.data[row][col] = value
+            db_index = row + 1
+            self.data_in[row][col] = value
+            print("New val: {}".format(value))
+            db_item_to_change = session.query(DatamapItem).filter(
+                DatamapItem.id == db_index).first()
+            print("Item to change: {}".format(db_item_to_change))
+            print("index to change: {}".format(db_index))
+            col_field = [
+                item[1] for item in self.header_model_map if item[2] == col
+            ][0]
+            db_item_to_change.__setattr__(col_field, value)
+            session.commit()
             self.dataChanged.emit(index, index)
             return True
         return False
@@ -97,7 +127,7 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
             default_values = [
                 "Default Value" for i in range(self.columnCount(None))]
 
-            self.data.insert(position, default_values)
+            self.data_in.insert(position, default_values)
 
         # this must be called after inserting rows
         self.endInsertRows()
@@ -105,26 +135,24 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
 
 
 def pull_all_data_from_db():
-    conn = sqlite3.connect('db.sqlite')
-    c = conn.cursor()
-    d = list(c.execute("SELECT * FROM datamap_item"))
-    c.close()
-    conn.close()
-    return d
+    """Using sqlalchemy this time."""
+    db_items = session.query(DatamapItem).all()
+    db_items_lst = [[
+        item.id,
+        item.key,
+        item.bicc_sheet,
+        item.bicc_cellref,
+        item.gmpp_sheet,
+        item.gmpp_cellref,
+        item.bicc_ver_form] for item in db_items]
+    return db_items_lst
 
 
 class DatamapWindow(QtWidgets.QWidget):
     def __init__(self, *args):
         super(DatamapWindow, self).__init__(*args)
-        self.setWindowTitle('Configure Datamaps')
-        self.resize(900, 600)
-        desktop = QtWidgets.QDesktopWidget().availableGeometry()
-        width = (desktop.width() - self.width()) / 2
-        height = (desktop.height() - self.height()) / 2
-        self.move(width, height)
-
         # convert from tuples to list
-        table_data = [list(item) for item in pull_all_data_from_db()]
+        table_data = pull_all_data_from_db()
 
         self.tv = QtWidgets.QTableView()
 
@@ -231,43 +259,7 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     w = DatamapWindow()
     w.show()
-#    data = ["one", "two", "three", "four"]
-#
-#    listView = QtWidgets.QListView()
-#    listView.show()
-#
-#    # model! better way to do things
-#    model = QtCore.QStringListModel(data)
-#
-#    listView.setModel(model)
-#
-#    comboBox = QtWidgets.QComboBox()
-#    comboBox.setModel(model)
-#    comboBox.show()
-#
-#    listView2 = QtWidgets.QListView()
-#    listView2.show()
-#    listView2.setModel(model)
-
-#    # list widget - this is not good
-#    listWidget = QtWidgets.QListWidget()
-#    listWidget.show()
-#    listWidget.addItems(data)
-#
-#
-#    # make the list items editable
-#    count = listWidget.count()
-#    for i in range(count):
-#        item = listWidget.item(i)
-#        print(item.flags())
-#        item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-#
-#    comboBox = QtWidgets.QComboBox()
-#    comboBox.show()
-#    comboBox.addItems(data)
-
     sys.exit(app.exec_())
-
 
 if __name__ == "__main__":
     main()

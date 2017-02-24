@@ -22,7 +22,7 @@ session = Session()
 # Hard-coded for now - this matches the current quarter with the same
 # value in the database so we're not relying on how it's written in
 # BICC template.
-CURRENT_QUARTER = "Q2 2016/17"
+CURRENT_QUARTER = "Q3 2016/17"
 
 
 def _change_dict_val(target, replacement, dictionary):
