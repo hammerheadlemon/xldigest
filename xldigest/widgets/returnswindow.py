@@ -197,6 +197,7 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
 
         self.selectionTree.setModel(self.model)
         self.selectionTree.clicked.connect(self.get_single_return_data)
+
         # REMOVE TWO LINES
         self.model_simple_return = SimpleReturnModel([["Hell", 2]], self)
         self.returnsTable.setModel(self.model_simple_return)
@@ -210,8 +211,7 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
                 project[1],  # name
                 self.selectionTree.childNode1,  # parent
                 project[0])  # db_index
-            project_index = self.model.index(row_count, 0,
-                                             QtCore.QModelIndex())
+            project_index = self.model.createIndex(row_count, column)
             pn.mod_index = project_index
             row_count += 1
 
@@ -222,11 +222,12 @@ class ReturnsWindow(QtWidgets.QWidget, Ui_ReturnsUI):
         tableview.
         """
         print("Signal triggered", index.row(), index.column())
-        self.model_simple_return = SimpleReturnModel([["Hell", 2]])
+        self.model_simple_return = SimpleReturnModel(
+            [["Hell", 2], ["Smersh", 3], ["Dickles", 23]])
         self.returnsTable.setModel(self.model_simple_return)
 
 
-class SimpleReturnModel(QtCore.QAbstractItemModel):
+class SimpleReturnModel(QtCore.QAbstractTableModel):
     """
     The model for the right hand table in the returns window which shows
     a simple display of return data for a single project.
