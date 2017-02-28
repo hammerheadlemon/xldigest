@@ -4,7 +4,7 @@ from xldigest.widgets.template_manager_ui import Ui_TemplateManager
 
 
 class TemplateFilesModel(QtCore.QAbstractTableModel):
-    def __init__(self, file_list=[[]], parent=None):
+    def __init__(self, file_list, parent=None):
         super(TemplateFilesModel, self).__init__(parent)
         self.file_list = file_list
 
@@ -34,5 +34,6 @@ class TemplateManagerWindow(QtWidgets.QWidget, Ui_TemplateManager):
     def __init__(self, parent=None):
         super(TemplateManagerWindow, self).__init__(parent)
         self.setupUi(self)
-        self.model = TemplateFilesModel([["Hello", "Goodbye"], ["More", "Less"]])
+        self.model = TemplateFilesModel(
+            [["Hello", "Goodbye"], ["More", "Less"]])
         self.tableView.setModel(self.model)

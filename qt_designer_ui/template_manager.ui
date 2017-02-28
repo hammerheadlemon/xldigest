@@ -21,6 +21,9 @@
        <property name="frameShape">
         <enum>QFrame::VLine</enum>
        </property>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
       </widget>
      </item>
      <item>

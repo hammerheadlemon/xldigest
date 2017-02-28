@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'template_manager.ui'
+# Form implementation generated from reading ui file 'qt_designer_ui/template_manager.ui'
 #
 # Created by: PyQt5 UI code generator 5.8
 #
@@ -19,6 +19,7 @@ class Ui_TemplateManager(object):
         self.tableView = QtWidgets.QTableView(TemplateManager)
         self.tableView.setFrameShape(QtWidgets.QFrame.VLine)
         self.tableView.setObjectName("tableView")
+        self.tableView.horizontalHeader().setStretchLastSection(True)
         self.verticalLayout_2.addWidget(self.tableView)
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
