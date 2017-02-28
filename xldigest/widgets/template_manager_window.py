@@ -3,6 +3,13 @@ from PyQt5 import QtCore, QtWidgets
 from xldigest.widgets.template_manager_ui import Ui_TemplateManager
 
 
+class TemplateTableItem:
+    def __init__(self, file_name, file_path):
+        self.file_name = file_name
+        self.file_path = file_path
+        self.directory = QtCore.QDir(self.file_path)
+
+
 class TemplateFilesModel(QtCore.QAbstractTableModel):
     def __init__(self, file_list, parent=None):
         super(TemplateFilesModel, self).__init__(parent)
@@ -36,6 +43,10 @@ class TemplateManagerWindow(QtWidgets.QWidget, Ui_TemplateManager):
     def __init__(self, parent=None):
         super(TemplateManagerWindow, self).__init__(parent)
         self.setupUi(self)
+        self.test_template = TemplateTableItem(
+            'BICC Template',
+            '/home/lemon/Documents/xldigest/source/bicc_template.xlsx'
+        )
         self.model = TemplateFilesModel(
-            [["Hello", "Goodbye"], ["More", "Less"]])
+            [[self.test_template.file_name, self.test_template.file_path]])
         self.tableView.setModel(self.model)
