@@ -10,12 +10,19 @@ import sys
 from PyQt5 import QtGui, QtWidgets
 from xldigest.widgets.main_ui import Ui_MainXldigestWindow
 from xldigest.widgets.datamap import DatamapTableModel
+from xldigest.widgets.template_manager_window import TemplateManagerWindow
 
 
 class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
     def __init__(self, parent=None):
         super(XldigestMainWindow, self).__init__(parent)
         self.setupUi(self)
+        self.actionTemplate_Manager.triggered.connect(
+            self._openTemplateManagerWindow_slot)
+
+    def _openTemplateManagerWindow_slot(self):
+        self.templateManagerWindow = TemplateManagerWindow()
+        self.templateManagerWindow.show()
 
 
 def main():

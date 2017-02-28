@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main_window.ui'
+# Form implementation generated from reading ui file 'qt_designer_ui/main_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.7.1
+# Created by: PyQt5 UI code generator 5.8
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,6 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainXldigestWindow(object):
     def setupUi(self, MainXldigestWindow):
         MainXldigestWindow.setObjectName("MainXldigestWindow")
+        MainXldigestWindow.resize(298, 331)
         self.centralwidget = QtWidgets.QWidget(MainXldigestWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -68,12 +69,21 @@ class Ui_MainXldigestWindow(object):
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
         MainXldigestWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainXldigestWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1085, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 298, 19))
         self.menubar.setObjectName("menubar")
+        self.menuFile = QtWidgets.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
+        self.menuTemplates = QtWidgets.QMenu(self.menubar)
+        self.menuTemplates.setObjectName("menuTemplates")
         MainXldigestWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainXldigestWindow)
         self.statusbar.setObjectName("statusbar")
         MainXldigestWindow.setStatusBar(self.statusbar)
+        self.actionTemplate_Manager = QtWidgets.QAction(MainXldigestWindow)
+        self.actionTemplate_Manager.setObjectName("actionTemplate_Manager")
+        self.menuTemplates.addAction(self.actionTemplate_Manager)
+        self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuTemplates.menuAction())
 
         self.retranslateUi(MainXldigestWindow)
         self.tabWidget.setCurrentIndex(0)
@@ -87,6 +97,9 @@ class Ui_MainXldigestWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainXldigestWindow", "Datamap"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("MainXldigestWindow", "Returns"))
         self.finishButton.setText(_translate("MainXldigestWindow", "Finish"))
+        self.menuFile.setTitle(_translate("MainXldigestWindow", "File"))
+        self.menuTemplates.setTitle(_translate("MainXldigestWindow", "Templates"))
+        self.actionTemplate_Manager.setText(_translate("MainXldigestWindow", "Template Manager..."))
 
 from xldigest.widgets.datamap import DatamapWindow
 from xldigest.widgets.returnswindow import ReturnsWindow

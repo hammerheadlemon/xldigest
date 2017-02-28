@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>MainXldigestWindow</class>
  <widget class="QMainWindow" name="MainXldigestWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>298</width>
+    <height>331</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>xldigest</string>
   </property>
@@ -96,12 +104,30 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1085</width>
+     <width>298</width>
      <height>19</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTemplates">
+    <property name="title">
+     <string>Templates</string>
+    </property>
+    <addaction name="actionTemplate_Manager"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuTemplates"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionTemplate_Manager">
+   <property name="text">
+    <string>Template Manager...</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
