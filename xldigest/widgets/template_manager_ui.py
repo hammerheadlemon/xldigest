@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'qt_designer_ui/template_manager.ui'
+# Form implementation generated from reading ui file '../qt_designer_ui/template_manager.ui'
 #
 # Created by: PyQt5 UI code generator 5.8
 #
@@ -11,7 +11,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_TemplateManager(object):
     def setupUi(self, TemplateManager):
         TemplateManager.setObjectName("TemplateManager")
-        TemplateManager.resize(400, 161)
+        TemplateManager.resize(382, 297)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(TemplateManager.sizePolicy().hasHeightForWidth())
+        TemplateManager.setSizePolicy(sizePolicy)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(TemplateManager)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
