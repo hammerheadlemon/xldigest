@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>298</width>
-    <height>331</height>
+    <width>488</width>
+    <height>396</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -69,6 +69,16 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="tab_3">
+         <attribute name="title">
+          <string>Templates</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="TemplateManagerWindow" name="templateManagerWidget" native="true"/>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
       <item>
@@ -104,7 +114,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>298</width>
+     <width>488</width>
      <height>19</height>
     </rect>
    </property>
@@ -140,6 +150,12 @@
    <class>ReturnsWindow</class>
    <extends>QWidget</extends>
    <header>xldigest.widgets.returnswindow.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TemplateManagerWindow</class>
+   <extends>QWidget</extends>
+   <header>xldigest.widgets.template_manager_window.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

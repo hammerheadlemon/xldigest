@@ -7,6 +7,8 @@ class TemplateFilesModel(QtCore.QAbstractTableModel):
     def __init__(self, file_list, parent=None):
         super(TemplateFilesModel, self).__init__(parent)
         self.file_list = file_list
+        self.templates_directory = QtCore.QDir(
+            "/home/lemon/Documents/xldigest/templates")
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.file_list)
