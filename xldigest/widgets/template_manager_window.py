@@ -4,9 +4,10 @@ from xldigest.widgets.template_manager_ui import Ui_TemplateManager
 
 
 class TemplateTableItem:
-    def __init__(self, file_name, file_path):
+    def __init__(self, file_name, file_path, template_type):
         self.file_name = file_name
         self.file_path = file_path
+        self.template_type = template_type
         self.directory = QtCore.QDir(self.file_path)
 
 
@@ -45,8 +46,11 @@ class TemplateManagerWindow(QtWidgets.QWidget, Ui_TemplateManager):
         self.setupUi(self)
         self.test_template = TemplateTableItem(
             'BICC Template',
-            '/home/lemon/Documents/xldigest/source/bicc_template.xlsx'
+            '/home/lemon/Documents/xldigest/source/bicc_template.xlsx',
+            'Test Type'
         )
-        self.model = TemplateFilesModel(
-            [[self.test_template.file_name, self.test_template.file_path]])
+        self.model = TemplateFilesModel([[
+            self.test_template.file_name, self.test_template.file_path,
+            self.test_template.template_type
+        ]])
         self.tableView.setModel(self.model)
