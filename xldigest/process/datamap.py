@@ -3,6 +3,16 @@ import sqlite3
 
 from xldigest.process.cell import Cell
 
+from xldigest.database.models import DatamapItem
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
+                       'db.sqlite')
+Session = sessionmaker(bind=engine)
+session = Session()
+
 """
 New Datamap class for QT redesign - started 18 January 2017.
 
@@ -59,18 +69,14 @@ class Datamap:
 
     def cell_map_from_database(self):
         """Creates a cellmap from a sqlite3 database."""
-        conn = sqlite3.connect(self.db_file)
-        c = conn.cursor()
-        for row in c.execute("SELECT * FROM datamap_items"):
+        for row in session.query(DatamapItem).all():
             self.cell_map.append(
                 Cell(
-                    cell_key=row[1],
+                    cell_key=row.key,
                     cell_value=None,
-                    template_sheet=row[2],
+                    template_sheet=row.bicc_sheet,
                     bg_colour=None,
                     fg_colour=None,
                     number_format=None,
                     verification_list=None,
-                    cell_reference=row[3]))
-        c.close()
-        conn.close()
+                    cell_reference=row.bicc_cellref))

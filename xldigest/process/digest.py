@@ -32,6 +32,11 @@ class Digest:
     def datamap(self):
         return self._datamap
 
+    def read_project_data(self):
+        """TODO: TEMPORARY - THIS IS PART-WAY THROUGH A THING
+        AND NEEDS CHANGING"""
+        return self._datamap.cell_map
+
     def read_template(self):
         """
         Read the relevant values from the template, based on the Datamap.
