@@ -14,10 +14,36 @@ class TemplateError(Exception):
 class Digest:
     """
     Initialise a Digest object with a Datamap object. Digest.data is a list
-    that is empty upon initialisation. To populate it from the
-    Datamap.template, call Digest.read_template(). To populate it from the
-    Datamap.db_file, call Digest.read_project_data(). The latter can then be
-    written to Datamap.template with Digest.write()
+    that is empty upon initialisation.
+
+    To populate it from the Datamap.template, call Digest.read_template().
+    To populate it from the Datamap.db_file, call Digest.read_project_data().
+    The latter can then be written to Datamap.template with Digest.write()
+
+    To create a Digest object for writing to a template:
+        - create a template object with the template you wish to populate.
+        e.g bicc_template = BICCTemplate(<path-to-file>)
+
+        - create an 'empty' datamap, based on this template:
+        e.g base_datamap = Datamap(bicc_template, <path-to-db-file>)
+
+        - create a Digest object:
+        e.g. digest = Digest(base_datamap, <quarter-id>)
+
+        - populate the datamap from the database:
+        e.g. digest.data.cell_map_from_database()
+
+        - populate the digest.data with either data from the template
+        (if the template is non-writable) or from the database. The Digest
+        then acts as the intermediadary between the template and database.
+
+        Data from database:
+            digest.read_project_data(<quarter-id>, <project-id>)
+            digest.data
+
+        Data from template:
+            digest.read_template()
+            digest.data
     """
 
     def __init__(self, dm, quarter_id):
@@ -46,29 +72,6 @@ class Digest:
         session = Session()
         for cell in self._datamap.cell_map:
             # ONLY ACT ON CELLS THAT HAVE A CELL_REFERENCE
-            """
-            Objective here is to populate the cell_value field of the Cell
-            object for a single project.
-
-            What data do we have at this point?
-
-                Cell(
-                    cell_key: string,
-                    cell_value: None,
-                    cell_reference: string
-                )
-                project_id
-                quarter_id
-
-            So our query is to look at the ReturnItem table
-                We need a datamap_id for a field but we don't want to match
-                    on the text, so we need to include the datamap_id in the
-                    Cell object when that is created. TODO!
-                for the value field
-                    if project_id AND quarter_id equal what is passed to func
-                    if datamap_item_id equals
-
-            """
             if cell.cell_reference:
                 cell.cell_value = session.query(ReturnItem.value).filter(
                     ReturnItem.project_id == Project.id).filter(
@@ -83,7 +86,7 @@ class Digest:
         write the datamap.cell_map to it.
         """
         if self.dm.template.writable is False:
-            pass  # do stuff to write
+            pass  # do stuff to write - consider compile.py in bcompiler
         else:
             raise TemplateError(
                 "Cannot write to template which contains source data.")
