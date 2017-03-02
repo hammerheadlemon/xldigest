@@ -48,10 +48,6 @@ class Digest:
 
     def __init__(self, dm, quarter_id):
         # TODO function to check that given datamap is "blank"
-        # It is 'blank' when all Cell.cell_value properties are None.
-        # Iiterate through each Cell object in datamap.cell_map:
-        #   if every cell_value is not None:
-        #       we have a partially populated datamap. Bounce.
         self._datamap = dm
         self._data = []
         self.quarter_id = quarter_id
