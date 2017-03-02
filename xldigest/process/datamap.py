@@ -68,7 +68,9 @@ class Datamap:
                         )
 
     def cell_map_from_database(self):
-        """Creates a cellmap from a sqlite3 database."""
+        """Creates a cellmap from a sqlite3 database. cell_map fields are
+        empty until a function is called to populate the cellmap from
+        a data source."""
         for row in session.query(DatamapItem).all():
             self.cell_map.append(
                 Cell(
