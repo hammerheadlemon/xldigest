@@ -13,17 +13,17 @@ engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
 Session = sessionmaker(bind=engine)
 session = Session()
 
-"""
-New Datamap class for QT redesign - started 18 January 2017.
-
-Do not run this code and expect it to work.
-"""
-
 
 class Datamap:
     """
     Purpose of the Datamap is to map key/value sets to the database and a
     FormTemplate class. A Datamap comprises a list of Cell objects.
+
+    Newly initialised Datamap object contains a template and a reference to
+    a SQLite database file, but it's cell_map is empty. To create a base cell
+    map from the template, using the datamap table in the database, call
+    Datamap.cell_map_from_database(). To create a base cell map from the
+    template, call Datamap.import_csv().
     """
     def __init__(self, template, db_file):
         self.cell_map = []
@@ -56,6 +56,7 @@ class Datamap:
             for row in reader:
                 self.cell_map.append(
                         Cell(
+                            datamap_id=None,
                             cell_key=row['cell_key'],
                             cell_value=None,  # have no need of a value in dm
                             cell_reference=row['cell_reference'],
@@ -74,6 +75,7 @@ class Datamap:
         for row in session.query(DatamapItem).all():
             self.cell_map.append(
                 Cell(
+                    datamap_id=row.id,  # for now...
                     cell_key=row.key,
                     cell_value=None,
                     template_sheet=row.bicc_sheet,

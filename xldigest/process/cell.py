@@ -13,6 +13,7 @@ class Cell:
     """
     def __init__(
             self,
+            datamap_id,
             cell_key,
             cell_value,
             cell_reference,
@@ -21,6 +22,7 @@ class Cell:
             fg_colour,
             number_format,
             verification_list):
+        self.datamap_id = datamap_id,
         self.cell_key = cell_key
         self.cell_value = None
         self.cell_reference = cell_reference

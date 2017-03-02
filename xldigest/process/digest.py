@@ -1,21 +1,26 @@
-import fnmatch
-import os
-from concurrent import futures
-from datetime import datetime
-
 from openpyxl import load_workbook
 
 from xldigest.process.cleansers import Cleanser
+from xldigest.database.models import ReturnItem, DatamapItem, Project
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+
+class TemplateError(Exception):
+    pass
 
 
 class Digest:
     """
-    A Digest is a Datamap object whose cell_map has been populated (ie
-    the datamap 'cell_value' has been populated by data in a particular
-    template source file.
+    Initialise a Digest object with a Datamap object. Digest.data is a list
+    that is empty upon initialisation. To populate it from the
+    Datamap.template, call Digest.read_template(). To populate it from the
+    Datamap.db_file, call Digest.read_project_data(). The latter can then be
+    written to Datamap.template with Digest.write()
     """
 
-    def __init__(self, dm):
+    def __init__(self, dm, quarter_id):
         # TODO function to check that given datamap is "blank"
         # It is 'blank' when all Cell.cell_value properties are None.
         # Iiterate through each Cell object in datamap.cell_map:
@@ -23,6 +28,7 @@ class Digest:
         #       we have a partially populated datamap. Bounce.
         self._datamap = dm
         self._data = []
+        self.quarter_id = quarter_id
 
     @property
     def data(self):
@@ -32,10 +38,54 @@ class Digest:
     def datamap(self):
         return self._datamap
 
-    def read_project_data(self):
-        """TODO: TEMPORARY - THIS IS PART-WAY THROUGH A THING
-        AND NEEDS CHANGING"""
-        return self._datamap.cell_map
+    def read_project_data(self, project_id, quarter_id):
+        database_file = self._datamap.db_file
+        engine = create_engine("sqlite:///" + database_file)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        for cell in self._datamap.cell_map:
+            # ONLY ACT ON CELLS THAT HAVE A CELL_REFERENCE
+            """
+            Objective here is to populate the cell_value field of the Cell
+            object for a single project.
+
+            What data do we have at this point?
+
+                Cell(
+                    cell_key: string,
+                    cell_value: None,
+                    cell_reference: string
+                )
+                project_id
+                quarter_id
+
+            So our query is to look at the ReturnItem table
+                We need a datamap_id for a field but we don't want to match
+                    on the text, so we need to include the datamap_id in the
+                    Cell object when that is created. TODO!
+                for the value field
+                    if project_id AND quarter_id equal what is passed to func
+                    if datamap_item_id equals
+
+            """
+            if cell.cell_reference:
+                cell.cell_value = session.query(ReturnItem.value).filter(
+                    ReturnItem.project_id == project_id,
+                    ReturnItem.quarter_id == quarter_id,
+                    ReturnItem.datamap_item_id == cell.datamap_id)
+                # then we append it to self.data
+                self.data.append(cell)
+
+    def write(self):
+        """
+        If self._datamap.template is a blank template, then write() will
+        write the datamap.cell_map to it.
+        """
+        if self.dm.template.writable is False:
+            pass  # do stuff to write
+        else:
+            raise TemplateError(
+                "Cannot write to template which contains source data.")
 
     def read_template(self):
         """
@@ -58,42 +108,3 @@ class Digest:
                     cell.cell_value = cleansed.string
                 # then we append it to self.data
                 self.data.append(cell)
-
-
-def flatten_project(future):
-    """
-    Get rid of the gmpp_key gmpp_key_value stuff pulled from a single
-    spreadsheet. Must be given a future.
-    """
-    p_data = future.result()
-    p_data = {item['gmpp_key']: item['gmpp_key_value'] for item in p_data}
-    return p_data
-
-
-def digest_source_files(base_dir, db_connection):
-    """
-    Use concurrent futures to digest data obtained using legacy
-    parse_source_cells function.
-    """
-    source_files = []
-    future_data = []
-    for f in os.listdir(base_dir):
-        if fnmatch.fnmatch(f, '*.xlsx'):
-            source_files.append(os.path.join(base_dir, f))
-    with futures.ThreadPoolExecutor(max_workers=4) as executor:
-        for f in source_files:
-            future_data.append(
-                executor.submit(parse_source_cells, f,
-                                DATAMAP_MASTER_TO_RETURN))
-            print("Processing {}".format(f))
-        for future in futures.as_completed(future_data):
-            f = flatten_project(future)
-            db.insert(f)
-
-
-def main():
-    digest_source_files()
-
-
-if __name__ == "__main__":
-    main()

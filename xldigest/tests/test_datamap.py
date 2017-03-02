@@ -57,6 +57,7 @@ def test_expect_datamap_cell():
     sheet = template.add_sheet('Summary')
     datamap = Datamap(template, 'db.sqlite')
     cell = Cell(
+            datamap_id=None,
             cell_key='Project/Programme Name',
             cell_value=None,
             cell_reference='B5',
