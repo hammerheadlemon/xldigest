@@ -75,7 +75,7 @@ class Datamap:
         for row in session.query(DatamapItem).all():
             self.cell_map.append(
                 Cell(
-                    datamap_id=row.id,  # for now...
+                    datamap_id=row.id,
                     cell_key=row.key,
                     cell_value=None,
                     template_sheet=row.bicc_sheet,

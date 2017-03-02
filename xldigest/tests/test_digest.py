@@ -10,7 +10,8 @@ DATAMAP_MOCK = fixtures.mock_datamap_source_file
 def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK):
     """Uses import_csv() function to process the datamap text file."""
     template = BICCTemplate(BICC_RETURN_MOCK)
-    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    datamap = Datamap(template,
+                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.import_csv(DATAMAP_MOCK)
     digest = Digest(datamap, None)
     assert digest.datamap.cell_map[0].cell_key == 'Project/Programme Name'
@@ -19,17 +20,23 @@ def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK):
 
 def test_digest_gets_project_from_database():
     "Get data for a single project from database."
+    qtr_id = 1  # this should be Q3 data
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    datamap = Datamap(template,
+                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.cell_map_from_database()
-    digest = Digest(datamap, 1)
-    digest.read_project_data(1, 1)
-    print(digest.data)
+    digest = Digest(datamap, qtr_id)
+    digest.read_project_data()
+    assert digest.data[0].cell_key == 'Project/Programme Name'
+    assert digest.data[0].cell_value[0] == 'A303 Amesbury to Berwick Down'
+    assert digest.data[1].cell_value[0] is None
+    assert digest.data[2].cell_value[0] == "Q3 1617"
 
 
 def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK):
     template = BICCTemplate(BICC_RETURN_MOCK)
-    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    datamap = Datamap(template,
+                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.import_csv(DATAMAP_MOCK)
     digest = Digest(datamap, None)
     # here we need to go through the datamap, use the cell_key and
@@ -39,9 +46,7 @@ def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK):
     for cell in digest.data:
         try:
             print("{0:<70}{1:<30}{2:<70}".format(
-                cell.cell_key,
-                cell.template_sheet,
-                cell.cell_value))
+                cell.cell_key, cell.template_sheet, cell.cell_value))
         except Exception:
             pass
     # WARNING: digest.data[] index here depends on whether the cell_reference

@@ -60,19 +60,24 @@ class Digest:
     def datamap(self):
         return self._datamap
 
-    def read_project_data(self, project_id, quarter_id):
+    def _set_up_session(self):
         database_file = self._datamap.db_file
         engine_string = "sqlite:///" + database_file
         engine = create_engine(engine_string)
         Session = sessionmaker(bind=engine)
-        session = Session()
+        return Session()
+
+    def read_project_data(self):
+        session = self._set_up_session()
+        import pdb; pdb.set_trace()  # XXX BREAKPOINT
         for cell in self._datamap.cell_map:
             # ONLY ACT ON CELLS THAT HAVE A CELL_REFERENCE
             if cell.cell_reference:
                 cell.cell_value = session.query(ReturnItem.value).filter(
                     ReturnItem.project_id == Project.id).filter(
                     ReturnItem.datamap_item_id == DatamapItem.id).filter(
-                    DatamapItem.key == cell.cell_key).first()
+                    ReturnItem.quarter_id == self.quarter_id).filter(
+                    DatamapItem.id == cell.datamap_id[0]).first()  # why a tup?
                 # then we append it to self.data
                 self.data.append(cell)
 
