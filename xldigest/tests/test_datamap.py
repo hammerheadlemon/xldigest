@@ -48,14 +48,14 @@ def mock_datamap_source_file():
 
 def test_for_datamap_class():
     template = BICCTemplate('tmp/bicc_template.xlsx')
-    datamap = Datamap(template, 'db.sqlite')
+    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     assert datamap
 
 
 def test_expect_datamap_cell():
     template = BICCTemplate('tmp/bicc_template.xlsx')
     sheet = template.add_sheet('Summary')
-    datamap = Datamap(template, 'db.sqlite')
+    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     cell = Cell(
             datamap_id=None,
             cell_key='Project/Programme Name',
@@ -72,7 +72,7 @@ def test_expect_datamap_cell():
 
 def test_datamap_source_file(mock_datamap_source_file):
     template = BICCTemplate('/tmp/bicc_template.xlsx')
-    datamap = Datamap(template, 'db.sqlite')
+    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.import_csv(mock_datamap_source_file)
     assert isinstance(datamap.cell_map[0], Cell)
     assert datamap.cell_map[0].cell_key == 'Project/Programme Name'

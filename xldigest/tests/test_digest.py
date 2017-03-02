@@ -10,7 +10,7 @@ DATAMAP_MOCK = fixtures.mock_datamap_source_file
 def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK):
     """Uses import_csv() function to process the datamap text file."""
     template = BICCTemplate(BICC_RETURN_MOCK)
-    datamap = Datamap(template, 'db.sqlite')
+    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.import_csv(DATAMAP_MOCK)
     digest = Digest(datamap, None)
     assert digest.datamap.cell_map[0].cell_key == 'Project/Programme Name'
@@ -20,7 +20,7 @@ def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK):
 def test_digest_gets_project_from_database():
     "Get data for a single project from database."
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, 'db.sqlite')
+    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.cell_map_from_database()
     digest = Digest(datamap, 1)
     digest.read_project_data(1, 1)
@@ -29,7 +29,7 @@ def test_digest_gets_project_from_database():
 
 def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK):
     template = BICCTemplate(BICC_RETURN_MOCK)
-    datamap = Datamap(template, 'db.sqlite')
+    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.import_csv(DATAMAP_MOCK)
     digest = Digest(datamap, None)
     # here we need to go through the datamap, use the cell_key and

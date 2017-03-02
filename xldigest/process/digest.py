@@ -1,7 +1,7 @@
 from openpyxl import load_workbook
 
 from xldigest.process.cleansers import Cleanser
-from xldigest.database.models import ReturnItem, DatamapItem, Project
+from xldigest.database.models import ReturnItem, DatamapItem, Project, Quarter
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -40,7 +40,8 @@ class Digest:
 
     def read_project_data(self, project_id, quarter_id):
         database_file = self._datamap.db_file
-        engine = create_engine("sqlite:///" + database_file)
+        engine_string = "sqlite:///" + database_file
+        engine = create_engine(engine_string)
         Session = sessionmaker(bind=engine)
         session = Session()
         for cell in self._datamap.cell_map:
@@ -70,9 +71,9 @@ class Digest:
             """
             if cell.cell_reference:
                 cell.cell_value = session.query(ReturnItem.value).filter(
-                    ReturnItem.project_id == project_id,
-                    ReturnItem.quarter_id == quarter_id,
-                    ReturnItem.datamap_item_id == cell.datamap_id)
+                    ReturnItem.project_id == Project.id).filter(
+                    ReturnItem.datamap_item_id == DatamapItem.id).filter(
+                    DatamapItem.key == cell.cell_key).first()
                 # then we append it to self.data
                 self.data.append(cell)
 
