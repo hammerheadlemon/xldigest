@@ -46,11 +46,12 @@ class Digest:
             digest.data
     """
 
-    def __init__(self, dm, quarter_id):
+    def __init__(self, dm, quarter_id, project_id):
         # TODO function to check that given datamap is "blank"
         self._datamap = dm
         self._data = []
         self.quarter_id = quarter_id
+        self.project_id = project_id
 
     @property
     def data(self):
@@ -73,7 +74,7 @@ class Digest:
             # ONLY ACT ON CELLS THAT HAVE A CELL_REFERENCE
             if cell.cell_reference:
                 cell.cell_value = session.query(ReturnItem.value).filter(
-                    ReturnItem.project_id == Project.id).filter(
+                    ReturnItem.project_id == self.project_id).filter(
                     ReturnItem.datamap_item_id == DatamapItem.id).filter(
                     ReturnItem.quarter_id == self.quarter_id).filter(
                     DatamapItem.id == cell.datamap_id[0]).first()  # why a tup?

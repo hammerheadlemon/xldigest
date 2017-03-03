@@ -24,7 +24,7 @@ def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
     datamap = Datamap(template,
                       INMEMORY_SQLITE3)
     datamap.import_csv(DATAMAP_MOCK)
-    digest = Digest(datamap, None)
+    digest = Digest(datamap, None, None)
     assert digest.datamap.cell_map[0].cell_key == 'Project/Programme Name'
     assert digest.datamap.cell_map[2].cell_key == 'GMPP - FD Sign-Off'
 
@@ -32,22 +32,27 @@ def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
 def test_digest_gets_project_from_database(INMEMORY_SQLITE3):
     "Get data for a single project from database."
     qtr_id = 1  # this should be Q3 data
+    pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
     datamap = Datamap(template, INMEMORY_SQLITE3)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id)
+    digest = Digest(datamap, qtr_id, pjt_id)
     digest.read_project_data()
+    print()
+    print(digest.data[0])
+    print(digest.data[1])
     assert digest.data[0].cell_key == 'Project/Programme Name'
-    assert digest.data[0].cell_value[0] == 'Snofflings Borker - Quarter 1 Sample'
-    assert digest.data[1].cell_value[0] == '23 - Quarter 1 Sample'
-    assert digest.data[2].cell_value[0] == 'mite@smodff.com - Quarter 1 Sample'
+    assert digest.data[0].cell_value[
+        0] == 'P1 Q1 DM1'
+    assert digest.data[1].cell_value[0] == 'P1 Q1 DM1'
+    assert digest.data[2].cell_value[0] == 'P1 Q1 DM2'
 
 
 def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
     template = BICCTemplate(BICC_RETURN_MOCK)
     datamap = Datamap(template, INMEMORY_SQLITE3)
     datamap.import_csv(DATAMAP_MOCK)
-    digest = Digest(datamap, None)
+    digest = Digest(datamap, None, None)
     # here we need to go through the datamap, use the cell_key and
     # cell_reference to populate the cell_value of the Cell object
     digest.read_template()

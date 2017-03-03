@@ -31,3 +31,12 @@ class Cell:
         self.fg_colour = fg_colour
         self.number_format = number_format
         self.verification_list = verification_list
+
+    def __repr__(self):
+        return ("<Cell: DMID:{} CellKey:{} CellValue:{} CellRef:{} "
+                "Sheet:{}>".format(
+                    self.datamap_id,
+                    self.cell_key,
+                    self.cell_value,
+                    self.cell_reference,
+                    self.template_sheet))
