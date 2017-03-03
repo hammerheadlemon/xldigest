@@ -31,7 +31,8 @@ def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
 
 def test_digest_gets_project_from_database(INMEMORY_SQLITE3):
     "Get data for a single project from database."
-    qtr_id = 1  # this should be Q3 data
+    # P1 Q1 asserts
+    qtr_id = 1
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
     datamap = Datamap(template, INMEMORY_SQLITE3)
@@ -41,11 +42,66 @@ def test_digest_gets_project_from_database(INMEMORY_SQLITE3):
     print()
     print(digest.data[0])
     print(digest.data[1])
+    print(digest.data[2])
+    print(digest.data[3])
     assert digest.data[0].cell_key == 'Project/Programme Name'
     assert digest.data[0].cell_value[
         0] == 'P1 Q1 DM1'
-    assert digest.data[1].cell_value[0] == 'P1 Q1 DM1'
-    assert digest.data[2].cell_value[0] == 'P1 Q1 DM2'
+    assert digest.data[1].cell_value[0] == 'P1 Q1 DM2'
+    assert digest.data[2].cell_value[0] == 'P1 Q1 DM3'
+    # P1 Q2 asserts
+    qtr_id = 2
+    pjt_id = 1
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    digest.read_project_data()
+    print()
+    print(digest.data[0])
+    print(digest.data[1])
+    print(digest.data[2])
+    print(digest.data[3])
+    assert digest.data[0].cell_value[
+        0] == 'P1 Q2 DM1'
+    assert digest.data[1].cell_value[0] == 'P1 Q2 DM2'
+    assert digest.data[2].cell_value[0] == 'P1 Q2 DM3'
+
+    # P2 Q1 asserts
+    qtr_id = 1
+    pjt_id = 2
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    digest.read_project_data()
+    print()
+    print(digest.data[0])
+    print(digest.data[1])
+    print(digest.data[2])
+    print(digest.data[3])
+    assert digest.data[0].cell_value[
+        0] == 'P2 Q1 DM1'
+    assert digest.data[1].cell_value[0] == 'P2 Q1 DM2'
+    assert digest.data[2].cell_value[0] == 'P2 Q1 DM3'
+
+    # P2 Q2 asserts
+    qtr_id = 2
+    pjt_id = 2
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    digest.read_project_data()
+    print()
+    print(digest.data[0])
+    print(digest.data[1])
+    print(digest.data[2])
+    print(digest.data[3])
+    assert digest.data[0].cell_value[
+        0] == 'P2 Q2 DM1'
+    assert digest.data[1].cell_value[0] == 'P2 Q2 DM2'
+    assert digest.data[2].cell_value[0] == 'P2 Q2 DM3'
 
 
 def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):

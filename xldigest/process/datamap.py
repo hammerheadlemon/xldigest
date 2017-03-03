@@ -1,5 +1,4 @@
 import csv
-import sqlite3
 
 from xldigest.process.cell import Cell
 
@@ -8,10 +7,12 @@ from xldigest.database.models import DatamapItem
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
-                       'db.sqlite')
-Session = sessionmaker(bind=engine)
-session = Session()
+
+def set_up_session(db_file):
+    engine_string = "sqlite:///" + db_file
+    engine = create_engine(engine_string)
+    Session = sessionmaker(bind=engine)
+    return Session()
 
 
 class Datamap:
@@ -29,6 +30,7 @@ class Datamap:
         self.cell_map = []
         self.template = template
         self.db_file = db_file
+        self.session = set_up_session(db_file)
 
     def add_cell(self, cell):
         self.cell_map.append(cell)
@@ -72,7 +74,7 @@ class Datamap:
         """Creates a cellmap from a sqlite3 database. cell_map fields are
         empty until a function is called to populate the cellmap from
         a data source."""
-        for row in session.query(DatamapItem).all():
+        for row in self.session.query(DatamapItem).all():
             self.cell_map.append(
                 Cell(
                     datamap_id=row.id,

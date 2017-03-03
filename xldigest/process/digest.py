@@ -1,7 +1,7 @@
 from openpyxl import load_workbook
 
 from xldigest.process.cleansers import Cleanser
-from xldigest.database.models import ReturnItem, DatamapItem, Project, Quarter
+from xldigest.database.models import ReturnItem, DatamapItem, Project
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
