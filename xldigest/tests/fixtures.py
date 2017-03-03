@@ -1,8 +1,9 @@
 import csv
 import os
+import sqlite3
 from datetime import datetime
-import pytest
 
+import pytest
 from openpyxl import Workbook
 
 ws_summary_B5_rand = [
@@ -175,6 +176,110 @@ ws_resources_E17_rand = [
     'Amber/Red',
     'Red',
 ]
+
+
+dm_data = [
+    ('Project/Programme Name', 'Summary', 'A5', 'GMPP Sheet', 'A15', None),
+    ('SRO Name', 'Summary', 'B5', 'GMPP Sheet', 'B15', None),
+    ('SRO Age', 'Summary', 'C5', 'GMPP Sheet', 'C15', None),
+    ('Top 37', 'Summary', 'I5', 'GMPP Sheet', 'C29', None),
+    ('DfT Business Plan', 'Summary', 'I6', 'GMPP Sheet', 'C30', None),
+    ('DFT ID Number', 'Summary', 'B6', 'GMPP Sheet', 'C31', None),
+    ('Working Contact Name', 'Summary', 'H8', 'GMPP Sheet', 'C32', None),
+    ('Working Contact Telephone', 'Summary', 'H9', 'GMPP Sheet', 'C33', None),
+    ('Working Contact Email', 'Summary', 'H10', 'GMPP Sheet', 'C34', None),
+    ('DfT Group', 'Summary', 'B8', 'GMPP Sheet', 'C35', None),
+    ('DfT Division', 'Summary', 'B9', 'GMPP Sheet', 'C36', None),
+    ('Agency or delivery partner (GMPP - Delivery Organisation primary)',
+     'Summary', 'B10', 'GMPP Sheet', 'C37', None),
+]
+
+return_data = [
+    (1, 2, 1, "Snofflings Borker - Quarter 2 Sample"),
+    (1, 2, 2, "Chaney McBrioil - Quarter 2 Sample"),
+    (1, 2, 3, "23 - Quarter 2 Sample"),
+    (1, 2, 4, "Yes - Quarter 2 Sample"),
+    (1, 2, 5, "Perhaps not - Quarter 2 Sample"),
+    (1, 2, 6, "2332 - Quarter 2 Sample"),
+    (1, 2, 7, "Mither Smadley - Quarter 2 Sample"),
+    (1, 2, 8, "0203 233 2331 - Quarter 2 Sample"),
+    (1, 2, 9, "mite@smodff.com - Quarter 2 Sample"),
+    (1, 2, 10, "Big Pedals on Bikes Group - Quarter 2 Sample"),
+    (1, 2, 11, "Little Wheels Division - Quarter 2 Sample"),
+    (1, 2, 11, "Bundles of Fun Inc - Quarter 2 Sample"),
+    (2, 1, 1, "Snofflings Borker - Quarter 1 Sample"),
+    (2, 1, 2, "Chaney McBrioil - Quarter 1 Sample"),
+    (2, 1, 3, "23 - Quarter 1 Sample"),
+    (2, 1, 4, "Yes - Quarter 1 Sample"),
+    (2, 1, 5, "Perhaps not - Quarter 1 Sample"),
+    (2, 1, 6, "2332 - Quarter 1 Sample"),
+    (2, 1, 7, "Mither Smadley - Quarter 1 Sample"),
+    (2, 1, 8, "0203 233 2331 - Quarter 1 Sample"),
+    (2, 1, 9, "mite@smodff.com - Quarter 1 Sample"),
+    (2, 1, 10, "Big Pedals on Bikes Group - Quarter 1 Sample"),
+    (2, 1, 11, "Little Wheels Division - Quarter 1 Sample"),
+    (2, 1, 11, "Bundles of Fun Inc - Quarter 1 Sample"),
+]
+
+
+@pytest.fixture
+def sqlite3_db_file():
+    db_file = "/tmp/test.db"
+    conn = sqlite3.connect(db_file)
+    c = conn.cursor()
+
+    c.execute("DROP TABLE IF EXISTS quarters")
+    c.execute("DROP TABLE IF EXISTS projects")
+    c.execute("DROP TABLE IF EXISTS datamap_items")
+    c.execute("DROP TABLE IF EXISTS returns")
+
+    c.execute("""CREATE TABLE quarters
+              (id integer PRIMARY KEY, name text)""")
+    c.execute("""CREATE TABLE projects
+              (id integer PRIMARY KEY, name text)""")
+    c.execute("""CREATE TABLE datamap_items
+              (id integer PRIMARY KEY,
+              key text,
+              bicc_sheet text,
+              bicc_cellref text,
+              gmpp_sheet text,
+              gmpp_cellref text,
+              bicc_ver_form text
+              )"""
+              )
+    c.execute("""CREATE TABLE returns
+              (id integer PRIMARY KEY,
+              project_id integer,
+              quarter_id integer,
+              datamap_item_id integer,
+              value text,
+              FOREIGN KEY (project_id) REFERENCES projects(id),
+              FOREIGN KEY (quarter_id) REFERENCES quarters(id),
+              FOREIGN KEY (datamap_item_id) REFERENCES datamap_items(id)
+              )""")
+
+    c.execute("INSERT INTO quarters (name) VALUES('Q2 2016/17')")
+    c.execute("INSERT INTO quarters (name) VALUES('Q2 2016/17')")
+    c.execute("INSERT INTO quarters (name) VALUES('Q2 2016/17')")
+
+    c.execute("INSERT INTO projects (name) VALUES('Project 1')")
+    c.execute("INSERT INTO projects (name) VALUES('Project 2')")
+    c.execute("INSERT INTO projects (name) VALUES('Project 3')")
+
+    c.executemany(
+        ("INSERT INTO datamap_items (key, bicc_sheet, "
+         "bicc_cellref, gmpp_sheet, gmpp_cellref, bicc_ver_form) VALUES"
+         "(?, ?, ?, ?, ?, ?)"), dm_data)
+
+    c.executemany(
+        ("INSERT INTO returns (project_id, quarter_id, datamap_item_id, value)"
+         " VALUES (?, ?, ?, ?)"), return_data)
+
+    conn.commit()
+    c.close()
+    conn.close()
+    return db_file
+    #os.unlink('/tmp/test.db')
 
 
 @pytest.fixture

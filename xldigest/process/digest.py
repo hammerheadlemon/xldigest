@@ -69,7 +69,6 @@ class Digest:
 
     def read_project_data(self):
         session = self._set_up_session()
-        import pdb; pdb.set_trace()  # XXX BREAKPOINT
         for cell in self._datamap.cell_map:
             # ONLY ACT ON CELLS THAT HAVE A CELL_REFERENCE
             if cell.cell_reference:
