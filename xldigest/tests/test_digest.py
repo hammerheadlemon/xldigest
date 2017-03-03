@@ -2,6 +2,7 @@ from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 import xldigest.tests.fixtures as fixtures
+import pytest
 import sqlite3
 
 BICC_RETURN_MOCK = fixtures.bicc_return
@@ -98,8 +99,7 @@ def test_digest_gets_project_from_database(INMEMORY_SQLITE3):
     print(digest.data[1])
     print(digest.data[2])
     print(digest.data[3])
-    assert digest.data[0].cell_value[
-        0] == 'P2 Q2 DM1'
+    assert digest.data[0].cell_value[0] == 'P2 Q2 DM1'
     assert digest.data[1].cell_value[0] == 'P2 Q2 DM2'
     assert digest.data[2].cell_value[0] == 'P2 Q2 DM3'
 
