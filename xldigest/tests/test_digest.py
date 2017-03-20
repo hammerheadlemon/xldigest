@@ -3,9 +3,13 @@ from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.exceptions import (QuarterNotFoundError,
                                          ProjectNotFoundError)
+
+from openpyxl import load_workbook
+
 import xldigest.tests.fixtures as fixtures
 import pytest
 import sqlite3
+
 
 BICC_RETURN_MOCK = fixtures.bicc_return
 DATAMAP_MOCK = fixtures.mock_datamap_source_file
@@ -180,3 +184,6 @@ def test_populate_blank_form(INMEMORY_SQLITE3, TEST_BLANK_XLS):
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
     digest.write_to_template()
+    wb = load_workbook(TEST_BLANK_XLS)
+    summary_sheet = wb['Summary']
+    assert summary_sheet['A5'].value == 'P2 Q2 DM1'
