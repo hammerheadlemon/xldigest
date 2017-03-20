@@ -64,6 +64,9 @@ class Digest:
         return self._datamap
 
     def _set_up_session(self):
+        """
+        Helper method to create a SQLAlchemy session.
+        """
         database_file = self._datamap.db_file
         engine_string = "sqlite:///" + database_file
         engine = create_engine(engine_string)
@@ -71,6 +74,10 @@ class Digest:
         return Session()
 
     def _check_params(self):
+        """
+        Internal method to check that we have valid quarter and project
+        ids in the Digest.
+        """
         session = self._set_up_session()
         project_ids = session.query(Project.id).all()
         project_ids = [item[0] for item in project_ids]
@@ -82,6 +89,10 @@ class Digest:
             raise ProjectNotFoundError('Quarter not found in database.')
 
     def read_project_data(self):
+        """
+        Reads project data from a database, to create a populated cell map
+        in Digest.data.
+        """
         self._check_params()
         session = self._set_up_session()
         for cell in self._datamap.cell_map:
