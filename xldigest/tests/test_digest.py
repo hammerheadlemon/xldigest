@@ -1,7 +1,8 @@
 from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
-from xldigest.process.exceptions import QuarterNotFoundError
+from xldigest.process.exceptions import (QuarterNotFoundError,
+                                         ProjectNotFoundError)
 import xldigest.tests.fixtures as fixtures
 import pytest
 import sqlite3
@@ -138,5 +139,17 @@ def test_missing_quarter(INMEMORY_SQLITE3):
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
     with pytest.raises(QuarterNotFoundError):
+        # TODO Need to work on this Exception test
+        digest.read_project_data()
+
+
+def test_missing_project(INMEMORY_SQLITE3):
+    qtr_id = 1
+    pjt_id = 1000
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    with pytest.raises(ProjectNotFoundError):
         # TODO Need to work on this Exception test
         digest.read_project_data()

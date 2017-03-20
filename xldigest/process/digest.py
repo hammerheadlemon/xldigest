@@ -1,8 +1,9 @@
 from openpyxl import load_workbook
 
 from xldigest.process.cleansers import Cleanser
-from xldigest.process.exceptions import QuarterNotFoundError
-from xldigest.database.models import ReturnItem, DatamapItem
+from xldigest.process.exceptions import (QuarterNotFoundError,
+                                         ProjectNotFoundError)
+from xldigest.database.models import ReturnItem, DatamapItem, Project, Quarter
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -69,7 +70,19 @@ class Digest:
         Session = sessionmaker(bind=engine)
         return Session()
 
+    def _check_params(self):
+        session = self._set_up_session()
+        project_ids = session.query(Project.id).all()
+        project_ids = [item[0] for item in project_ids]
+        quarter_ids = session.query(Quarter.id).all()
+        quarter_ids = [item[0] for item in quarter_ids]
+        if self.quarter_id not in quarter_ids:
+            raise QuarterNotFoundError('Quarter not found in database.')
+        elif self.project_id not in project_ids:
+            raise ProjectNotFoundError('Quarter not found in database.')
+
     def read_project_data(self):
+        self._check_params()
         session = self._set_up_session()
         for cell in self._datamap.cell_map:
             # ONLY ACT ON CELLS THAT HAVE A CELL_REFERENCE
@@ -78,7 +91,7 @@ class Digest:
                     ReturnItem.project_id == self.project_id).filter(
                     ReturnItem.datamap_item_id == DatamapItem.id).filter(
                     ReturnItem.quarter_id == self.quarter_id).filter(
-                    DatamapItem.id == cell.datamap_id[0]).first()  # why a tup?
+                    DatamapItem.id == cell.datamap_id[0]).first()
                 # then we append it to self.data
                 self.data.append(cell)
 
