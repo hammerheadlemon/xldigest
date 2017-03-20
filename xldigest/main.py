@@ -7,9 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 import sys
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtWidgets
 from xldigest.widgets.main_ui import Ui_MainXldigestWindow
-from xldigest.widgets.datamap import DatamapTableModel
 from xldigest.widgets.template_manager_window import TemplateManagerWindow
 
 

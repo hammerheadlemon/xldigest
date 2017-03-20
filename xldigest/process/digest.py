@@ -106,13 +106,19 @@ class Digest:
                 # then we append it to self.data
                 self.data.append(cell)
 
-    def write(self):
+    def write_to_template(self):
         """
-        If self._datamap.template is a blank template, then write() will
-        write the datamap.cell_map to it.
+        If self._datamap.template is a blank template, then write_to_template()
+        will write the datamap.cell_map to it.
         """
-        if self.dm.template.writable is False:
-            pass  # do stuff to write - consider compile.py in bcompiler
+        if self._datamap.template.writable is False:
+            self.read_project_data()
+            blank = load_workbook(self._datamap.template.file_name)
+            for i in self.data:
+                blank[i.template_sheet][
+                    i.cell_reference].value = i.cell_value[0]
+            blank.save(self._datamap.template.file_name)
+
         else:
             raise TemplateError(
                 "Cannot write to template which contains source data.")

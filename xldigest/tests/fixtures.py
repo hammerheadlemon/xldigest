@@ -1,8 +1,6 @@
 import csv
 import os
 import sqlite3
-from datetime import datetime
-
 import pytest
 from openpyxl import Workbook
 
@@ -305,6 +303,19 @@ def sqlite3_db_file():
     conn.close()
     return db_file
     #os.unlink('/tmp/test.db')
+
+
+@pytest.fixture
+def test_blank_xls():
+    wb = Workbook()
+    wb.create_sheet('Summary')
+    wb.create_sheet('Finance & Benefits')
+    wb.create_sheet('Approval & Project milestones')
+    wb.create_sheet('Resources')
+    wb.create_sheet('Assurance planning')
+    wb.create_sheet('GMPP info')
+    wb.save('/tmp/test.xlsx')
+    return('/tmp/test.xlsx')
 
 
 @pytest.fixture

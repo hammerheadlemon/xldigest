@@ -10,6 +10,7 @@ import sqlite3
 BICC_RETURN_MOCK = fixtures.bicc_return
 DATAMAP_MOCK = fixtures.mock_datamap_source_file
 INMEMORY_SQLITE3 = fixtures.sqlite3_db_file
+TEST_BLANK_XLS = fixtures.test_blank_xls
 
 
 def test_in_tmp_sqlite3(INMEMORY_SQLITE3):
@@ -169,3 +170,13 @@ def test_both_missing_quarter_project(INMEMORY_SQLITE3):
     with pytest.raises(QuarterNotFoundError):
         # TODO Need to work on this Exception test
         digest.read_project_data()
+
+
+def test_populate_blank_form(INMEMORY_SQLITE3, TEST_BLANK_XLS):
+    qtr_id = 2
+    pjt_id = 2
+    template = BICCTemplate(TEST_BLANK_XLS, True)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    digest.write_to_template()
