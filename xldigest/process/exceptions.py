@@ -1,0 +1,2 @@
+class QuarterNotFoundError(Exception):
+    pass

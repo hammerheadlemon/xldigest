@@ -1,6 +1,7 @@
 from openpyxl import load_workbook
 
 from xldigest.process.cleansers import Cleanser
+from xldigest.process.exceptions import QuarterNotFoundError
 from xldigest.database.models import ReturnItem, DatamapItem
 
 from sqlalchemy import create_engine

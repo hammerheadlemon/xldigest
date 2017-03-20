@@ -282,9 +282,10 @@ def sqlite3_db_file():
               FOREIGN KEY (datamap_item_id) REFERENCES datamap_items(id)
               )""")
 
+    c.execute("INSERT INTO quarters (name) VALUES('Q1 2016/17')")
     c.execute("INSERT INTO quarters (name) VALUES('Q2 2016/17')")
-    c.execute("INSERT INTO quarters (name) VALUES('Q2 2016/17')")
-    c.execute("INSERT INTO quarters (name) VALUES('Q2 2016/17')")
+    c.execute("INSERT INTO quarters (name) VALUES('Q3 2016/17')")
+    c.execute("INSERT INTO quarters (name) VALUES('Q4 2016/17')")
 
     c.execute("INSERT INTO projects (name) VALUES('Project 1')")
     c.execute("INSERT INTO projects (name) VALUES('Project 2')")

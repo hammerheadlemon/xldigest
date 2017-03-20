@@ -1,6 +1,7 @@
 from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
+from xldigest.process.exceptions import QuarterNotFoundError
 import xldigest.tests.fixtures as fixtures
 import pytest
 import sqlite3
@@ -15,7 +16,7 @@ def test_in_tmp_sqlite3(INMEMORY_SQLITE3):
     c = conn.cursor()
     q1 = c.execute("SELECT * FROM quarters").fetchone()[1]
     p1 = c.execute("SELECT * FROM projects").fetchone()[1]
-    assert q1 == "Q2 2016/17"
+    assert q1 == "Q1 2016/17"
     assert p1 == "Project 1"
 
 
@@ -127,3 +128,15 @@ def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
     assert digest.data[0].cell_reference == 'B5'
     assert digest.data[0].template_sheet == 'Summary'
     assert digest.data[4].cell_value == 2012
+
+
+def test_missing_quarter(INMEMORY_SQLITE3):
+    qtr_id = 10
+    pjt_id = 1
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    with pytest.raises(QuarterNotFoundError):
+        # TODO Need to work on this Exception test
+        digest.read_project_data()
