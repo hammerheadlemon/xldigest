@@ -2,7 +2,8 @@ from openpyxl import load_workbook
 
 from xldigest.process.cleansers import Cleanser
 from xldigest.process.exceptions import (QuarterNotFoundError,
-                                         ProjectNotFoundError)
+                                         ProjectNotFoundError,
+                                         DuplicateReturnError)
 from xldigest.database.models import ReturnItem, DatamapItem, Project, Quarter
 
 from sqlalchemy import create_engine
@@ -49,9 +50,12 @@ class Digest:
     """
 
     def __init__(self, dm, quarter_id, project_id):
-        # TODO function to check that given datamap is "blank"
         self._datamap = dm
         self._data = []
+        self._existing_quarter_ids = self._get_existing_project_and_quarter_ids()[0]
+        self._existing_project_ids = self._get_existing_project_and_quarter_ids()[1]
+        self._get_existing_return_project_and_quarter_ids()
+
         self.quarter_id = quarter_id
         self.project_id = project_id
 
@@ -73,6 +77,26 @@ class Digest:
         Session = sessionmaker(bind=engine)
         return Session()
 
+    def _get_existing_project_and_quarter_ids(self):
+        """
+        Returns a tuple of lists of quarter_ids and project_ids
+        in the database.
+        """
+        session = self._set_up_session()
+        project_ids = session.query(Project.id).all()
+        quarter_ids = session.query(Quarter.id).all()
+        session.close()
+        return quarter_ids, project_ids
+
+    def _get_existing_return_project_and_quarter_ids(self):
+        session = self._set_up_session()
+        project_ids_in_returns = session.query(ReturnItem.project_id).all()
+        quarter_ids_in_returns = session.query(ReturnItem.quarter_id).all()
+        self._existing_project_ids_in_returns = {
+            id[0] for id in project_ids_in_returns}
+        self._existing_quarter_ids_in_returns = {
+            id[0] for id in quarter_ids_in_returns}
+
     def _check_params(self):
         """
         Internal method to check that we have valid quarter and project
@@ -84,8 +108,10 @@ class Digest:
         quarter_ids = session.query(Quarter.id).all()
         quarter_ids = [item[0] for item in quarter_ids]
         if self.quarter_id not in quarter_ids:
+            session.close()
             raise QuarterNotFoundError('Quarter not found in database.')
         elif self.project_id not in project_ids:
+            session.close()
             raise ProjectNotFoundError('Quarter not found in database.')
 
     def read_project_data(self):
@@ -104,6 +130,7 @@ class Digest:
                     ReturnItem.quarter_id == self.quarter_id).filter(
                     DatamapItem.id == cell.datamap_id[0]).first()
                 self.data.append(cell)
+        session.close()
 
     def write_to_template(self):
         """
@@ -121,6 +148,34 @@ class Digest:
         else:
             raise TemplateError(
                 "Cannot write to template which contains source data.")
+
+    def _check_for_existing_return(self):
+        """
+        Checks for existence of any returns in database matching qtr_id and
+        pjt_id. If there are already records in there with these values,
+        we're going to be duplicating returns, therefore this is not allowed.
+        """
+        if (self.project_id in self._existing_project_ids_in_returns and self.quarter_id in self._existing_quarter_ids_in_returns):
+            return False
+        else:
+            return True
+
+    def write_to_database(self):
+        if self._check_for_existing_return():
+            session = self._set_up_session()
+            for cell in self._data:
+                return_item = ReturnItem(
+                    project_id=self.project_id,
+                    quarter_id=self.quarter_id,
+                    datamap_item_id=cell.datamap_id[0],
+                    value=cell.cell_value)
+                session.add(return_item)
+            session.commit()
+            session.close()
+        else:
+            raise DuplicateReturnError(
+                "Existing records in database with quarter_id:"
+                " {} project_id: {}".format(self.quarter_id, self.project_id))
 
     def read_template(self):
         """

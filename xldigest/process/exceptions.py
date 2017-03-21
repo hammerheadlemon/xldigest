@@ -4,3 +4,7 @@ class QuarterNotFoundError(Exception):
 
 class ProjectNotFoundError(Exception):
     pass
+
+
+class DuplicateReturnError(Exception):
+    pass

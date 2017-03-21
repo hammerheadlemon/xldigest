@@ -2,7 +2,8 @@ from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.exceptions import (QuarterNotFoundError,
-                                         ProjectNotFoundError)
+                                         ProjectNotFoundError,
+                                         DuplicateReturnError)
 
 from openpyxl import load_workbook
 
@@ -27,7 +28,7 @@ def test_in_tmp_sqlite3(INMEMORY_SQLITE3):
 
 
 def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
-    """Uses import_csv() function to process the datamap text file."""
+    """Uses cell_map_from_csv() function to process the datamap text file."""
     template = BICCTemplate(BICC_RETURN_MOCK)
     datamap = Datamap(template,
                       INMEMORY_SQLITE3)
@@ -187,11 +188,33 @@ def test_populate_blank_form(INMEMORY_SQLITE3, TEST_BLANK_XLS):
     assert summary_sheet['A5'].value == 'P2 Q2 DM1'
 
 
-def test_populate_from_to_db(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
+def test_duplicate_record_on_write_to_db(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
     qtr_id = 1
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
     datamap = Datamap(template, INMEMORY_SQLITE3)
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
+    digest.read_template()
+    with pytest.raises(DuplicateReturnError):
+        digest.write_to_database()
 
+
+def test_successful_write_return_to_db(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
+    conn = sqlite3.connect(INMEMORY_SQLITE3)
+    c = conn.cursor()
+    c.execute("DELETE FROM returns")
+    conn.commit()
+    qtr_id = 1
+    pjt_id = 1
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    digest.read_template()
+    digest._get_existing_return_project_and_quarter_ids()
+    digest.write_to_database()
+    test_returns = c.execute("SELECT value FROM returns").fetchone()
+    conn.commit()
+    conn.close()
+    assert test_returns[0] == "Project/Programme Name"
