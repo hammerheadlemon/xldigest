@@ -155,7 +155,8 @@ class Digest:
         pjt_id. If there are already records in there with these values,
         we're going to be duplicating returns, therefore this is not allowed.
         """
-        if (self.project_id in self._existing_project_ids_in_returns and self.quarter_id in self._existing_quarter_ids_in_returns):
+        if self.project_id in self._existing_project_ids_in_returns \
+                and self.quarter_id in self._existing_quarter_ids_in_returns:
             return False
         else:
             return True
