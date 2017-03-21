@@ -218,3 +218,31 @@ def test_successful_write_return_to_db(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
     conn.commit()
     conn.close()
     assert test_returns[0] == "Project/Programme Name"
+
+
+def test_attempt_to_write_return_to_db_unavailable_qtr(INMEMORY_SQLITE3,
+                                                       BICC_RETURN_MOCK):
+    qtr_id = 100
+    pjt_id = 1
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    digest.read_template()
+    with pytest.raises(QuarterNotFoundError):
+        # TODO Need to work on this Exception test
+        digest.write_to_database()
+
+
+def test_attempt_to_write_return_to_db_unavailable_project(INMEMORY_SQLITE3,
+                                                           BICC_RETURN_MOCK):
+    qtr_id = 1
+    pjt_id = 100
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    digest.read_template()
+    with pytest.raises(ProjectNotFoundError):
+        # TODO Need to work on this Exception test
+        digest.write_to_database()

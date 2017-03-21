@@ -89,6 +89,10 @@ class Digest:
         return quarter_ids, project_ids
 
     def _get_existing_return_project_and_quarter_ids(self):
+        """
+        Generate a set containing project_ids in returns, and a set containing
+        quarter_ids in returns.
+        """
         session = self._set_up_session()
         project_ids_in_returns = session.query(ReturnItem.project_id).all()
         quarter_ids_in_returns = session.query(ReturnItem.quarter_id).all()
@@ -96,30 +100,41 @@ class Digest:
             id[0] for id in project_ids_in_returns}
         self._existing_quarter_ids_in_returns = {
             id[0] for id in quarter_ids_in_returns}
+        session.close()
 
-    def _check_params(self):
+    def _check_quarter_exists_in_db(self):
         """
-        Internal method to check that we have valid quarter and project
-        ids in the Digest.
+        Raise QuarterNotFoundError if there is no corresponding quarter_id in
+        Digest object.
         """
         session = self._set_up_session()
-        project_ids = session.query(Project.id).all()
-        project_ids = [item[0] for item in project_ids]
         quarter_ids = session.query(Quarter.id).all()
         quarter_ids = [item[0] for item in quarter_ids]
         if self.quarter_id not in quarter_ids:
             session.close()
             raise QuarterNotFoundError('Quarter not found in database.')
-        elif self.project_id not in project_ids:
+        session.close()
+
+    def _check_project_exists_in_db(self):
+        """
+        Raise ProjectNotFoundError if there is no corresponding project_id in
+        Digest object.
+        """
+        session = self._set_up_session()
+        project_ids = session.query(Project.id).all()
+        project_ids = [item[0] for item in project_ids]
+        if self.project_id not in project_ids:
             session.close()
-            raise ProjectNotFoundError('Quarter not found in database.')
+            raise ProjectNotFoundError('Project not found in database.')
+        session.close()
 
     def read_project_data(self):
         """
         Reads project data from a database, to create a populated cell map
         in Digest.data.
         """
-        self._check_params()
+        self._check_quarter_exists_in_db()
+        self._check_project_exists_in_db()
         session = self._set_up_session()
         for cell in self._datamap.cell_map:
             # ONLY ACT ON CELLS THAT HAVE A CELL_REFERENCE
@@ -162,6 +177,20 @@ class Digest:
             return True
 
     def write_to_database(self):
+        """
+        Checks whether there is a quarter and a project in the database that
+        corresponds with the Digest data we wish to import into the database.
+        If there isn't, an appropriate exception is raised.
+
+        If we go ahead, we then check whether there is already a return in the
+        database with the same quarter/project_id combination. If there is,
+        we should not be importing this Digest and an appropriate exception
+        is raised.
+
+        Otherwise, write the Digest data to the database.
+        """
+        self._check_quarter_exists_in_db()
+        self._check_project_exists_in_db()
         if self._check_for_existing_return():
             session = self._set_up_session()
             for cell in self._data:
