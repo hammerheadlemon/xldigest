@@ -73,7 +73,7 @@ def test_expect_datamap_cell():
 def test_datamap_source_file(mock_datamap_source_file):
     template = BICCTemplate('/tmp/bicc_template.xlsx')
     datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
-    datamap.import_csv(mock_datamap_source_file)
+    datamap.cell_map_from_csv(mock_datamap_source_file)
     assert isinstance(datamap.cell_map[0], Cell)
     assert datamap.cell_map[0].cell_key == 'Project/Programme Name'
     assert datamap.cell_map[5].template_sheet is None

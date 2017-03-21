@@ -31,7 +31,7 @@ def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
     template = BICCTemplate(BICC_RETURN_MOCK)
     datamap = Datamap(template,
                       INMEMORY_SQLITE3)
-    datamap.import_csv(DATAMAP_MOCK)
+    datamap.cell_map_from_csv(DATAMAP_MOCK)
     digest = Digest(datamap, None, None)
     assert digest.datamap.cell_map[0].cell_key == 'Project/Programme Name'
     assert digest.datamap.cell_map[2].cell_key == 'GMPP - FD Sign-Off'
@@ -114,7 +114,7 @@ def test_digest_gets_project_from_database(INMEMORY_SQLITE3):
 def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
     template = BICCTemplate(BICC_RETURN_MOCK)
     datamap = Datamap(template, INMEMORY_SQLITE3)
-    datamap.import_csv(DATAMAP_MOCK)
+    datamap.cell_map_from_csv(DATAMAP_MOCK)
     digest = Digest(datamap, None, None)
     # here we need to go through the datamap, use the cell_key and
     # cell_reference to populate the cell_value of the Cell object
@@ -185,3 +185,13 @@ def test_populate_blank_form(INMEMORY_SQLITE3, TEST_BLANK_XLS):
     wb = load_workbook(TEST_BLANK_XLS)
     summary_sheet = wb['Summary']
     assert summary_sheet['A5'].value == 'P2 Q2 DM1'
+
+
+def test_populate_from_to_db(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
+    qtr_id = 1
+    pjt_id = 1
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+

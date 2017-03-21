@@ -24,7 +24,7 @@ class Datamap:
     a SQLite database file, but it's cell_map is empty. To create a base cell
     map from the template, using the datamap table in the database, call
     Datamap.cell_map_from_database(). To create a base cell map from the
-    template, call Datamap.import_csv().
+    template, call Datamap.cell_map_from_csv().
     """
     def __init__(self, template, db_file):
         self.cell_map = []
@@ -40,7 +40,7 @@ class Datamap:
         self.cell_map.remove(cell)
         return cell
 
-    def import_csv(self, source_file):
+    def cell_map_from_csv(self, source_file):
         """
         Read from a CSV source file. Returns a list of corresponding Cell
         objects.
