@@ -103,7 +103,6 @@ class Digest:
                     ReturnItem.datamap_item_id == DatamapItem.id).filter(
                     ReturnItem.quarter_id == self.quarter_id).filter(
                     DatamapItem.id == cell.datamap_id[0]).first()
-                # then we append it to self.data
                 self.data.append(cell)
 
     def write_to_template(self):
@@ -114,9 +113,9 @@ class Digest:
         if self._datamap.template.writable is False:
             self.read_project_data()
             blank = load_workbook(self._datamap.template.file_name)
-            for i in self.data:
-                blank[i.template_sheet][
-                    i.cell_reference].value = i.cell_value[0]
+            for celldata in self.data:
+                blank[celldata.template_sheet][
+                    celldata.cell_reference].value = celldata.cell_value[0]
             blank.save(self._datamap.template.file_name)
 
         else:
@@ -128,13 +127,9 @@ class Digest:
         Read the relevant values from the template, based on the Datamap.
         Made available in self.data.
         """
-        # load the template
         wb = load_workbook(self._datamap.template.source_file)
-        # go through each Cell in datamap.cell_map
         for cell in self._datamap.cell_map:
-            # ONLY ACT ON CELLS THAT HAVE A CELL_REFERENCE
             if cell.cell_reference:
-                # get value of cell from the template file
                 cell.cell_value = wb[cell.template_sheet][
                     cell.cell_reference].value
                 # as long as that value is not None, we cleanse the value
@@ -142,5 +137,4 @@ class Digest:
                     cleansed = Cleanser(cell.cell_value)
                     cleansed.clean()
                     cell.cell_value = cleansed.string
-                # then we append it to self.data
                 self.data.append(cell)
