@@ -1,6 +1,10 @@
 from openpyxl import load_workbook
 
+from typing import Tuple, Any, List
+
 from xldigest.process.cleansers import Cleanser
+from xldigest.process.datamap import Datamap
+from xldigest.process.cell import Cell
 from xldigest.process.exceptions import (QuarterNotFoundError,
                                          ProjectNotFoundError,
                                          DuplicateReturnError)
@@ -49,11 +53,13 @@ class Digest:
             digest.data
     """
 
-    def __init__(self, dm, quarter_id, project_id):
+    def __init__(self, dm: Datamap, quarter_id: int, project_id: int) -> None:
         self._datamap = dm
-        self._data = []
-        self._existing_quarter_ids = self._get_existing_project_and_quarter_ids()[0]
-        self._existing_project_ids = self._get_existing_project_and_quarter_ids()[1]
+        self._data: List[Cell] = []
+        self._existing_quarter_ids = \
+            self._get_existing_project_and_quarter_ids()[0]
+        self._existing_project_ids = \
+            self._get_existing_project_and_quarter_ids()[1]
         self._get_existing_return_project_and_quarter_ids()
 
         self.quarter_id = quarter_id
@@ -77,7 +83,7 @@ class Digest:
         Session = sessionmaker(bind=engine)
         return Session()
 
-    def _get_existing_project_and_quarter_ids(self):
+    def _get_existing_project_and_quarter_ids(self) -> Tuple[Any, Any]:
         """
         Returns a tuple of lists of quarter_ids and project_ids
         in the database.
@@ -88,7 +94,7 @@ class Digest:
         session.close()
         return quarter_ids, project_ids
 
-    def _get_existing_return_project_and_quarter_ids(self):
+    def _get_existing_return_project_and_quarter_ids(self) -> None:
         """
         Generate a set containing project_ids in returns, and a set containing
         quarter_ids in returns.
@@ -102,7 +108,7 @@ class Digest:
             id[0] for id in quarter_ids_in_returns}
         session.close()
 
-    def _check_quarter_exists_in_db(self):
+    def _check_quarter_exists_in_db(self) -> None:
         """
         Raise QuarterNotFoundError if there is no corresponding quarter_id in
         Digest object.
@@ -115,7 +121,7 @@ class Digest:
             raise QuarterNotFoundError('Quarter not found in database.')
         session.close()
 
-    def _check_project_exists_in_db(self):
+    def _check_project_exists_in_db(self) -> None:
         """
         Raise ProjectNotFoundError if there is no corresponding project_id in
         Digest object.
@@ -128,7 +134,7 @@ class Digest:
             raise ProjectNotFoundError('Project not found in database.')
         session.close()
 
-    def read_project_data(self):
+    def read_project_data(self) -> None:
         """
         Reads project data from a database, to create a populated cell map
         in Digest.data.
@@ -147,7 +153,7 @@ class Digest:
                 self.data.append(cell)
         session.close()
 
-    def write_to_template(self):
+    def write_to_template(self) -> None:
         """
         If self._datamap.template is a blank template, then write_to_template()
         will write the datamap.cell_map to it.
@@ -164,7 +170,7 @@ class Digest:
             raise TemplateError(
                 "Cannot write to template which contains source data.")
 
-    def _check_for_existing_return(self):
+    def _check_for_existing_return(self) -> bool:
         """
         Checks for existence of any returns in database matching qtr_id and
         pjt_id. If there are already records in there with these values,
@@ -176,7 +182,7 @@ class Digest:
         else:
             return True
 
-    def write_to_database(self):
+    def write_to_database(self) -> None:
         """
         Checks whether there is a quarter and a project in the database that
         corresponds with the Digest data we wish to import into the database.
@@ -207,7 +213,7 @@ class Digest:
                 "Existing records in database with quarter_id:"
                 " {} project_id: {}".format(self.quarter_id, self.project_id))
 
-    def read_template(self):
+    def read_template(self) -> None:
         """
         Read the relevant values from the template, based on the Datamap.
         Made available in self.data.

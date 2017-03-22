@@ -7,6 +7,8 @@ from xldigest.database.models import DatamapItem
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from typing import List
+
 
 def set_up_session(db_file):
     engine_string = "sqlite:///" + db_file
@@ -26,21 +28,21 @@ class Datamap:
     Datamap.cell_map_from_database(). To create a base cell map from the
     template, call Datamap.cell_map_from_csv().
     """
-    def __init__(self, template, db_file):
-        self.cell_map = []
+    def __init__(self, template: str, db_file: str) -> None:
+        self.cell_map: List[Cell] = []
         self.template = template
         self.db_file = db_file
         self.session = set_up_session(db_file)
 
-    def add_cell(self, cell):
+    def add_cell(self, cell) -> Cell:
         self.cell_map.append(cell)
         return cell
 
-    def delete_cell(self, cell):
+    def delete_cell(self, cell) -> Cell:
         self.cell_map.remove(cell)
         return cell
 
-    def cell_map_from_csv(self, source_file):
+    def cell_map_from_csv(self, source_file: str) -> None:
         """
         Read from a CSV source file. Returns a list of corresponding Cell
         objects.
@@ -51,7 +53,7 @@ class Datamap:
             except Exception:
                 print("Problem with that CSV file. File extension?")
 
-    def _import_source_data(self, source_file):
+    def _import_source_data(self, source_file: str) -> None:
         """Internal implementation of csv importer."""
         with open(source_file, 'r') as csv_file:
             reader = csv.DictReader(csv_file)
@@ -70,7 +72,7 @@ class Datamap:
                             )
                         )
 
-    def cell_map_from_database(self):
+    def cell_map_from_database(self) -> None:
         """Creates a cellmap from a sqlite3 database. cell_map fields are
         empty until a function is called to populate the cellmap from
         a data source."""

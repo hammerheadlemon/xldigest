@@ -4,6 +4,8 @@ New Cell class for QT redesign - started 18 January 2017.
 Do not run this code and expect it to work.
 """
 
+from typing import Any
+
 
 class Cell:
     """
@@ -11,20 +13,19 @@ class Cell:
     They are used to populate a datamap cell_map and to write out data to
     a template.
     """
-    def __init__(
-            self,
-            datamap_id,
-            cell_key,
-            cell_value,
-            cell_reference,
-            template_sheet,
-            bg_colour,
-            fg_colour,
-            number_format,
-            verification_list):
+    def __init__(self,
+                 datamap_id: int,
+                 cell_key: str,
+                 cell_value: Any,
+                 cell_reference: str,
+                 template_sheet: str,
+                 bg_colour: str,
+                 fg_colour: str,
+                 number_format: str,
+                 verification_list: str) -> None:
         self.datamap_id = datamap_id,
         self.cell_key = cell_key
-        self.cell_value = None
+        self.cell_value: Any = None
         self.cell_reference = cell_reference
         self.template_sheet = template_sheet
         self.bg_colour = bg_colour

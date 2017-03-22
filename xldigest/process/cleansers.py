@@ -1,5 +1,6 @@
-from datetime import date
+from datetime import date, datetime
 from operator import itemgetter
+from typing import AnyStr, Callable, Any, Optional
 import re
 
 from dateutil.parser import parse
@@ -38,7 +39,7 @@ class Cleanser:
 
     """
 
-    def __init__(self, string):
+    def __init__(self, string: str) -> None:
         self.string = string
 
         # a list of dicts that describe everything needed to fix errors in
@@ -121,7 +122,7 @@ class Cleanser:
         self.checks_l = len(self._checks)
         self._analyse()
 
-    def _sort_checks(self):
+    def _sort_checks(self) -> None:
         """
         Sorts the list of dicts in self._checks by their count, highest
         first, so that when the fix methods run down them, they always have
@@ -131,13 +132,15 @@ class Cleanser:
         self._checks = sorted(
             self._checks, key=itemgetter('count'), reverse=True)
 
-    def _endash(self, regex, fix):
+    def _endash(self,
+                regex,
+                fix) -> Callable[[AnyStr, AnyStr, AnyStr], AnyStr]:
         """
         Turns – into -.
         """
         return re.sub(regex, fix, self.string)
 
-    def _pound(self, regex, fix):
+    def _pound(self, regex, fix) -> float:
         """
         Turns £12.24 into 12.24 (a float).
         """
@@ -148,7 +151,7 @@ class Cleanser:
         else:
             return float(sum_p)
 
-    def _percent(self, regex, fix):
+    def _percent(self, regex, fix) -> float:
         """
         Turns 100% into 1.0.
         """
@@ -156,35 +159,33 @@ class Cleanser:
         p = int(m.group(1))
         return p / 100
 
-    def _float(self, regex, fix):
+    def _float(self, regex, fix) -> float:
         """
         Turns numbers that look like floats into floats.
         """
         return float(self.string)
 
-    def _int(self, regex, fix):
+    def _int(self, regex, fix) -> int:
         """
         Turns numbers that look like integers into integers.
         """
         return int(self.string)
 
-    def _date(self, regex, fix):
+    def _date(self, regex, fix) -> Any:
         """
         Handles dates in "03/05/2016" format.
         """
         m = re.match(regex, self.string)
         if int(m.groups()[-1]) in range(1965, 1967):
-            logger.warning(
-                ("Dates inputted as dd/mm/65 will migrate as dd/mm/2065. "
-                    "Dates inputted as dd/mm/66 will migrate as dd/mm/1966."))
+            print(("Dates inputted as dd/mm/65 will migrate as dd/mm/2065. "
+                   "Dates inputted as dd/mm/66 will migrate as dd/mm/1966."))
         try:
             return parse(m.string, dayfirst=True)
         except ValueError:
-            logger.error(
-                "This date is causing problems: {}".format(self.string))
+            print("This date is causing problems: {}".format(self.string))
             return self.string
 
-    def _date_time(self, regex, fix):
+    def _date_time(self, regex, fix) -> Any:
         """
         Handles dates in "2017-05-01 0:00:00" format. We get this from the
         csv file when we send it back out to templates/forms. Returns a Python
@@ -197,10 +198,12 @@ class Cleanser:
         try:
             return date(year, month, day)
         except ValueError:
-            logger.error("Incorrect date format {}!".format(self.string))
+            print("Incorrect date format {}!".format(self.string))
             return self.string
 
-    def _commas(self, regex, fix):
+    def _commas(self,
+                regex,
+                fix) -> Callable[[AnyStr, AnyStr, AnyStr], AnyStr]:
         """
         Handles commas in self.string according to rule in self._checks
         """
@@ -209,19 +212,25 @@ class Cleanser:
         # before it in the list, the > 0 count never gets fixed
         return re.sub(regex, fix, self.string)
 
-    def _apostrophe(self, regex, fix):
+    def _apostrophe(self, regex, fix) -> str:
         """Handles apostrophes as first char of the string."""
         return self.string.lstrip('\'')
 
-    def _newline(self, regex, fix):
+    def _newline(self,
+                 regex,
+                 fix) -> Callable[[AnyStr, AnyStr, AnyStr], AnyStr]:
         """Handles newlines anywhere in string."""
         return re.sub(regex, fix, self.string)
 
-    def _doublespace(self, regex, fix):
+    def _doublespace(self,
+                     regex,
+                     fix) -> Callable[[AnyStr, AnyStr, AnyStr], AnyStr]:
         """Handles double-spaces anywhere in string."""
         return re.sub(regex, fix, self.string)
 
-    def _space_pipe_char(self, regex, fix):
+    def _space_pipe_char(self,
+                         regex,
+                         fix) -> Callable[[AnyStr, AnyStr, AnyStr], AnyStr]:
         """Handles space pipe char anywhere in string."""
         return re.sub(regex, fix, self.string)
 
@@ -231,7 +240,7 @@ class Cleanser:
         return self._checks.index(next(
             item for item in self._checks if item['c_type'] == c_type))
 
-    def _analyse(self):
+    def _analyse(self) -> None:
         """
         Uses the self._checks table as a basis for counting the number of
         each cleaning target required, and calling the appropriate method
@@ -247,7 +256,7 @@ class Cleanser:
             except TypeError:
                 i += 1
 
-    def clean(self):
+    def clean(self) -> str:
         """Runs each applicable cleaning action and returns the cleaned
         string."""
         self._sort_checks()
