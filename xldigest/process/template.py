@@ -31,7 +31,7 @@ class BICCTemplate(FormTemplate):
         Initialising a BICCTemplate object requires an Excel file.
         """
         super(BICCTemplate, self).__init__(file_name, blank)
-        self.sheets: List[str] = []
+        self.sheets = []  # type:  List[str]
         self.source_file = file_name
 
     def add_sheet(self, sheet_name: str) -> None:

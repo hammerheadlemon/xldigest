@@ -55,7 +55,7 @@ class Digest:
 
     def __init__(self, dm: Datamap, quarter_id: int, project_id: int) -> None:
         self._datamap = dm
-        self._data: List[Cell] = []
+        self._data = []  # type: List[Cell]
         self._existing_quarter_ids = \
             self._get_existing_project_and_quarter_ids()[0]
         self._existing_project_ids = \

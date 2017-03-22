@@ -25,7 +25,7 @@ class Cell:
                  verification_list: Union[str, None]) -> None:
         self.datamap_id = datamap_id,
         self.cell_key = cell_key
-        self.cell_value: Any = None
+        self.cell_value = None  # type: Any
         self.cell_reference = cell_reference
         self.template_sheet = template_sheet
         self.bg_colour = bg_colour

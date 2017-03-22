@@ -45,7 +45,7 @@ class Cleanser:
         # a list of dicts that describe everything needed to fix errors in
         # string passed to class constructor. Method self.clean() runs through
         # them,  fixing each in turn.
-        self._checks: List[Dict[str, Any]] = [
+        self._checks = [
             dict(
                 c_type="emdash",
                 rule=ENDASH_REGEX,
@@ -118,7 +118,7 @@ class Cleanser:
                 fix=None,
                 func=self._pound,
                 count=0)
-        ]
+            ]  # type: List[Dict[str, Any]]
         self.checks_l = len(self._checks)
         self._analyse()
 

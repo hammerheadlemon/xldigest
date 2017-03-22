@@ -30,7 +30,7 @@ class Datamap:
     template, call Datamap.cell_map_from_csv().
     """
     def __init__(self, template: FormTemplate, db_file: str) -> None:
-        self.cell_map: List[Cell] = []
+        self.cell_map = []  # type: List[Cell]
         self.template = template
         self.db_file = db_file
         self.session = set_up_session(db_file)
@@ -39,7 +39,7 @@ class Datamap:
         self.cell_map.append(cell)
         return cell
 
-    def delete_cell(self, cell:Cell) -> Cell:
+    def delete_cell(self, cell: Cell) -> Cell:
         self.cell_map.remove(cell)
         return cell
 
