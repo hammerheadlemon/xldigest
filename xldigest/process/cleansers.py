@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from operator import itemgetter
-from typing import AnyStr, Callable, Any, Optional
+from typing import AnyStr, Callable, Any, Optional, Union, List, Dict
 import re
 
 from dateutil.parser import parse
@@ -45,7 +45,7 @@ class Cleanser:
         # a list of dicts that describe everything needed to fix errors in
         # string passed to class constructor. Method self.clean() runs through
         # them,  fixing each in turn.
-        self._checks = [
+        self._checks: List[Dict[str, Any]] = [
             dict(
                 c_type="emdash",
                 rule=ENDASH_REGEX,
@@ -132,15 +132,13 @@ class Cleanser:
         self._checks = sorted(
             self._checks, key=itemgetter('count'), reverse=True)
 
-    def _endash(self,
-                regex,
-                fix) -> Callable[[AnyStr, AnyStr, AnyStr], AnyStr]:
+    def _endash(self, regex: str, fix: str) -> str:
         """
         Turns – into -.
         """
         return re.sub(regex, fix, self.string)
 
-    def _pound(self, regex, fix) -> float:
+    def _pound(self, regex: str, fix: str) -> float:
         """
         Turns £12.24 into 12.24 (a float).
         """
@@ -151,7 +149,7 @@ class Cleanser:
         else:
             return float(sum_p)
 
-    def _percent(self, regex, fix) -> float:
+    def _percent(self, regex: str, fix: str) -> float:
         """
         Turns 100% into 1.0.
         """
@@ -159,19 +157,19 @@ class Cleanser:
         p = int(m.group(1))
         return p / 100
 
-    def _float(self, regex, fix) -> float:
+    def _float(self, regex: str, fix: str) -> float:
         """
         Turns numbers that look like floats into floats.
         """
         return float(self.string)
 
-    def _int(self, regex, fix) -> int:
+    def _int(self, regex: str, fix: str) -> int:
         """
         Turns numbers that look like integers into integers.
         """
         return int(self.string)
 
-    def _date(self, regex, fix) -> Any:
+    def _date(self, regex: str, fix: str) -> Union[datetime, str]:
         """
         Handles dates in "03/05/2016" format.
         """
@@ -185,7 +183,7 @@ class Cleanser:
             print("This date is causing problems: {}".format(self.string))
             return self.string
 
-    def _date_time(self, regex, fix) -> Any:
+    def _date_time(self, regex: str, fix: str) -> Union[date, str]:
         """
         Handles dates in "2017-05-01 0:00:00" format. We get this from the
         csv file when we send it back out to templates/forms. Returns a Python
@@ -201,9 +199,7 @@ class Cleanser:
             print("Incorrect date format {}!".format(self.string))
             return self.string
 
-    def _commas(self,
-                regex,
-                fix) -> Callable[[AnyStr, AnyStr, AnyStr], AnyStr]:
+    def _commas(self, regex: str, fix: str) -> str:
         """
         Handles commas in self.string according to rule in self._checks
         """
@@ -212,29 +208,23 @@ class Cleanser:
         # before it in the list, the > 0 count never gets fixed
         return re.sub(regex, fix, self.string)
 
-    def _apostrophe(self, regex, fix) -> str:
+    def _apostrophe(self, regex: str, fix: str) -> str:
         """Handles apostrophes as first char of the string."""
         return self.string.lstrip('\'')
 
-    def _newline(self,
-                 regex,
-                 fix) -> Callable[[AnyStr, AnyStr, AnyStr], AnyStr]:
+    def _newline(self, regex: str, fix: str) -> str:
         """Handles newlines anywhere in string."""
         return re.sub(regex, fix, self.string)
 
-    def _doublespace(self,
-                     regex,
-                     fix) -> Callable[[AnyStr, AnyStr, AnyStr], AnyStr]:
+    def _doublespace(self, regex: str, fix: str) -> str:
         """Handles double-spaces anywhere in string."""
         return re.sub(regex, fix, self.string)
 
-    def _space_pipe_char(self,
-                         regex,
-                         fix) -> Callable[[AnyStr, AnyStr, AnyStr], AnyStr]:
+    def _space_pipe_char(self, regex: str, fix: str) -> str:
         """Handles space pipe char anywhere in string."""
         return re.sub(regex, fix, self.string)
 
-    def _access_checks(self, c_type):
+    def _access_checks(self, c_type: str) -> int:
         """Helper method returns the index of rule in self._checks
         when given a c_type"""
         return self._checks.index(next(

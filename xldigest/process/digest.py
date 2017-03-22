@@ -66,11 +66,11 @@ class Digest:
         self.project_id = project_id
 
     @property
-    def data(self):
+    def data(self) -> List[Cell]:
         return self._data
 
     @property
-    def datamap(self):
+    def datamap(self) -> Datamap:
         return self._datamap
 
     def _set_up_session(self):
@@ -218,7 +218,7 @@ class Digest:
         Read the relevant values from the template, based on the Datamap.
         Made available in self.data.
         """
-        wb = load_workbook(self._datamap.template.source_file)
+        wb = load_workbook(self._datamap.template.file_name)
         for cell in self._datamap.cell_map:
             if cell.cell_reference:
                 cell.cell_value = wb[cell.template_sheet][

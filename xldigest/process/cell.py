@@ -4,7 +4,7 @@ New Cell class for QT redesign - started 18 January 2017.
 Do not run this code and expect it to work.
 """
 
-from typing import Any
+from typing import Any, Union
 
 
 class Cell:
@@ -14,15 +14,15 @@ class Cell:
     a template.
     """
     def __init__(self,
-                 datamap_id: int,
+                 datamap_id: Union[int, None],
                  cell_key: str,
                  cell_value: Any,
                  cell_reference: str,
                  template_sheet: str,
-                 bg_colour: str,
-                 fg_colour: str,
-                 number_format: str,
-                 verification_list: str) -> None:
+                 bg_colour: Union[str, None],
+                 fg_colour: Union[str, None],
+                 number_format: Union[str, None],
+                 verification_list: Union[str, None]) -> None:
         self.datamap_id = datamap_id,
         self.cell_key = cell_key
         self.cell_value: Any = None
@@ -33,7 +33,7 @@ class Cell:
         self.number_format = number_format
         self.verification_list = verification_list
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return ("<Cell: DMID:{} CellKey:{} CellValue:{} CellRef:{} "
                 "Sheet:{}>".format(
                     self.datamap_id,
