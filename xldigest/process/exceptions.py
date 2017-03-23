@@ -8,3 +8,7 @@ class ProjectNotFoundError(Exception):
 
 class DuplicateReturnError(Exception):
     pass
+
+
+class NonExistantReturnError(Exception):
+    pass

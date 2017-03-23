@@ -3,7 +3,8 @@ from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.exceptions import (QuarterNotFoundError,
                                          ProjectNotFoundError,
-                                         DuplicateReturnError)
+                                         DuplicateReturnError,
+                                         NonExistantReturnError)
 
 from openpyxl import load_workbook
 
@@ -174,17 +175,29 @@ def test_both_missing_quarter_project(INMEMORY_SQLITE3):
         digest.read_project_data()
 
 
-def test_populate_blank_form(INMEMORY_SQLITE3, TEST_BLANK_XLS):
-    qtr_id = 2
+def test_populate_blank_form_export_new(INMEMORY_SQLITE3, TEST_BLANK_XLS):
+    qtr_id = 1
     pjt_id = 2
     template = BICCTemplate(TEST_BLANK_XLS, True)
     datamap = Datamap(template, INMEMORY_SQLITE3)
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
-    digest.write_to_template()
-    wb = load_workbook(TEST_BLANK_XLS)
+    output_path = digest.write_to_template('/tmp')
+    wb = load_workbook(output_path)
     summary_sheet = wb['Summary']
-    assert summary_sheet['A5'].value == 'P2 Q2 DM1'
+    assert summary_sheet['A5'].value == 'P2 Q1 DM1'
+
+
+def test_populate_blank_form_non_existing_qtr_proj_combo(INMEMORY_SQLITE3,
+                                                         TEST_BLANK_XLS):
+    qtr_id = 3
+    pjt_id = 2
+    template = BICCTemplate(TEST_BLANK_XLS, True)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    with pytest.raises(NonExistantReturnError):
+        digest.write_to_template('/tmp')
 
 
 def test_duplicate_record_on_write_to_db(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
@@ -243,3 +256,15 @@ def test_attempt_to_write_return_to_db_unavailable_project(INMEMORY_SQLITE3,
     digest.read_template()
     with pytest.raises(ProjectNotFoundError):
         digest.write_to_database()
+
+
+def test_file_name_cleaner(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
+    qtr_id = 1
+    pjt_id = 1
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    digest.read_template()
+    assert digest._generate_file_name_from_return_data(
+        qtr_id, pjt_id) == 'Project_1_Q1_2016_17'

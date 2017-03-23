@@ -1,17 +1,19 @@
+import re
+
+from typing import Any, List, Tuple
+
 from openpyxl import load_workbook
-
-from typing import Tuple, Any, List
-
-from xldigest.process.cleansers import Cleanser
-from xldigest.process.datamap import Datamap
-from xldigest.process.cell import Cell
-from xldigest.process.exceptions import (QuarterNotFoundError,
-                                         ProjectNotFoundError,
-                                         DuplicateReturnError)
-from xldigest.database.models import ReturnItem, DatamapItem, Project, Quarter
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from xldigest.database.models import DatamapItem, Project, Quarter, ReturnItem
+from xldigest.process.cell import Cell
+from xldigest.process.cleansers import Cleanser
+from xldigest.process.datamap import Datamap
+from xldigest.process.exceptions import (DuplicateReturnError,
+                                         ProjectNotFoundError,
+                                         QuarterNotFoundError,
+                                         NonExistantReturnError)
 
 
 class TemplateError(Exception):
@@ -73,6 +75,12 @@ class Digest:
     def datamap(self) -> Datamap:
         return self._datamap
 
+    @classmethod
+    def easy_set_up_session_sqlite(cls, database_file: str):
+        engine = create_engine("sqlite:///" + database_file)
+        Session = sessionmaker(bind=engine)
+        return Session()
+
     def _set_up_session(self):
         """
         Helper method to create a SQLAlchemy session.
@@ -89,8 +97,8 @@ class Digest:
         in the database.
         """
         session = self._set_up_session()
-        project_ids = session.query(Project.id).all()
-        quarter_ids = session.query(Quarter.id).all()
+        project_ids = session.query(Project.id).first()[0]
+        quarter_ids = session.query(Quarter.id).first()[0]
         session.close()
         return quarter_ids, project_ids
 
@@ -153,22 +161,47 @@ class Digest:
                 self.data.append(cell)
         session.close()
 
-    def write_to_template(self) -> None:
+    def _generate_file_name_from_return_data(self,
+                                             quarter_id: int,
+                                             project_id: int) -> str:
+        session = self._set_up_session()
+        q_str = session.query(Quarter.name).filter(
+            Quarter.id == quarter_id).first()[0]
+        proj_str = session.query(Project.name).filter(
+            Project.id == project_id).first()[0]
+        white_sp = re.compile(r'[\W/]')
+        lc_fn = white_sp.sub('_', (proj_str + '_' + q_str))
+        return lc_fn
+
+    def write_to_template(self, dir: str) -> str:
         """
         If self._datamap.template is a blank template, then write_to_template()
         will write the datamap.cell_map to it.
         """
-        if self._datamap.template.writable is False:
-            self.read_project_data()
-            blank = load_workbook(self._datamap.template.file_name)
-            for celldata in self.data:
-                blank[celldata.template_sheet][
-                    celldata.cell_reference].value = celldata.cell_value[0]
-            blank.save(self._datamap.template.file_name)
+        if self._check_for_existing_return():
+            if self._datamap.template.writable is False:
+                self.read_project_data()
+                blank = load_workbook(self._datamap.template.file_name)
+                for celldata in self.data:
+                    try:
+                        blank[celldata.template_sheet][
+                            celldata.cell_reference].value = celldata.cell_value[0]
+                    except TypeError:
+                        blank[celldata.template_sheet][
+                            celldata.cell_reference].value = ""
+                output_path = (
+                    dir + '/' + self._generate_file_name_from_return_data(
+                        self.quarter_id, self.project_id) + '.xlsx')
+                blank.save(output_path)
+                return output_path
 
+            else:
+                raise TemplateError(
+                    "Cannot write to template which contains source data.")
         else:
-            raise TemplateError(
-                "Cannot write to template which contains source data.")
+            raise NonExistantReturnError(
+                f"A return with project_id {self.project_id} and quarter_id"
+                f" {self.quarter_id} is not in the database.")
 
     def _check_for_existing_return(self) -> bool:
         """
@@ -178,9 +211,9 @@ class Digest:
         """
         if self.project_id in self._existing_project_ids_in_returns \
                 and self.quarter_id in self._existing_quarter_ids_in_returns:
-            return False
-        else:
             return True
+        else:
+            return False
 
     def write_to_database(self) -> None:
         """
@@ -197,7 +230,7 @@ class Digest:
         """
         self._check_quarter_exists_in_db()
         self._check_project_exists_in_db()
-        if self._check_for_existing_return():
+        if not self._check_for_existing_return():
             session = self._set_up_session()
             for cell in self._data:
                 return_item = ReturnItem(
