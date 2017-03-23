@@ -302,7 +302,7 @@ def sqlite3_db_file():
     c.close()
     conn.close()
     return db_file
-    #os.unlink('/tmp/test.db')
+    # os.unlink('/tmp/test.db')
 
 
 @pytest.fixture

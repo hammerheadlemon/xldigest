@@ -171,7 +171,6 @@ def test_both_missing_quarter_project(INMEMORY_SQLITE3):
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
     with pytest.raises(QuarterNotFoundError):
-        # TODO Need to work on this Exception test
         digest.read_project_data()
 
 
@@ -230,7 +229,6 @@ def test_attempt_to_write_return_to_db_unavailable_qtr(INMEMORY_SQLITE3,
     digest = Digest(datamap, qtr_id, pjt_id)
     digest.read_template()
     with pytest.raises(QuarterNotFoundError):
-        # TODO Need to work on this Exception test
         digest.write_to_database()
 
 
@@ -244,5 +242,4 @@ def test_attempt_to_write_return_to_db_unavailable_project(INMEMORY_SQLITE3,
     digest = Digest(datamap, qtr_id, pjt_id)
     digest.read_template()
     with pytest.raises(ProjectNotFoundError):
-        # TODO Need to work on this Exception test
         digest.write_to_database()
