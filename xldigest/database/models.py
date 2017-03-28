@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey
+from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -6,6 +6,24 @@ Base = declarative_base()
 
 engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
                        'db.sqlite')
+
+
+class SeriesItem(Base):
+    __tablename__ = 'series_item'
+    name = Column(String)
+    series = Column(Integer, ForeignKey('series.id'))
+    start_date = Column(Date)
+    end_date = Column(Date)
+
+
+class Series(Base):
+    __tablename__ = 'series'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    first_series_item = Column(Date)
+    last_series_item = Column(Date)
+    series_items = relationship("SeriesItem")
 
 
 class Project(Base):

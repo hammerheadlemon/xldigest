@@ -1,7 +1,7 @@
 import csv
 import os
-import sys
-import sqlite3
+
+from datetime import date
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -10,8 +10,8 @@ from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.template import BICCTemplate
 
-from xldigest.database.models import (DatamapItem, Project, Quarter, Base,
-                                      ReturnItem)
+from xldigest.database.models import (DatamapItem, Project, Quarter,
+                                      ReturnItem, Series, SeriesItem)
 
 engine = create_engine('sqlite:///db.sqlite')
 
@@ -84,18 +84,98 @@ def merge_gmpp_datamap(source_file):
     session.commit()
 
 
+def populate_series_table():
+    """
+    A single series: Financial Quarters
+    """
+    session.add(Series(
+        name='Financial Quarters',
+        first_series_item=1,
+        last_series_item=20
+    ))
+
+
 def populate_quarters_table():
     """
-    Populate basic Quarter information.
+    Populate basic Quarter information as SeriesItem objects.
     """
-    session.add_all([
-        Quarter(name='Q2 2016/17'), Quarter(name='Q3 2016/17'),
-        Quarter(name='Q4 2016/17'), Quarter(name='Q1 2017/18'),
-        Quarter(name='Q2 2017/18'), Quarter(name='Q3 2017/18'),
-        Quarter(name='Q4 2017/18'), Quarter(name='Q1 2018/19'),
-        Quarter(name='Q2 2018/19'), Quarter(name='Q3 2018/19'),
-        Quarter(name='Q4 2018/19'), Quarter(name='Q5 2019/20')
-    ])
+    #  1
+    session.add(
+        SeriesItem(
+            name='Q1 2012/13',
+            series=1,
+            start_date=date(2012, 4, 1),
+            end_date=date(2012, 6, 30)))
+    session.add(
+        SeriesItem(
+            name='Q2 2012/13',
+            series=1,
+            start_date=date(2012, 7, 1),
+            end_date=date(2012, 9, 30)))
+    session.add(
+        SeriesItem(
+            name='Q3 2012/13',
+            series=1,
+            start_date=date(2012, 10, 1),
+            end_date=date(2012, 12, 31)))
+    session.add(
+        SeriesItem(
+            name='Q4 2012/13',
+            series=1,
+            start_date=date(2013, 1, 1),
+            end_date=date(2013, 3, 31)))
+
+    #  2
+    session.add(
+        SeriesItem(
+            name='Q1 2013/14',
+            series=1,
+            start_date=date(2013, 4, 1),
+            end_date=date(2013, 6, 31)))
+    session.add(
+        SeriesItem(
+            name='Q2 2013/14',
+            series=1,
+            start_date=date(2013, 7, 1),
+            end_date=date(2013, 9, 30)))
+    session.add(
+        SeriesItem(
+            name='Q3 2013/14',
+            series=1,
+            start_date=date(2013, 10, 1),
+            end_date=date(2013, 12, 31)))
+    session.add(
+        SeriesItem(
+            name='Q4 2013/14',
+            series=1,
+            start_date=date(2014, 1, 1),
+            end_date=date(2014, 3, 31)))
+
+    #  3
+    session.add(
+        SeriesItem(
+            name='Q1 2013/14',
+            series=1,
+            start_date=date(2013, 4, 1),
+            end_date=date(2013, 6, 31)))
+    session.add(
+        SeriesItem(
+            name='Q2 2013/14',
+            series=1,
+            start_date=date(2013, 7, 1),
+            end_date=date(2013, 9, 30)))
+    session.add(
+        SeriesItem(
+            name='Q3 2013/14',
+            series=1,
+            start_date=date(2013, 10, 1),
+            end_date=date(2013, 12, 31)))
+    session.add(
+        SeriesItem(
+            name='Q4 2013/14',
+            series=1,
+            start_date=date(2014, 1, 1),
+            end_date=date(2014, 3, 31)))
     session.commit()
 
 
@@ -174,12 +254,12 @@ def import_all_returns_to_database():
 
 
 def main():
-#   import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
-#                      'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-#   merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
-#                      'datamap-master-to-gmpp')
-#   populate_projects_table()
-#   populate_quarters_table()
+    #   import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
+    #                      'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+    #   merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
+    #                      'datamap-master-to-gmpp')
+    #   populate_projects_table()
+    #   populate_quarters_table()
     import_all_returns_to_database()
 
 
