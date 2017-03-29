@@ -10,6 +10,7 @@ engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
 
 class SeriesItem(Base):
     __tablename__ = 'series_item'
+    id = Column(Integer, primary_key=True)
     name = Column(String)
     series = Column(Integer, ForeignKey('series.id'))
     start_date = Column(Date)

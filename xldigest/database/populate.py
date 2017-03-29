@@ -131,7 +131,7 @@ def populate_quarters_table():
             name='Q1 2013/14',
             series=1,
             start_date=date(2013, 4, 1),
-            end_date=date(2013, 6, 31)))
+            end_date=date(2013, 6, 30)))
     session.add(
         SeriesItem(
             name='Q2 2013/14',
@@ -154,28 +154,158 @@ def populate_quarters_table():
     #  3
     session.add(
         SeriesItem(
-            name='Q1 2013/14',
+            name='Q1 2014/15',
             series=1,
-            start_date=date(2013, 4, 1),
-            end_date=date(2013, 6, 31)))
+            start_date=date(2014, 4, 1),
+            end_date=date(2014, 6, 30)))
     session.add(
         SeriesItem(
-            name='Q2 2013/14',
+            name='Q2 2014/15',
             series=1,
-            start_date=date(2013, 7, 1),
-            end_date=date(2013, 9, 30)))
+            start_date=date(2014, 7, 1),
+            end_date=date(2014, 9, 30)))
     session.add(
         SeriesItem(
-            name='Q3 2013/14',
+            name='Q3 2014/15',
             series=1,
-            start_date=date(2013, 10, 1),
-            end_date=date(2013, 12, 31)))
+            start_date=date(2014, 10, 1),
+            end_date=date(2014, 12, 31)))
     session.add(
         SeriesItem(
-            name='Q4 2013/14',
+            name='Q4 2014/15',
             series=1,
-            start_date=date(2014, 1, 1),
-            end_date=date(2014, 3, 31)))
+            start_date=date(2015, 1, 1),
+            end_date=date(2015, 3, 31)))
+
+    #  4
+    session.add(
+        SeriesItem(
+            name='Q1 2015/16',
+            series=1,
+            start_date=date(2015, 4, 1),
+            end_date=date(2015, 6, 30)))
+    session.add(
+        SeriesItem(
+            name='Q2 2015/16',
+            series=1,
+            start_date=date(2015, 7, 1),
+            end_date=date(2015, 9, 30)))
+    session.add(
+        SeriesItem(
+            name='Q3 2015/16',
+            series=1,
+            start_date=date(2015, 10, 1),
+            end_date=date(2015, 12, 31)))
+    session.add(
+        SeriesItem(
+            name='Q4 2015/16',
+            series=1,
+            start_date=date(2016, 1, 1),
+            end_date=date(2016, 3, 31)))
+
+    #  5
+    session.add(
+        SeriesItem(
+            name='Q1 2016/17',
+            series=1,
+            start_date=date(2016, 4, 1),
+            end_date=date(2016, 6, 30)))
+    session.add(
+        SeriesItem(
+            name='Q2 2016/17',
+            series=1,
+            start_date=date(2016, 7, 1),
+            end_date=date(2016, 9, 30)))
+    session.add(
+        SeriesItem(
+            name='Q3 2016/17',
+            series=1,
+            start_date=date(2016, 10, 1),
+            end_date=date(2016, 12, 31)))
+    session.add(
+        SeriesItem(
+            name='Q4 2016/17',
+            series=1,
+            start_date=date(2017, 1, 1),
+            end_date=date(2017, 3, 31)))
+
+    #  6
+    session.add(
+        SeriesItem(
+            name='Q1 2017/18',
+            series=1,
+            start_date=date(2017, 4, 1),
+            end_date=date(2017, 6, 30)))
+    session.add(
+        SeriesItem(
+            name='Q2 2017/18',
+            series=1,
+            start_date=date(2017, 7, 1),
+            end_date=date(2017, 9, 30)))
+    session.add(
+        SeriesItem(
+            name='Q3 2017/18',
+            series=1,
+            start_date=date(2017, 10, 1),
+            end_date=date(2017, 12, 31)))
+    session.add(
+        SeriesItem(
+            name='Q4 2017/18',
+            series=1,
+            start_date=date(2018, 1, 1),
+            end_date=date(2018, 3, 31)))
+
+    #  7
+    session.add(
+        SeriesItem(
+            name='Q1 2018/19',
+            series=1,
+            start_date=date(2018, 4, 1),
+            end_date=date(2018, 6, 30)))
+    session.add(
+        SeriesItem(
+            name='Q2 2018/19',
+            series=1,
+            start_date=date(2018, 7, 1),
+            end_date=date(2018, 9, 30)))
+    session.add(
+        SeriesItem(
+            name='Q3 2018/19',
+            series=1,
+            start_date=date(2018, 10, 1),
+            end_date=date(2018, 12, 31)))
+    session.add(
+        SeriesItem(
+            name='Q4 2018/19',
+            series=1,
+            start_date=date(2019, 1, 1),
+            end_date=date(2019, 3, 31)))
+
+    #  8
+    session.add(
+        SeriesItem(
+            name='Q1 2019/20',
+            series=1,
+            start_date=date(2019, 4, 1),
+            end_date=date(2019, 6, 30)))
+    session.add(
+        SeriesItem(
+            name='Q2 2019/20',
+            series=1,
+            start_date=date(2019, 7, 1),
+            end_date=date(2019, 9, 30)))
+    session.add(
+        SeriesItem(
+            name='Q3 2019/20',
+            series=1,
+            start_date=date(2019, 10, 1),
+            end_date=date(2019, 12, 31)))
+    session.add(
+        SeriesItem(
+            name='Q4 2019/20',
+            series=1,
+            start_date=date(2020, 1, 1),
+            end_date=date(2020, 3, 31)))
     session.commit()
 
 
@@ -194,11 +324,25 @@ def populate_projects_table():
     session.commit()
 
 
+def _query_for_single_project_id(prj_str: str) -> int:
+    project_id = session.query(Project.id).filter(
+        Project.name == prj_str).first()[0]
+    return project_id
+
+
 def import_single_bicc_return_using_database(source_file):
     """
     Import a single BICC return based on a source template. Use the datamap
     from database, rather than the csv file.
     """
+    # we need the project_id to build the tables
+    # TODO finish this function - prj_str used here needs to be passed
+    # to this function by the calling loop
+    project_id = _query_for_single_project_id(prj_str)
+    # we need quarter_id to build the tables
+    quarter_id = session.query(Quarter.id).filter(
+        Quarter.name == CURRENT_QUARTER).all()[0][0]
+
     template = BICCTemplate(source_file)
     datamap = Datamap(template,
                       '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
@@ -220,10 +364,6 @@ def import_single_bicc_return_using_database(source_file):
     except IndexError:
         print("Project {} not in projects table. Fix it!".format(project_name))
         project_id = None
-
-    # we need quarter_id to build the tables
-    quarter_id = session.query(Quarter.id).filter(
-        Quarter.name == CURRENT_QUARTER).all()[0][0]
 
     # go through the cell_map in the Digest object and drop into database
     for cell in digest.data:
@@ -250,16 +390,18 @@ def import_all_returns_to_database():
                                   'returns/')
     for f in os.listdir(returns_dir):
         print("Importing {}".format(f))
+        #  TODO Function called here that pulls the Project/Programme String
+        #  from the f in question
         import_single_bicc_return_using_database(os.path.join(returns_dir, f))
 
 
 def main():
-    #   import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
-    #                      'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-    #   merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
-    #                      'datamap-master-to-gmpp')
-    #   populate_projects_table()
-    #   populate_quarters_table()
+    # import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
+    #                    'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+    # merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
+    #                    'datamap-master-to-gmpp')
+    # populate_projects_table()
+    # populate_quarters_table()
     import_all_returns_to_database()
 
 
