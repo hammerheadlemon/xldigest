@@ -467,7 +467,7 @@ def mock_datamap_source_file():
     os.unlink('/tmp/mock_datamap.csv')
 
 
-def mock_blank_xlsx_file(source_dir):
+def mock_blank_xlsx_file(source_dir: str, empty: bool=False, mix: bool=False) -> None:
     wb = Workbook()
     wb.create_sheet('Test')
 
@@ -479,10 +479,20 @@ def mock_blank_xlsx_file(source_dir):
     ws_summary['B8'].value = ws_summary_B8_rand[0]
     try:
         os.mkdir(source_dir)
-        wb.save(source_dir + '/' + '/test-blank.xlsx')
+        wb.save(os.path.join(os.path.abspath(source_dir), 'test-blank.xlsx'))
+        if mix:  # we want to throw another file type in there
+            with open(source_dir + '/' + 'baws.txt', 'w') as f:
+                f.write("Some random bollocks")
+        if empty:  # we want the dir but no files in it
+            for test_file in os.path.abspath(source_dir):
+                os.unlink(os.path.abspath(source_dir).join(test_file))
     except:
         shutil.rmtree(source_dir)
         os.mkdir(source_dir)
-        wb.save(source_dir + '/' + '/test-blank.xlsx')
-
-
+        wb.save(os.path.join(os.path.abspath(source_dir), 'test-blank.xlsx'))
+        if mix:
+            with open(source_dir + '/' + 'baws.txt', 'w') as f:
+                f.write("Some random bollocks")
+        if empty:
+            for test_file in os.listdir(os.path.abspath(source_dir)):
+                os.unlink(os.path.join(os.path.abspath(source_dir), test_file))

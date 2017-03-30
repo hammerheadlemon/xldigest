@@ -1,10 +1,8 @@
 import os
 
+from xldigest.process.exceptions import NoFilesInDirectoryError
+
 from openpyxl import load_workbook
-
-
-class NoFilesInDirectoryError(Exception):
-    pass
 
 
 class Ingestor:
@@ -25,10 +23,9 @@ class Ingestor:
                 try:
                     load_workbook(self.source_dir + '/' + f)
                 except:
-                    print("No")
+                    print(f"{f} - that's not an xlsx file")
                     return False
-                else:
-                    return True
+            return True
         else:
             raise NoFilesInDirectoryError
 

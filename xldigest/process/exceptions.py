@@ -12,3 +12,7 @@ class DuplicateReturnError(Exception):
 
 class NonExistantReturnError(Exception):
     pass
+
+
+class NoFilesInDirectoryError(Exception):
+    pass

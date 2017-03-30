@@ -7,7 +7,8 @@ from xldigest.process.ingestor import Ingestor
 from xldigest.process.exceptions import (QuarterNotFoundError,
                                          ProjectNotFoundError,
                                          DuplicateReturnError,
-                                         NonExistantReturnError)
+                                         NonExistantReturnError,
+                                         NoFilesInDirectoryError)
 
 from xldigest.tests.fixtures import mock_blank_xlsx_file
 
@@ -37,8 +38,22 @@ def test_ingestor_source_dir():
     assert ingestor.source_dir == SOURCE_DIR
 
 
-def test_ingestor_source_dir_contains_xls_files():
+def test_ingestor_source_dir_contains_only_xls_files():
     ingestor = Ingestor(SOURCE_DIR, PORTFOLIO, SERIES, SERIES_ITEM)
     mock_blank_xlsx_file(SOURCE_DIR)
     is_there_files = ingestor.source_xls_only()
     assert is_there_files is True
+
+
+def test_ingestor_source_dir_contains_mixed_files():
+    ingestor = Ingestor(SOURCE_DIR, PORTFOLIO, SERIES, SERIES_ITEM)
+    mock_blank_xlsx_file(SOURCE_DIR, mix=True)
+    is_there_files = ingestor.source_xls_only()
+    assert is_there_files is False
+
+
+def test_ingestor_source_dir_contains_no_files():
+    ingestor = Ingestor(SOURCE_DIR, PORTFOLIO, SERIES, SERIES_ITEM)
+    mock_blank_xlsx_file(SOURCE_DIR, empty=True)
+    with pytest.raises(NoFilesInDirectoryError):
+        ingestor.source_xls_only()
