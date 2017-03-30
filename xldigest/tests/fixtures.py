@@ -285,7 +285,7 @@ def sqlite3_db_file():
     c.execute("""CREATE TABLE portfolios
               (id integer PRIMARY KEY,
               portfolio_id integer,
-              portfolio_name text)"""
+              name text)"""
               )
 
     c.execute("INSERT INTO portfolios (name) VALUES('Tier 1 Projects')")
