@@ -2,6 +2,7 @@ import csv
 import os
 import sqlite3
 import pytest
+import shutil
 from openpyxl import Workbook
 
 ws_summary_B5_rand = [
@@ -254,6 +255,7 @@ def sqlite3_db_file():
     c.execute("DROP TABLE IF EXISTS projects")
     c.execute("DROP TABLE IF EXISTS datamap_items")
     c.execute("DROP TABLE IF EXISTS returns")
+    c.execute("DROP TABLE IF EXISTS portfolios")
 
     c.execute("""CREATE TABLE quarters
               (id integer PRIMARY KEY, name text)""")
@@ -279,6 +281,14 @@ def sqlite3_db_file():
               FOREIGN KEY (quarter_id) REFERENCES quarters(id),
               FOREIGN KEY (datamap_item_id) REFERENCES datamap_items(id)
               )""")
+
+    c.execute("""CREATE TABLE portfolios
+              (id integer PRIMARY KEY,
+              portfolio_id integer,
+              portfolio_name text)"""
+              )
+
+    c.execute("INSERT INTO portfolios (name) VALUES('Tier 1 Projects')")
 
     c.execute("INSERT INTO quarters (name) VALUES('Q1 2016/17')")
     c.execute("INSERT INTO quarters (name) VALUES('Q2 2016/17')")
@@ -455,3 +465,24 @@ def mock_datamap_source_file():
             datamap_writer.writerow(item)
     yield '/tmp/mock_datamap.csv'
     os.unlink('/tmp/mock_datamap.csv')
+
+
+def mock_blank_xlsx_file(source_dir):
+    wb = Workbook()
+    wb.create_sheet('Test')
+
+    # Test sheet fixtures
+    ws_summary = wb['Test']
+    ws_summary['A5'].value = 'Project/Programme Name'
+    ws_summary['B5'].value = ws_summary_B5_rand[0]
+    ws_summary['A8'].value = 'DfT Group'
+    ws_summary['B8'].value = ws_summary_B8_rand[0]
+    try:
+        os.mkdir(source_dir)
+        wb.save(source_dir + '/' + '/test-blank.xlsx')
+    except:
+        shutil.rmtree(source_dir)
+        os.mkdir(source_dir)
+        wb.save(source_dir + '/' + '/test-blank.xlsx')
+
+
