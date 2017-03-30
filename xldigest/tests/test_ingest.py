@@ -57,3 +57,20 @@ def test_ingestor_source_dir_contains_no_files():
     mock_blank_xlsx_file(SOURCE_DIR, empty=True)
     with pytest.raises(NoFilesInDirectoryError):
         ingestor.source_xls_only()
+
+
+def test_series_object(INMEMORY_SQLITE3):
+    conn = sqlite3.connect(INMEMORY_SQLITE3)
+    c = conn.cursor()
+    series = c.execute("SELECT * FROM series").fetchone()[1]
+    assert series == 'Financial Quarters'
+
+
+def test_series_item_object(INMEMORY_SQLITE3):
+    conn = sqlite3.connect(INMEMORY_SQLITE3)
+    c = conn.cursor()
+    series_item = c.execute("SELECT * FROM series_items").fetchone()
+    assert series_item[1] == 'Q1 2013/14'
+    assert series_item[0] == 1
+    assert series_item[2] == '2013-04-01'
+    assert series_item[3] == '2013-06-30'

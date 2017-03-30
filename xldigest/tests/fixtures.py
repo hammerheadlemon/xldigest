@@ -256,6 +256,8 @@ def sqlite3_db_file():
     c.execute("DROP TABLE IF EXISTS datamap_items")
     c.execute("DROP TABLE IF EXISTS returns")
     c.execute("DROP TABLE IF EXISTS portfolios")
+    c.execute("DROP TABLE IF EXISTS series")
+    c.execute("DROP TABLE IF EXISTS series_items")
 
     c.execute("""CREATE TABLE quarters
               (id integer PRIMARY KEY, name text)""")
@@ -284,11 +286,26 @@ def sqlite3_db_file():
 
     c.execute("""CREATE TABLE portfolios
               (id integer PRIMARY KEY,
-              portfolio_id integer,
               name text)"""
               )
 
+    c.execute("""CREATE TABLE series
+              (id integer PRIMARY KEY,
+              name text)"""
+              )
+    c.execute("""CREATE TABLE series_items
+              (id integer PRIMARY KEY,
+              name text,
+              start_date text,
+              end_date text,
+              series_id integer,
+              FOREIGN KEY (series_id) REFERENCES series(id)
+              )""")
+
     c.execute("INSERT INTO portfolios (name) VALUES('Tier 1 Projects')")
+    c.execute("INSERT INTO series (name) VALUES('Financial Quarters')")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q1 2013/14', '2013-04-01', '2013-06-30', 1 )""")
 
     c.execute("INSERT INTO quarters (name) VALUES('Q1 2016/17')")
     c.execute("INSERT INTO quarters (name) VALUES('Q2 2016/17')")
