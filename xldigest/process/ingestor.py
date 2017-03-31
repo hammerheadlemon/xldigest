@@ -21,9 +21,6 @@ class Ingestor:
         self.series = series
         self.series_item = series_item
 
-    def _set_up_cache(self) -> None:
-        pass
-
     def source_xls_only(self) -> bool:
         fls = os.listdir(self.source_dir)
         if len(fls) > 0:
