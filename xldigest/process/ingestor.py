@@ -1,8 +1,13 @@
 import os
+import appdirs
 
 from xldigest.process.exceptions import NoFilesInDirectoryError
 
 from openpyxl import load_workbook
+
+APPNAME = 'xldigest'
+APPAUTHOR = 'MRLemon'
+USER_DATA_DIR = appdirs.user_data_dir(APPNAME, APPAUTHOR)
 
 
 class Ingestor:
@@ -16,7 +21,10 @@ class Ingestor:
         self.series = series
         self.series_item = series_item
 
-    def source_xls_only(self):
+    def _set_up_cache(self) -> None:
+        pass
+
+    def source_xls_only(self) -> bool:
         fls = os.listdir(self.source_dir)
         if len(fls) > 0:
             for f in fls:

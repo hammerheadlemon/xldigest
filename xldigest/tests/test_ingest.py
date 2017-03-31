@@ -1,9 +1,7 @@
-import os
+import getpass
+import platform
 
-from xldigest.process.template import BICCTemplate
-from xldigest.process.datamap import Datamap
-from xldigest.process.digest import Digest
-from xldigest.process.ingestor import Ingestor
+from xldigest.process.ingestor import Ingestor, USER_DATA_DIR, APPNAME, APPAUTHOR
 from xldigest.process.exceptions import (SeriesItemNotFoundError,
                                          ProjectNotFoundError,
                                          DuplicateReturnError,
@@ -11,8 +9,6 @@ from xldigest.process.exceptions import (SeriesItemNotFoundError,
                                          NoFilesInDirectoryError)
 
 from xldigest.tests.fixtures import mock_blank_xlsx_file
-
-from openpyxl import load_workbook
 
 import xldigest.tests.fixtures as fixtures
 import pytest
@@ -74,3 +70,11 @@ def test_series_item_object(INMEMORY_SQLITE3):
     assert series_item[0] == 1
     assert series_item[2] == '2013-04-01'
     assert series_item[3] == '2013-06-30'
+
+
+def test_application_data_path():
+    usr = getpass.getuser()
+    if platform.system() == 'Linux':
+        assert USER_DATA_DIR == f'/home/{usr}/.local/share/{APPNAME}'
+    elif platform.system() == 'Windows':
+        assert USER_DATA_DIR == f'C:\\Users\\{usr}\\AppData\\Local\\{APPAUTHOR}\\{APPNAME}'
