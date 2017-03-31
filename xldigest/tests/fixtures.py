@@ -276,11 +276,11 @@ def sqlite3_db_file():
     c.execute("""CREATE TABLE returns
               (id integer PRIMARY KEY,
               project_id integer,
-              quarter_id integer,
+              series_item_id integer,
               datamap_item_id integer,
               value text,
               FOREIGN KEY (project_id) REFERENCES projects(id),
-              FOREIGN KEY (quarter_id) REFERENCES quarters(id),
+              FOREIGN KEY (series_item_id) REFERENCES series_items(id),
               FOREIGN KEY (datamap_item_id) REFERENCES datamap_items(id)
               )""")
 
@@ -322,7 +322,7 @@ def sqlite3_db_file():
          "(?, ?, ?, ?, ?, ?)"), dm_data)
 
     c.executemany(
-        ("INSERT INTO returns (project_id, quarter_id, datamap_item_id, value)"
+        ("INSERT INTO returns (project_id, series_item_id, datamap_item_id, value)"
          " VALUES (?, ?, ?, ?)"), return_data)
 
     conn.commit()

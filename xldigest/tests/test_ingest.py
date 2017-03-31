@@ -4,7 +4,7 @@ from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.ingestor import Ingestor
-from xldigest.process.exceptions import (QuarterNotFoundError,
+from xldigest.process.exceptions import (SeriesItemNotFoundError,
                                          ProjectNotFoundError,
                                          DuplicateReturnError,
                                          NonExistantReturnError,

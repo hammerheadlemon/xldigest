@@ -9,7 +9,7 @@ engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
 
 
 class SeriesItem(Base):
-    __tablename__ = 'series_item'
+    __tablename__ = 'series_items'
     id = Column(Integer, primary_key=True)
     name = Column(String)
     series = Column(Integer, ForeignKey('series.id'))
@@ -66,13 +66,13 @@ class ReturnItem(Base):
 
     id = Column(Integer, primary_key=True)
     project_id = Column(Integer, ForeignKey('projects.id'))
-    quarter_id = Column(Integer, ForeignKey('quarters.id'))
+    series_item_id = Column(Integer, ForeignKey('series_items.id'))
     datamap_item_id = Column(Integer, ForeignKey('datamap_items.id'))
     value = Column(String)
 
     def __repr__(self):
-        return ("<ReturnItem(Project: {0}, Quarter for {1}, "
-                "for DMI: {2}>").format(self.project_id, self.quarter_id,
+        return ("<ReturnItem(Project: {0}, SeriesItem for {1}, "
+                "for DMI: {2}>").format(self.project_id, self.series_item_id,
                                         self.datamap_item_id)
 
 
