@@ -267,4 +267,4 @@ def test_file_name_cleaner(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
     digest = Digest(datamap, qtr_id, pjt_id)
     digest.read_template()
     assert digest._generate_file_name_from_return_data(
-        qtr_id, pjt_id) == 'Project_1_Q1_2016_17'
+        qtr_id, pjt_id) == 'Project_1_Q1_2013_14'

@@ -251,7 +251,6 @@ def sqlite3_db_file():
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
 
-    c.execute("DROP TABLE IF EXISTS quarters")
     c.execute("DROP TABLE IF EXISTS projects")
     c.execute("DROP TABLE IF EXISTS datamap_items")
     c.execute("DROP TABLE IF EXISTS returns")
@@ -259,8 +258,6 @@ def sqlite3_db_file():
     c.execute("DROP TABLE IF EXISTS series")
     c.execute("DROP TABLE IF EXISTS series_items")
 
-    c.execute("""CREATE TABLE quarters
-              (id integer PRIMARY KEY, name text)""")
     c.execute("""CREATE TABLE projects
               (id integer PRIMARY KEY, name text)""")
     c.execute("""CREATE TABLE datamap_items
@@ -306,11 +303,12 @@ def sqlite3_db_file():
     c.execute("INSERT INTO series (name) VALUES('Financial Quarters')")
     c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
               VALUES('Q1 2013/14', '2013-04-01', '2013-06-30', 1 )""")
-
-    c.execute("INSERT INTO quarters (name) VALUES('Q1 2016/17')")
-    c.execute("INSERT INTO quarters (name) VALUES('Q2 2016/17')")
-    c.execute("INSERT INTO quarters (name) VALUES('Q3 2016/17')")
-    c.execute("INSERT INTO quarters (name) VALUES('Q4 2016/17')")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q2 2013/14', '2013-04-01', '2013-06-30', 1 )""")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q3 2013/14', '2013-04-01', '2013-06-30', 1 )""")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q5 2013/14', '2013-04-01', '2013-06-30', 1 )""")
 
     c.execute("INSERT INTO projects (name) VALUES('Project 1')")
     c.execute("INSERT INTO projects (name) VALUES('Project 2')")
