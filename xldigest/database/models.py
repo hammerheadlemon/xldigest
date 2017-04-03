@@ -38,6 +38,23 @@ class Project(Base):
         return "<Project(name='{0}')>".format(self.name)
 
 
+class Portfolio(Base):
+    __tablename__ = 'portfolios'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+
+class RetainedSourceFile(Base):
+    __tablename__ = 'retained_source_files'
+
+    id = Column(Integer, primary_key=True)
+    project_id = Column(Integer, ForeignKey('projects.id'))
+    portfolio_id = Column(Integer, ForeignKey('portfolios.id'))
+    series_item_id = Column(Integer, ForeignKey('series_items.id'))
+    uuid = Column(String)
+
+
 class Quarter(Base):
     __tablename__ = 'quarters'
 

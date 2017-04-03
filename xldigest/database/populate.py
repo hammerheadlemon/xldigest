@@ -17,8 +17,7 @@ engine = create_engine('sqlite:///db.sqlite')
 
 Session = sessionmaker(bind=engine)
 
-session = Session()
-
+session = Session().close()
 # Hard-coded for now - this matches the current quarter with the same
 # value in the database so we're not relying on how it's written in
 # BICC template.

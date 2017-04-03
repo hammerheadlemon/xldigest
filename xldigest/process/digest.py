@@ -16,6 +16,8 @@ from xldigest.process.exceptions import (DuplicateReturnError,
                                          SeriesItemNotFoundError,
                                          NonExistantReturnError)
 
+from xldigest.database.setup import set_up_session
+
 
 class TemplateError(Exception):
     pass
@@ -78,19 +80,15 @@ class Digest:
 
     @classmethod
     def easy_set_up_session_sqlite(cls, database_file: str):
+        """
+        For use in repls.
+        """
         engine = create_engine("sqlite:///" + database_file)
         Session = sessionmaker(bind=engine)
         return Session()
 
     def _set_up_session(self):
-        """
-        Helper method to create a SQLAlchemy session.
-        """
-        database_file = self._datamap.db_file
-        engine_string = "sqlite:///" + database_file
-        engine = create_engine(engine_string)
-        Session = sessionmaker(bind=engine)
-        return Session()
+        return set_up_session(self._datamap.db_file)
 
     def _get_existing_project_and_series_item_ids(self) -> Tuple[Any, Any]:
         """

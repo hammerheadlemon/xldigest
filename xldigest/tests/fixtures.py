@@ -257,6 +257,7 @@ def sqlite3_db_file():
     c.execute("DROP TABLE IF EXISTS portfolios")
     c.execute("DROP TABLE IF EXISTS series")
     c.execute("DROP TABLE IF EXISTS series_items")
+    c.execute("DROP TABLE IF EXISTS  retained_source_files")
 
     c.execute("""CREATE TABLE projects
               (id integer PRIMARY KEY, name text)""")
@@ -298,6 +299,16 @@ def sqlite3_db_file():
               series_id integer,
               FOREIGN KEY (series_id) REFERENCES series(id)
               )""")
+    c.execute("""CREATE TABLE retained_source_files
+              (id integer PRIMARY KEY,
+              project_id integer,
+              portfolio_id integer,
+              series_item_id integer,
+              uuid text,
+              FOREIGN KEY (project_id) REFERENCES projects(id),
+              FOREIGN KEY (portfolio_id) REFERENCES portfolios(id),
+              FOREIGN KEY (series_item_id) REFERENCES series_items(id)
+              )""")
 
     c.execute("INSERT INTO portfolios (name) VALUES('Tier 1 Projects')")
     c.execute("INSERT INTO series (name) VALUES('Financial Quarters')")
@@ -313,6 +324,9 @@ def sqlite3_db_file():
     c.execute("INSERT INTO projects (name) VALUES('Project 1')")
     c.execute("INSERT INTO projects (name) VALUES('Project 2')")
     c.execute("INSERT INTO projects (name) VALUES('Project 3')")
+
+#    c.execute("""INSERT INTO retained_source_files (portfolio_id, project_id, series_item_id)
+#              VALUES(1, 1, 1)""")
 
     c.executemany(
         ("INSERT INTO datamap_items (key, bicc_sheet, "
