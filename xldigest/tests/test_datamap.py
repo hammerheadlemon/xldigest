@@ -1,9 +1,12 @@
 import csv
 import pytest
+import os
 
 from xldigest.process.datamap import Datamap
 from xldigest.process.cell import Cell
 from xldigest.process.template import BICCTemplate
+
+from xldigest.tests.fixtures import TMP_DIR
 
 
 @pytest.fixture
@@ -37,42 +40,44 @@ def mock_datamap_source_file():
         ['SRO Finance confidence', 'Finance & Benefits', 'C6', 'RAG_Short'],
         ['BICC approval point', 'Finance & Benefits', 'E9', 'Business Cases'],
     ]
-    with open('/tmp/mock_datamap.csv', 'w') as f:
+    with open(os.path.join(TMP_DIR, 'mock_datamap.csv'), 'w') as f:
         datamap_writer = csv.writer(f, delimiter=',')
         f.write('cell_key,template_sheet,cell_reference,bg_colour,fg_colour'
                 ',number_format,verification_list\n')
         for item in data:
             datamap_writer.writerow(item)
-    return '/tmp/mock_datamap.csv'
+    return os.path.join(TMP_DIR, 'mock_datamap.csv')
 
 
 def test_for_datamap_class():
-    template = BICCTemplate('tmp/bicc_template.xlsx')
-    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    template = BICCTemplate(os.path.join(TMP_DIR, 'bicc_template.xlsx'))
+    datamap = Datamap(template,
+                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     assert datamap
 
 
 def test_expect_datamap_cell():
-    template = BICCTemplate('tmp/bicc_template.xlsx')
+    template = BICCTemplate(os.path.join(TMP_DIR, 'tmp/bicc_template.xlsx'))
     sheet = template.add_sheet('Summary')
-    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    datamap = Datamap(template,
+                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     cell = Cell(
-            datamap_id=None,
-            cell_key='Project/Programme Name',
-            cell_value=None,
-            cell_reference='B5',
-            template_sheet=sheet,
-            bg_colour=None,
-            fg_colour=None,
-            number_format=None,
-            verification_list=None
-            )
+        datamap_id=None,
+        cell_key='Project/Programme Name',
+        cell_value=None,
+        cell_reference='B5',
+        template_sheet=sheet,
+        bg_colour=None,
+        fg_colour=None,
+        number_format=None,
+        verification_list=None)
     assert datamap.add_cell(cell)
 
 
 def test_datamap_source_file(mock_datamap_source_file):
-    template = BICCTemplate('/tmp/bicc_template.xlsx')
-    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    template = BICCTemplate(os.path.join(TMP_DIR, 'bicc_template.xlsx'))
+    datamap = Datamap(template,
+                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.cell_map_from_csv(mock_datamap_source_file)
     assert isinstance(datamap.cell_map[0], Cell)
     assert datamap.cell_map[0].cell_key == 'Project/Programme Name'

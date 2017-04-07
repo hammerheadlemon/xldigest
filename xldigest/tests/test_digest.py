@@ -5,6 +5,7 @@ from xldigest.process.exceptions import (QuarterNotFoundError,
                                          ProjectNotFoundError,
                                          DuplicateReturnError,
                                          NonExistantReturnError)
+from xldigest.tests.fixtures import TMP_DIR
 
 from openpyxl import load_workbook
 
@@ -182,7 +183,7 @@ def test_populate_blank_form_export_new(INMEMORY_SQLITE3, TEST_BLANK_XLS):
     datamap = Datamap(template, INMEMORY_SQLITE3)
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
-    output_path = digest.write_to_template('/tmp')
+    output_path = digest.write_to_template(TMP_DIR)
     wb = load_workbook(output_path)
     summary_sheet = wb['Summary']
     assert summary_sheet['A5'].value == 'P2 Q1 DM1'
@@ -197,7 +198,7 @@ def test_populate_blank_form_non_existing_qtr_proj_combo(INMEMORY_SQLITE3,
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
     with pytest.raises(NonExistantReturnError):
-        digest.write_to_template('/tmp')
+        digest.write_to_template(TMP_DIR)
 
 
 def test_duplicate_record_on_write_to_db(INMEMORY_SQLITE3, BICC_RETURN_MOCK):

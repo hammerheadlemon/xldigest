@@ -1,28 +1,18 @@
-import os
-
-from xldigest.process.template import BICCTemplate
-from xldigest.process.datamap import Datamap
-from xldigest.process.digest import Digest
 from xldigest.process.ingestor import Ingestor
-from xldigest.process.exceptions import (QuarterNotFoundError,
-                                         ProjectNotFoundError,
-                                         DuplicateReturnError,
-                                         NonExistantReturnError,
-                                         NoFilesInDirectoryError)
+from xldigest.process.exceptions import NoFilesInDirectoryError
 
-from xldigest.tests.fixtures import mock_blank_xlsx_file
+from xldigest.tests.fixtures import mock_blank_xlsx_file, TMP_DIR
 
-from openpyxl import load_workbook
 
 import xldigest.tests.fixtures as fixtures
+import os
 import pytest
 import sqlite3
-
 
 BICC_RETURN_MOCK = fixtures.bicc_return
 DATAMAP_MOCK = fixtures.mock_datamap_source_file
 INMEMORY_SQLITE3 = fixtures.sqlite3_db_file
-SOURCE_DIR = '/tmp/xlsx_tests'
+SOURCE_DIR = os.path.join(TMP_DIR, 'xlsx_tests/')
 PORTFOLIO = 1
 SERIES = 1
 SERIES_ITEM = 1

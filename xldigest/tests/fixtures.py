@@ -3,7 +3,12 @@ import os
 import sqlite3
 import pytest
 import shutil
+
+from tempfile import gettempdir
+
 from openpyxl import Workbook
+
+TMP_DIR = gettempdir()
 
 ws_summary_B5_rand = [
     'Cookfield, Rebuild',
@@ -247,7 +252,7 @@ return_data = [
 
 @pytest.fixture
 def sqlite3_db_file():
-    db_file = "/tmp/test.db"
+    db_file = os.path.join(TMP_DIR, "test.db")
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
 
@@ -329,7 +334,7 @@ def sqlite3_db_file():
     c.close()
     conn.close()
     return db_file
-    # os.unlink('/tmp/test.db')
+    # os.unlink(os.path.join(TMP_DIR, 'test.db')
 
 
 @pytest.fixture
@@ -341,8 +346,8 @@ def test_blank_xls():
     wb.create_sheet('Resources')
     wb.create_sheet('Assurance planning')
     wb.create_sheet('GMPP info')
-    wb.save('/tmp/test.xlsx')
-    return('/tmp/test.xlsx')
+    wb.save(os.path.join(TMP_DIR, 'test.xlsx'))
+    return(os.path.join(TMP_DIR, 'test.xlsx'))
 
 
 @pytest.fixture
@@ -409,9 +414,9 @@ def bicc_return():
     ws_assurance['A17'].value = 'Review Point 4 MPRG'
     ws_assurance['E17'].value = 'Amber/Green'
 
-    wb.save('/tmp/test-bicc-return.xlsx')
-    yield '/tmp/test-bicc-return.xlsx'
-    os.unlink('/tmp/test-bicc-return.xlsx')
+    wb.save(os.path.join(TMP_DIR, 'test-bicc-return.xlsx'))
+    yield os.path.join(TMP_DIR, 'test-bicc-return.xlsx')
+    os.unlink(os.path.join(TMP_DIR, 'test-bicc-return.xlsx'))
 
 
 @pytest.fixture
@@ -474,14 +479,14 @@ def mock_datamap_source_file():
             'yellow', 'd/mm/yy', 'Capability RAG'
         ]
     ]
-    with open('/tmp/mock_datamap.csv', 'w') as f:
+    with open(os.path.join(TMP_DIR, 'mock_datamap.csv'), 'w') as f:
         datamap_writer = csv.writer(f, delimiter=',')
         f.write('cell_key,template_sheet,cell_reference,bg_colour,fg_colour'
                 ',number_format,verification_list\n')
         for item in data:
             datamap_writer.writerow(item)
-    yield '/tmp/mock_datamap.csv'
-    os.unlink('/tmp/mock_datamap.csv')
+    yield os.path.join(TMP_DIR, 'mock_datamap.csv')
+    os.unlink(os.path.join(TMP_DIR, 'mock_datamap.csv'))
 
 
 def mock_blank_xlsx_file(source_dir: str, empty: bool=False, mix: bool=False) -> None:
