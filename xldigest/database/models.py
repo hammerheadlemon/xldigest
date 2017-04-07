@@ -4,8 +4,10 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
-                       'db.sqlite')
+#engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
+#                       'db.sqlite')
+
+engine = create_engine('sqlite:///db.sqlite')
 
 
 class SeriesItem(Base):
