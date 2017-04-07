@@ -1,14 +1,15 @@
-import os
 import appdirs
-import uuid
+import os
 import shutil
-
-from xldigest.process.exceptions import NoFilesInDirectoryError
-from xldigest.process.template import BICCTemplate
-from xldigest.database.setup import set_up_session
-from xldigest.database.models import RetainedSourceFile
+import uuid
 
 from openpyxl import load_workbook
+
+from xldigest.database.models import RetainedSourceFile
+from xldigest.database.setup import set_up_session
+from xldigest.process.exceptions import NoFilesInDirectoryError
+from xldigest.process.template import BICCTemplate
+
 
 APPNAME = 'xldigest'
 APPAUTHOR = 'MRLemon'
@@ -28,6 +29,9 @@ except FileNotFoundError:
 # up all files in a source directory, or for pulling in a single populated
 # template file. I suspect that the best option would be to get rid of the
 # source_dir option and go for a single file Ingest.
+
+# This probably needs to be handled with a class method that acts as an
+# alternative init method.
 
 class Ingestor:
     def __init__(self,

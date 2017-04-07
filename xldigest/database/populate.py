@@ -3,21 +3,18 @@ import os
 
 from datetime import date
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
+from xldigest.database.setup import set_up_session, USER_DATA_DIR
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.template import BICCTemplate
 
-from xldigest.database.models import (DatamapItem, Project, Quarter,
+from xldigest.database.models import (DatamapItem, Quarter, Project,
                                       ReturnItem, Series, SeriesItem)
 
-engine = create_engine('sqlite:///db.sqlite')
+db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
+print(db_pth)
+session = set_up_session(db_pth)
 
-Session = sessionmaker(bind=engine)
-
-session = Session().close()
 # Hard-coded for now - this matches the current quarter with the same
 # value in the database so we're not relying on how it's written in
 # BICC template.
@@ -59,6 +56,7 @@ def import_datamap_csv(source_file):
             session.add(dmi)
 
         session.commit()
+        session.close()
 
 
 def merge_gmpp_datamap(source_file):
@@ -87,11 +85,11 @@ def populate_series_table():
     """
     A single series: Financial Quarters
     """
-    session.add(Series(
-        name='Financial Quarters',
-        first_series_item=1,
-        last_series_item=20
-    ))
+    session.add(
+        Series(
+            name='Financial Quarters',
+            first_series_item=1,
+            last_series_item=20))
 
 
 def populate_quarters_table():
@@ -395,13 +393,13 @@ def import_all_returns_to_database():
 
 
 def main():
-    # import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
-    #                    'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-    # merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
-    #                    'datamap-master-to-gmpp')
-    # populate_projects_table()
-    # populate_quarters_table()
-    import_all_returns_to_database()
+    import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
+                       'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+    merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
+                       'datamap-master-to-gmpp')
+    populate_projects_table()
+    populate_quarters_table()
+    #import_all_returns_to_database()
 
 
 if __name__ == "__main__":
