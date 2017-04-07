@@ -8,9 +8,6 @@ from xldigest.database.models import DatamapItem
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from typing import List
-
-
 def set_up_session(db_file):
     engine_string = "sqlite:///" + db_file
     engine = create_engine(engine_string)
@@ -60,18 +57,16 @@ class Datamap:
             reader = csv.DictReader(csv_file)
             for row in reader:
                 self.cell_map.append(
-                        Cell(
-                            datamap_id=None,
-                            cell_key=row['cell_key'],
-                            cell_value=None,  # have no need of a value in dm
-                            cell_reference=row['cell_reference'],
-                            template_sheet=row['template_sheet'],
-                            bg_colour=row['bg_colour'],
-                            fg_colour=row['fg_colour'],
-                            number_format=row['number_format'],
-                            verification_list=None
-                            )
-                        )
+                    Cell(
+                        datamap_id=None,
+                        cell_key=row['cell_key'],
+                        cell_value=None,  # have no need of a value in dm
+                        cell_reference=row['cell_reference'],
+                        template_sheet=row['template_sheet'],
+                        bg_colour=row['bg_colour'],
+                        fg_colour=row['fg_colour'],
+                        number_format=row['number_format'],
+                        verification_list=None))
 
     def cell_map_from_database(self) -> None:
         """Creates a cellmap from a sqlite3 database. cell_map fields are

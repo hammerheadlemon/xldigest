@@ -1,4 +1,4 @@
-class QuarterNotFoundError(Exception):
+class SeriesItemNotFoundError(Exception):
     pass
 
 

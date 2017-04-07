@@ -1,7 +1,7 @@
 from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
-from xldigest.process.exceptions import (QuarterNotFoundError,
+from xldigest.process.exceptions import (SeriesItemNotFoundError,
                                          ProjectNotFoundError,
                                          DuplicateReturnError,
                                          NonExistantReturnError)
@@ -23,9 +23,9 @@ TEST_BLANK_XLS = fixtures.test_blank_xls
 def test_in_tmp_sqlite3(INMEMORY_SQLITE3):
     conn = sqlite3.connect(INMEMORY_SQLITE3)
     c = conn.cursor()
-    q1 = c.execute("SELECT * FROM quarters").fetchone()[1]
+    q1 = c.execute("SELECT * FROM series_items").fetchone()[1]
     p1 = c.execute("SELECT * FROM projects").fetchone()[1]
-    assert q1 == "Q1 2016/17"
+    assert q1 == "Q1 2013/14"
     assert p1 == "Project 1"
 
 
@@ -139,14 +139,14 @@ def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
     assert digest.data[4].cell_value == 2012
 
 
-def test_missing_quarter(INMEMORY_SQLITE3):
+def test_missing_series_item(INMEMORY_SQLITE3):
     qtr_id = 10
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
     datamap = Datamap(template, INMEMORY_SQLITE3)
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
-    with pytest.raises(QuarterNotFoundError):
+    with pytest.raises(SeriesItemNotFoundError):
         digest.read_project_data()
 
 
@@ -161,10 +161,10 @@ def test_missing_project(INMEMORY_SQLITE3):
         digest.read_project_data()
 
 
-def test_both_missing_quarter_project(INMEMORY_SQLITE3):
+def test_both_missing_series_item_project(INMEMORY_SQLITE3):
     """
-    This should raise QuarterNotFoundError, despite the fact that both
-    quarter and project ids are not present.
+    This should raise SeriesItemNotFoundError, despite the fact that both
+    series_item and project ids are not present.
     """
     qtr_id = 1000
     pjt_id = 1000
@@ -172,7 +172,7 @@ def test_both_missing_quarter_project(INMEMORY_SQLITE3):
     datamap = Datamap(template, INMEMORY_SQLITE3)
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
-    with pytest.raises(QuarterNotFoundError):
+    with pytest.raises(SeriesItemNotFoundError):
         digest.read_project_data()
 
 
@@ -225,7 +225,7 @@ def test_successful_write_return_to_db(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
     digest.read_template()
-    digest._get_existing_return_project_and_quarter_ids()
+    digest._get_existing_return_project_and_series_item_ids()
     digest.write_to_database()
     test_returns = c.execute("SELECT value FROM returns").fetchone()
     conn.commit()
@@ -242,7 +242,7 @@ def test_attempt_to_write_return_to_db_unavailable_qtr(INMEMORY_SQLITE3,
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
     digest.read_template()
-    with pytest.raises(QuarterNotFoundError):
+    with pytest.raises(SeriesItemNotFoundError):
         digest.write_to_database()
 
 
@@ -268,4 +268,4 @@ def test_file_name_cleaner(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
     digest = Digest(datamap, qtr_id, pjt_id)
     digest.read_template()
     assert digest._generate_file_name_from_return_data(
-        qtr_id, pjt_id) == 'Project_1_Q1_2016_17'
+        qtr_id, pjt_id) == 'Project_1_Q1_2013_14'

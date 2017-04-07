@@ -6,14 +6,17 @@ from openpyxl import load_workbook
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from xldigest.database.models import DatamapItem, Project, Quarter, ReturnItem
+from xldigest.database.models import (DatamapItem, Project,
+                                      ReturnItem, SeriesItem)
 from xldigest.process.cell import Cell
 from xldigest.process.cleansers import Cleanser
 from xldigest.process.datamap import Datamap
 from xldigest.process.exceptions import (DuplicateReturnError,
                                          ProjectNotFoundError,
-                                         QuarterNotFoundError,
+                                         SeriesItemNotFoundError,
                                          NonExistantReturnError)
+
+from xldigest.database.setup import set_up_session
 
 
 class TemplateError(Exception):
@@ -37,7 +40,7 @@ class Digest:
         e.g base_datamap = Datamap(bicc_template, <path-to-db-file>)
 
         - create a Digest object:
-        e.g. digest = Digest(base_datamap, <quarter-id>)
+        e.g. digest = Digest(base_datamap, <series_item-id>)
 
         - populate the datamap from the database:
         e.g. digest.data.cell_map_from_database()
@@ -47,7 +50,7 @@ class Digest:
         then acts as the intermediadary between the template and database.
 
         Data from database:
-            digest.read_project_data(<quarter-id>, <project-id>)
+            digest.read_project_data(<series_item-id>, <project-id>)
             digest.data
 
         Data from template:
@@ -55,16 +58,16 @@ class Digest:
             digest.data
     """
 
-    def __init__(self, dm: Datamap, quarter_id: int, project_id: int) -> None:
+    def __init__(self, dm: Datamap, series_item_id: int, project_id: int) -> None:
         self._datamap = dm
         self._data = []  # type: List[Cell]
-        self._existing_quarter_ids = \
-            self._get_existing_project_and_quarter_ids()[0]
+        self._existing_series_item_ids = \
+            self._get_existing_project_and_series_item_ids()[0]
         self._existing_project_ids = \
-            self._get_existing_project_and_quarter_ids()[1]
-        self._get_existing_return_project_and_quarter_ids()
+            self._get_existing_project_and_series_item_ids()[1]
+        self._get_existing_return_project_and_series_item_ids()
 
-        self.quarter_id = quarter_id
+        self.series_item_id = series_item_id
         self.project_id = project_id
 
     @property
@@ -77,56 +80,52 @@ class Digest:
 
     @classmethod
     def easy_set_up_session_sqlite(cls, database_file: str):
+        """
+        For use in repls.
+        """
         engine = create_engine("sqlite:///" + database_file)
         Session = sessionmaker(bind=engine)
         return Session()
 
     def _set_up_session(self):
-        """
-        Helper method to create a SQLAlchemy session.
-        """
-        database_file = self._datamap.db_file
-        engine_string = "sqlite:///" + database_file
-        engine = create_engine(engine_string)
-        Session = sessionmaker(bind=engine)
-        return Session()
+        return set_up_session(self._datamap.db_file)
 
-    def _get_existing_project_and_quarter_ids(self) -> Tuple[Any, Any]:
+    def _get_existing_project_and_series_item_ids(self) -> Tuple[Any, Any]:
         """
-        Returns a tuple of lists of quarter_ids and project_ids
+        Returns a tuple of lists of series_item_ids and project_ids
         in the database.
         """
         session = self._set_up_session()
         project_ids = session.query(Project.id).first()[0]
-        quarter_ids = session.query(Quarter.id).first()[0]
+        series_item_ids = session.query(SeriesItem.id).first()[0]
         session.close()
-        return quarter_ids, project_ids
+        return series_item_ids, project_ids
 
-    def _get_existing_return_project_and_quarter_ids(self) -> None:
+    def _get_existing_return_project_and_series_item_ids(self) -> None:
         """
         Generate a set containing project_ids in returns, and a set containing
-        quarter_ids in returns.
+        series_item_ids in returns.
         """
         session = self._set_up_session()
         project_ids_in_returns = session.query(ReturnItem.project_id).all()
-        quarter_ids_in_returns = session.query(ReturnItem.quarter_id).all()
+        series_item_ids_in_returns = session.query(ReturnItem.series_item_id).all()
         self._existing_project_ids_in_returns = {
             id[0] for id in project_ids_in_returns}
-        self._existing_quarter_ids_in_returns = {
-            id[0] for id in quarter_ids_in_returns}
+        self._existing_series_item_ids_in_returns = {
+            id[0] for id in series_item_ids_in_returns}
         session.close()
 
-    def _check_quarter_exists_in_db(self) -> None:
+    def _check_series_item_exists_in_db(self) -> None:
         """
-        Raise QuarterNotFoundError if there is no corresponding quarter_id in
+        Raise SeriesItemNotFoundError if there is no corresponding series_item_id in
         Digest object.
         """
         session = self._set_up_session()
-        quarter_ids = session.query(Quarter.id).all()
-        quarter_ids = [item[0] for item in quarter_ids]
-        if self.quarter_id not in quarter_ids:
+        series_item_ids = session.query(SeriesItem.id).all()
+        series_item_ids = [item[0] for item in series_item_ids]
+        if self.series_item_id not in series_item_ids:
             session.close()
-            raise QuarterNotFoundError('Quarter not found in database.')
+            raise SeriesItemNotFoundError('SeriesItem not found in database.')
         session.close()
 
     def _check_project_exists_in_db(self) -> None:
@@ -147,7 +146,7 @@ class Digest:
         Reads project data from a database, to create a populated cell map
         in Digest.data.
         """
-        self._check_quarter_exists_in_db()
+        self._check_series_item_exists_in_db()
         self._check_project_exists_in_db()
         session = self._set_up_session()
         for cell in self._datamap.cell_map:
@@ -156,17 +155,17 @@ class Digest:
                 cell.cell_value = session.query(ReturnItem.value).filter(
                     ReturnItem.project_id == self.project_id).filter(
                     ReturnItem.datamap_item_id == DatamapItem.id).filter(
-                    ReturnItem.quarter_id == self.quarter_id).filter(
+                    ReturnItem.series_item_id == self.series_item_id).filter(
                     DatamapItem.id == cell.datamap_id[0]).first()
                 self.data.append(cell)
         session.close()
 
     def _generate_file_name_from_return_data(self,
-                                             quarter_id: int,
+                                             series_item_id: int,
                                              project_id: int) -> str:
         session = self._set_up_session()
-        q_str = session.query(Quarter.name).filter(
-            Quarter.id == quarter_id).first()[0]
+        q_str = session.query(SeriesItem.name).filter(
+            SeriesItem.id == series_item_id).first()[0]
         proj_str = session.query(Project.name).filter(
             Project.id == project_id).first()[0]
         white_sp = re.compile(r'[\W/]')
@@ -191,7 +190,7 @@ class Digest:
                             celldata.cell_reference].value = ""
                 output_path = (
                     dir + '/' + self._generate_file_name_from_return_data(
-                        self.quarter_id, self.project_id) + '.xlsx')
+                        self.series_item_id, self.project_id) + '.xlsx')
                 blank.save(output_path)
                 return output_path
 
@@ -200,8 +199,8 @@ class Digest:
                     "Cannot write to template which contains source data.")
         else:
             raise NonExistantReturnError(
-                f"A return with project_id {self.project_id} and quarter_id"
-                f" {self.quarter_id} is not in the database.")
+                f"A return with project_id {self.project_id} and series_item_id"
+                f" {self.series_item_id} is not in the database.")
 
     def _check_for_existing_return(self) -> bool:
         """
@@ -210,32 +209,32 @@ class Digest:
         we're going to be duplicating returns, therefore this is not allowed.
         """
         if self.project_id in self._existing_project_ids_in_returns \
-                and self.quarter_id in self._existing_quarter_ids_in_returns:
+                and self.series_item_id in self._existing_series_item_ids_in_returns:
             return True
         else:
             return False
 
     def write_to_database(self) -> None:
         """
-        Checks whether there is a quarter and a project in the database that
+        Checks whether there is a series_item and a project in the database that
         corresponds with the Digest data we wish to import into the database.
         If there isn't, an appropriate exception is raised.
 
         If we go ahead, we then check whether there is already a return in the
-        database with the same quarter/project_id combination. If there is,
+        database with the same series_item/project_id combination. If there is,
         we should not be importing this Digest and an appropriate exception
         is raised.
 
         Otherwise, write the Digest data to the database.
         """
-        self._check_quarter_exists_in_db()
+        self._check_series_item_exists_in_db()
         self._check_project_exists_in_db()
         if not self._check_for_existing_return():
             session = self._set_up_session()
             for cell in self._data:
                 return_item = ReturnItem(
                     project_id=self.project_id,
-                    quarter_id=self.quarter_id,
+                    series_item_id=self.series_item_id,
                     datamap_item_id=cell.datamap_id[0],
                     value=cell.cell_value)
                 session.add(return_item)
@@ -243,8 +242,8 @@ class Digest:
             session.close()
         else:
             raise DuplicateReturnError(
-                "Existing records in database with quarter_id:"
-                " {} project_id: {}".format(self.quarter_id, self.project_id))
+                "Existing records in database with series_item_id:"
+                " {} project_id: {}".format(self.series_item_id, self.project_id))
 
     def read_template(self) -> None:
         """

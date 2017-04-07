@@ -256,16 +256,14 @@ def sqlite3_db_file():
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
 
-    c.execute("DROP TABLE IF EXISTS quarters")
     c.execute("DROP TABLE IF EXISTS projects")
     c.execute("DROP TABLE IF EXISTS datamap_items")
     c.execute("DROP TABLE IF EXISTS returns")
     c.execute("DROP TABLE IF EXISTS portfolios")
     c.execute("DROP TABLE IF EXISTS series")
     c.execute("DROP TABLE IF EXISTS series_items")
+    c.execute("DROP TABLE IF EXISTS  retained_source_files")
 
-    c.execute("""CREATE TABLE quarters
-              (id integer PRIMARY KEY, name text)""")
     c.execute("""CREATE TABLE projects
               (id integer PRIMARY KEY, name text)""")
     c.execute("""CREATE TABLE datamap_items
@@ -281,11 +279,11 @@ def sqlite3_db_file():
     c.execute("""CREATE TABLE returns
               (id integer PRIMARY KEY,
               project_id integer,
-              quarter_id integer,
+              series_item_id integer,
               datamap_item_id integer,
               value text,
               FOREIGN KEY (project_id) REFERENCES projects(id),
-              FOREIGN KEY (quarter_id) REFERENCES quarters(id),
+              FOREIGN KEY (series_item_id) REFERENCES series_items(id),
               FOREIGN KEY (datamap_item_id) REFERENCES datamap_items(id)
               )""")
 
@@ -306,20 +304,34 @@ def sqlite3_db_file():
               series_id integer,
               FOREIGN KEY (series_id) REFERENCES series(id)
               )""")
+    c.execute("""CREATE TABLE retained_source_files
+              (id integer PRIMARY KEY,
+              project_id integer,
+              portfolio_id integer,
+              series_item_id integer,
+              uuid text,
+              FOREIGN KEY (project_id) REFERENCES projects(id),
+              FOREIGN KEY (portfolio_id) REFERENCES portfolios(id),
+              FOREIGN KEY (series_item_id) REFERENCES series_items(id)
+              )""")
 
     c.execute("INSERT INTO portfolios (name) VALUES('Tier 1 Projects')")
     c.execute("INSERT INTO series (name) VALUES('Financial Quarters')")
     c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
               VALUES('Q1 2013/14', '2013-04-01', '2013-06-30', 1 )""")
-
-    c.execute("INSERT INTO quarters (name) VALUES('Q1 2016/17')")
-    c.execute("INSERT INTO quarters (name) VALUES('Q2 2016/17')")
-    c.execute("INSERT INTO quarters (name) VALUES('Q3 2016/17')")
-    c.execute("INSERT INTO quarters (name) VALUES('Q4 2016/17')")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q2 2013/14', '2013-04-01', '2013-06-30', 1 )""")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q3 2013/14', '2013-04-01', '2013-06-30', 1 )""")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q5 2013/14', '2013-04-01', '2013-06-30', 1 )""")
 
     c.execute("INSERT INTO projects (name) VALUES('Project 1')")
     c.execute("INSERT INTO projects (name) VALUES('Project 2')")
     c.execute("INSERT INTO projects (name) VALUES('Project 3')")
+
+#    c.execute("""INSERT INTO retained_source_files (portfolio_id, project_id, series_item_id)
+#              VALUES(1, 1, 1)""")
 
     c.executemany(
         ("INSERT INTO datamap_items (key, bicc_sheet, "
@@ -327,7 +339,7 @@ def sqlite3_db_file():
          "(?, ?, ?, ?, ?, ?)"), dm_data)
 
     c.executemany(
-        ("INSERT INTO returns (project_id, quarter_id, datamap_item_id, value)"
+        ("INSERT INTO returns (project_id, series_item_id, datamap_item_id, value)"
          " VALUES (?, ?, ?, ?)"), return_data)
 
     conn.commit()
