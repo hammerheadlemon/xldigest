@@ -9,8 +9,7 @@ from xldigest.database.models import DatamapItem
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
 
-engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
-                       'db.sqlite')
+engine = create_engine('sqlite:///db.sqlite')
 
 Session = sessionmaker(bind=engine)
 
