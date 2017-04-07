@@ -6,15 +6,14 @@ from openpyxl import load_workbook
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from xldigest.database.models import (DatamapItem, Project,
-                                      ReturnItem, SeriesItem)
+from xldigest.database.models import (DatamapItem, Project, ReturnItem,
+                                      SeriesItem)
 from xldigest.process.cell import Cell
 from xldigest.process.cleansers import Cleanser
 from xldigest.process.datamap import Datamap
-from xldigest.process.exceptions import (DuplicateReturnError,
-                                         ProjectNotFoundError,
-                                         SeriesItemNotFoundError,
-                                         NonExistantReturnError)
+from xldigest.process.exceptions import (
+    DuplicateReturnError, ProjectNotFoundError, SeriesItemNotFoundError,
+    NonExistantReturnError)
 
 from xldigest.database.setup import set_up_session
 
@@ -58,7 +57,8 @@ class Digest:
             digest.data
     """
 
-    def __init__(self, dm: Datamap, series_item_id: int, project_id: int) -> None:
+    def __init__(self, dm: Datamap, series_item_id: int,
+                 project_id: int) -> None:
         self._datamap = dm
         self._data = []  # type: List[Cell]
         self._existing_series_item_ids = \
@@ -108,11 +108,16 @@ class Digest:
         """
         session = self._set_up_session()
         project_ids_in_returns = session.query(ReturnItem.project_id).all()
-        series_item_ids_in_returns = session.query(ReturnItem.series_item_id).all()
+        series_item_ids_in_returns = session.query(
+            ReturnItem.series_item_id).all()
         self._existing_project_ids_in_returns = {
-            id[0] for id in project_ids_in_returns}
+            id[0]
+            for id in project_ids_in_returns
+        }
         self._existing_series_item_ids_in_returns = {
-            id[0] for id in series_item_ids_in_returns}
+            id[0]
+            for id in series_item_ids_in_returns
+        }
         session.close()
 
     def _check_series_item_exists_in_db(self) -> None:
@@ -154,9 +159,10 @@ class Digest:
             if cell.cell_reference:
                 cell.cell_value = session.query(ReturnItem.value).filter(
                     ReturnItem.project_id == self.project_id).filter(
-                    ReturnItem.datamap_item_id == DatamapItem.id).filter(
-                    ReturnItem.series_item_id == self.series_item_id).filter(
-                    DatamapItem.id == cell.datamap_id[0]).first()
+                        ReturnItem.datamap_item_id == DatamapItem.id).filter(
+                            ReturnItem.series_item_id ==
+                            self.series_item_id).filter(
+                                DatamapItem.id == cell.datamap_id[0]).first()
                 self.data.append(cell)
         session.close()
 
@@ -184,7 +190,8 @@ class Digest:
                 for celldata in self.data:
                     try:
                         blank[celldata.template_sheet][
-                            celldata.cell_reference].value = celldata.cell_value[0]
+                            celldata.
+                            cell_reference].value = celldata.cell_value[0]
                     except TypeError:
                         blank[celldata.template_sheet][
                             celldata.cell_reference].value = ""
@@ -199,8 +206,8 @@ class Digest:
                     "Cannot write to template which contains source data.")
         else:
             raise NonExistantReturnError(
-                f"A return with project_id {self.project_id} and series_item_id"
-                f" {self.series_item_id} is not in the database.")
+                "A return with project_id {} and series_item_id {} is not in the database.".
+                format(self.project_id, self.series_item_id))
 
     def _check_for_existing_return(self) -> bool:
         """
@@ -243,7 +250,8 @@ class Digest:
         else:
             raise DuplicateReturnError(
                 "Existing records in database with series_item_id:"
-                " {} project_id: {}".format(self.series_item_id, self.project_id))
+                " {} project_id: {}".format(self.series_item_id,
+                                            self.project_id))
 
     def read_template(self) -> None:
         """
