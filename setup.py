@@ -4,7 +4,8 @@ requirements = [
     'pyqt5',
     'openpyxl',
     'python-dateutil',
-    'sqlalchemy'
+    'sqlalchemy',
+    'appdirs'
 ]
 
 test_requirements = [
