@@ -1,4 +1,3 @@
-import appdirs
 import os
 import shutil
 import uuid
@@ -6,14 +5,10 @@ import uuid
 from openpyxl import load_workbook
 
 from xldigest.database.models import RetainedSourceFile
-from xldigest.database.setup import set_up_session
+from xldigest.database.setup import set_up_session, APPNAME, APPAUTHOR, USER_DATA_DIR
 from xldigest.process.exceptions import NoFilesInDirectoryError
 from xldigest.process.template import BICCTemplate
 
-
-APPNAME = 'xldigest'
-APPAUTHOR = 'MRLemon'
-USER_DATA_DIR = appdirs.user_data_dir(APPNAME, APPAUTHOR)
 
 try:
     os.listdir(USER_DATA_DIR)
