@@ -323,7 +323,9 @@ def _query_for_single_project_id(prj_str: str) -> int:
     return project_id
 
 
-def import_single_bicc_return_using_database(source_file):
+def import_single_bicc_return_using_database(source_file: str,
+                                             series_item_id: int,
+                                             project_id: int) -> None:
     """
     Import a single BICC return based on a source template. Use the datamap
     from database, rather than the csv file.
@@ -331,20 +333,15 @@ def import_single_bicc_return_using_database(source_file):
     # we need the project_id to build the tables
     # TODO finish this function - prj_str used here needs to be passed
     # to this function by the calling loop
-    project_id = _query_for_single_project_id(prj_str)
-    # we need quarter_id to build the tables
-    quarter_id = session.query(SeriesItem.id).filter(
-        SeriesItem.name == CURRENT_QUARTER).all()[0][0]
 
     template = BICCTemplate(source_file)
+
     datamap = Datamap(template,
-                      '{}{}'.format(USER_DATA_DIR + 'db.sqlite'))
-    # call the bcompiler class here
+                      '{}{}'.format(USER_DATA_DIR, '/db.sqlite'))
     datamap.cell_map_from_database()
-    digest = Digest(datamap)
+    digest = Digest(datamap, series_item_id, project_id)
     digest.read_template()
 
-    # we need project_names to build the tables
     project_name = [
         item.cell_value.rstrip() for item in datamap.cell_map
         if item.cell_key == 'Project/Programme Name'
@@ -366,14 +363,14 @@ def import_single_bicc_return_using_database(source_file):
 
         return_item = ReturnItem(
             project_id=project_id,
-            quarter_id=quarter_id,
+            series_item_id=series_item_id,
             datamap_item_id=cell_val_id,
             value=cell.cell_value)
         session.add(return_item)
     session.commit()
 
 
-def import_all_returns_to_database():
+def import_all_returns_to_database(series_item: str) -> None:
     """
     Runs through a directory of files and calls
     import_single_bicc_return_using_database on each one. Does not distinguish
@@ -381,11 +378,12 @@ def import_all_returns_to_database():
     """
     returns_dir = os.path.dirname('/home/lemon/Documents/bcompiler/source/'
                                   'returns/')
+    quarter_id = session.query(SeriesItem.id).filter(
+        SeriesItem.name == series_item).all()[0][0]
     for f in os.listdir(returns_dir):
         print("Importing {}".format(f))
-        #  TODO Function called here that pulls the Project/Programme String
-        #  from the f in question
-        import_single_bicc_return_using_database(os.path.join(returns_dir, f))
+        import_single_bicc_return_using_database(
+            os.path.join(returns_dir, f), quarter_id, 1)
 
 
 def main():
@@ -396,7 +394,7 @@ def main():
     # populate_series_table()
     # populate_projects_table()
     # populate_quarters_table()
-    import_all_returns_to_database()
+    import_all_returns_to_database(CURRENT_QUARTER)
 
 
 if __name__ == "__main__":
