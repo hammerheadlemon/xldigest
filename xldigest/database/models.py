@@ -32,22 +32,24 @@ class Series(Base):
     series_items = relationship("SeriesItem")
 
 
-class Project(Base):
-    __tablename__ = 'projects'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    returnitems = relationship("ReturnItem")
-
-    def __repr__(self):
-        return "<Project(name='{0}')>".format(self.name)
-
-
 class Portfolio(Base):
     __tablename__ = 'portfolios'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    projects = relationship("Project")
+
+
+class Project(Base):
+    __tablename__ = 'projects'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    portfolio = Column(Integer, ForeignKey('portfolios.id'))
+    returnitems = relationship("ReturnItem")
+
+    def __repr__(self):
+        return "<Project(name='{0}')>".format(self.name)
 
 
 class RetainedSourceFile(Base):

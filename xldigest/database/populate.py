@@ -8,7 +8,7 @@ from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.template import BICCTemplate
 
-from xldigest.database.models import (DatamapItem, Project,
+from xldigest.database.models import (DatamapItem, Project, Portfolio,
                                       ReturnItem, Series, SeriesItem)
 
 db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
@@ -18,7 +18,7 @@ session = set_up_session(db_pth)
 # Hard-coded for now - this matches the current quarter with the same
 # value in the database so we're not relying on how it's written in
 # BICC template.
-CURRENT_QUARTER = "Q3 2016/17"
+CURRENT_QUARTER = "Q4 2016/17"
 
 
 def _change_dict_val(target, replacement, dictionary):
@@ -81,11 +81,12 @@ def merge_gmpp_datamap(source_file):
     session.commit()
 
 
-def populate_series_table():
+def populate_series_table() -> None:
     """
     A single series: Financial Quarters
     """
     session.add(Series(name='Financial Quarters'))
+    session.commit()
 
 
 def populate_quarters_table():
@@ -302,7 +303,15 @@ def populate_quarters_table():
     session.commit()
 
 
-def populate_projects_table():
+def populate_portfolio_table() -> None:
+    """
+    Populate the Portfolio table.
+    """
+    session.add(Portfolio(name="DfT Tier 1 Projects Portfolio"))
+    session.commit()
+
+
+def populate_projects_table(portfolio_id: int) -> None:
     """
     Populate the project table in the database. The master_transposed.csv
     file is used as the source for this.
@@ -312,7 +321,7 @@ def populate_projects_table():
         reader = csv.DictReader(f)
         project_list = [row['Project/Programme Name'] for row in reader]
         for p in project_list:
-            p = Project(name=p)
+            p = Project(name=p, portfolio=1)
             session.add(p)
     session.commit()
 
@@ -391,8 +400,9 @@ def main():
     #                    'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
     # merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
     #                    'datamap-master-to-gmpp')
+    # populate_portfolio_table()
     # populate_series_table()
-    # populate_projects_table()
+    # populate_projects_table(1)
     # populate_quarters_table()
     import_all_returns_to_database(CURRENT_QUARTER)
 

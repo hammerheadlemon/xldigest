@@ -265,7 +265,7 @@ def sqlite3_db_file():
     c.execute("DROP TABLE IF EXISTS  retained_source_files")
 
     c.execute("""CREATE TABLE projects
-              (id integer PRIMARY KEY, name text)""")
+              (id integer PRIMARY KEY, name text, portfolio id)""")
     c.execute("""CREATE TABLE datamap_items
               (id integer PRIMARY KEY,
               key text,
@@ -326,9 +326,9 @@ def sqlite3_db_file():
     c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
               VALUES('Q5 2013/14', '2013-04-01', '2013-06-30', 1 )""")
 
-    c.execute("INSERT INTO projects (name) VALUES('Project 1')")
-    c.execute("INSERT INTO projects (name) VALUES('Project 2')")
-    c.execute("INSERT INTO projects (name) VALUES('Project 3')")
+    c.execute("INSERT INTO projects (name, portfolio) VALUES('Project 1', 1)")
+    c.execute("INSERT INTO projects (name, portfolio) VALUES('Project 2', 1)")
+    c.execute("INSERT INTO projects (name, portfolio) VALUES('Project 3', 1)")
 
 #    c.execute("""INSERT INTO retained_source_files (portfolio_id, project_id, series_item_id)
 #              VALUES(1, 1, 1)""")

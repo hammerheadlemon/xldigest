@@ -44,6 +44,7 @@ class Ingestor:
         self.series_item = series_item_id
         self.source_file = source_file
         self.db_file = db_file
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
 
     def _non_duplicated_return(self) -> bool:
         """

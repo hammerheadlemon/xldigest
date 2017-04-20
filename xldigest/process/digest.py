@@ -265,7 +265,7 @@ class Digest:
         Read the relevant values from the template, based on the Datamap.
         Made available in self.data.
         """
-        wb = load_workbook(self._datamap.template.file_name)
+        wb = load_workbook(self._datamap.template.file_name, data_only=True)
         for cell in self._datamap.cell_map:
             if cell.cell_reference:
                 cell.cell_value = wb[cell.template_sheet][
