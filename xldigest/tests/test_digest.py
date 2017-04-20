@@ -269,3 +269,13 @@ def test_file_name_cleaner(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
     digest.read_template()
     assert digest._generate_file_name_from_return_data(
         qtr_id, pjt_id) == 'Project_1_Q1_2013_14'
+
+
+def test_get_project_name_from_digest(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
+    qtr_id = 1
+    pjt_id = 1
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id)
+    assert digest.project_name == "Project 1"

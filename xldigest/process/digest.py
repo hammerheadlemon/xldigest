@@ -146,6 +146,14 @@ class Digest:
             raise ProjectNotFoundError('Project not found in database.')
         session.close()
 
+    @property
+    def project_name(self) -> str:
+        """
+        Get name of project.
+        """
+        session = self._set_up_session()
+        return session.query(Project.name).filter(Project.id == self.project_id).first()[0]
+
     def read_project_data(self) -> None:
         """
         Reads project data from a database, to create a populated cell map
@@ -172,8 +180,7 @@ class Digest:
         session = self._set_up_session()
         q_str = session.query(SeriesItem.name).filter(
             SeriesItem.id == series_item_id).first()[0]
-        proj_str = session.query(Project.name).filter(
-            Project.id == project_id).first()[0]
+        proj_str = self.project_name
         white_sp = re.compile(r'[\W/]')
         lc_fn = white_sp.sub('_', (proj_str + '_' + q_str))
         return lc_fn

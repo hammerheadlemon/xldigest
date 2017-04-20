@@ -8,7 +8,7 @@ from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.template import BICCTemplate
 
-from xldigest.database.models import (DatamapItem, Quarter, Project,
+from xldigest.database.models import (DatamapItem, Project,
                                       ReturnItem, Series, SeriesItem)
 
 db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
@@ -333,12 +333,12 @@ def import_single_bicc_return_using_database(source_file):
     # to this function by the calling loop
     project_id = _query_for_single_project_id(prj_str)
     # we need quarter_id to build the tables
-    quarter_id = session.query(Quarter.id).filter(
-        Quarter.name == CURRENT_QUARTER).all()[0][0]
+    quarter_id = session.query(SeriesItem.id).filter(
+        SeriesItem.name == CURRENT_QUARTER).all()[0][0]
 
     template = BICCTemplate(source_file)
     datamap = Datamap(template,
-                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+                      '{}{}'.format(USER_DATA_DIR + 'db.sqlite'))
     # call the bcompiler class here
     datamap.cell_map_from_database()
     digest = Digest(datamap)
@@ -389,14 +389,14 @@ def import_all_returns_to_database():
 
 
 def main():
-    import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
-                       'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-    merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
-                       'datamap-master-to-gmpp')
-    populate_series_table()
-    populate_projects_table()
-    populate_quarters_table()
-    #import_all_returns_to_database()
+    # import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
+    #                    'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+    # merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
+    #                    'datamap-master-to-gmpp')
+    # populate_series_table()
+    # populate_projects_table()
+    # populate_quarters_table()
+    import_all_returns_to_database()
 
 
 if __name__ == "__main__":

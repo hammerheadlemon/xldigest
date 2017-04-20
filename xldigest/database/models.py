@@ -60,13 +60,6 @@ class RetainedSourceFile(Base):
     uuid = Column(String)
 
 
-class Quarter(Base):
-    __tablename__ = 'quarters'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-
-
 class DatamapItem(Base):
     __tablename__ = 'datamap_items'
 
