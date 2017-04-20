@@ -1,22 +1,19 @@
-from .models import DatamapItem, Project, Quarter, ReturnItem
+import os
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
+from .models import DatamapItem, Project, ReturnItem, SeriesItem
 
-engine = create_engine('sqlite:////home/lemon/code/python/xldigest/'
-                       'xldigest/db.sqlite')
+from xldigest.database.setup import set_up_session, USER_DATA_DIR
 
-Session = sessionmaker(bind=engine)
-session = scoped_session(Session)
+db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
+session = set_up_session(db_pth)
 
 
 def quarter_data(quarter_id):
     d = session.query(DatamapItem.key, ReturnItem.value, Project.id,
-                      Project.name, Quarter.id).\
+                      Project.name, SeriesItem.id).\
         filter(ReturnItem.project_id == Project.id).\
-        filter(ReturnItem.quarter_id == Quarter.id).\
-        filter(ReturnItem.datamap_item_id == DatamapItem.id).\
-        filter(ReturnItem.quarter_id == quarter_id).all()
+        filter(ReturnItem.series_item_id == SeriesItem.id).\
+        filter(ReturnItem.datamap_item_id == DatamapItem.id).all()
     return d
 
 
