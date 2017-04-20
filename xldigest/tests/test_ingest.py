@@ -24,7 +24,7 @@ SERIES = 1
 SERIES_ITEM = 1
 
 
-def test_ingestor_obect():
+def test_ingestor_object():
     ingestor = Ingestor(INMEMORY_SQLITE3, SOURCE_DIR, PORTFOLIO, SERIES, SERIES_ITEM)
     assert ingestor.__str__() == "Ingestor()"
 
