@@ -4,10 +4,12 @@ import uuid
 
 from openpyxl import load_workbook
 
-from xldigest.database.models import RetainedSourceFile
+from xldigest.database.models import RetainedSourceFile, ReturnItem, DatamapItem
 from xldigest.database.setup import set_up_session, APPNAME, APPAUTHOR, USER_DATA_DIR
 from xldigest.process.exceptions import NoFilesInDirectoryError
 from xldigest.process.template import BICCTemplate
+from xldigest.process.datamap import Datamap
+from xldigest.process.digest import Digest
 
 
 try:
@@ -61,6 +63,28 @@ class Ingestor:
             session.close()
             return True
 
+    def import_single_return(self) -> None:
+        """
+        Import a single return in the form of a populated template and save it
+        as ReturnItem values in the database.
+        """
+        session = set_up_session(self.db_file)
+        datamap = Datamap(self.source_file, self.db_file)
+        datamap.cell_map_from_database()
+        digest = Digest(datamap, self.series_item, self.project)
+        digest.read_template()
+        for cell in digest.data:
+            cell_val_id = session.query(DatamapItem.id).filter(
+                DatamapItem.key == cell.cell_key).all()[0][0]
+
+            return_item = ReturnItem(
+                project_id=self.project,
+                series_item_id=self.series_item,
+                datamap_item_id=cell_val_id,
+                value=cell.cell_value)
+            session.add(return_item)
+        session.commit()
+
     def write_source_file(self) -> str:
         """
         Writes the self.source_file (which should be a populated tempalte file)
@@ -79,9 +103,7 @@ class Ingestor:
                 str(self.project),  # project_third field
                 fuuid, '.xlsx'])
             w_path = os.path.join(USER_DATA_DIR, target_file_name)
-            #        with open(self.source_file, 'w') as f:
-            #            # TODO we call the function that imports the data
-            #            pasS
+            self.import_single_return()
             # Here we write the file to our store
             shutil.copy(self.source_file.source_file, w_path)
             # Here we write the details to the db

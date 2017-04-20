@@ -113,3 +113,20 @@ def test_import_duplicate_return(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
     saved_file2 = ingestor2.write_source_file()
     assert "1_1_1" in saved_file
     assert saved_file2 == ""
+
+
+def test_import_single_return_using_ingestor(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
+    source_template = BICCTemplate(BICC_RETURN_MOCK)
+    ingestor = Ingestor(
+        INMEMORY_SQLITE3,
+        project_id=1,
+        portfolio_id=1,
+        series_item_id=1,
+        source_file=source_template)
+    saved_file = ingestor.write_source_file()
+    ingestor.import_single_return()
+    conn = sqlite3.connect(INMEMORY_SQLITE3)
+    c = conn.cursor()
+    return_item = c.execute("SELECT * FROM returns").fetchone()
+    assert "1_1_1" in saved_file
+    assert return_item == (1, 1, 1, 1, 'P1 Q1 DM1')
