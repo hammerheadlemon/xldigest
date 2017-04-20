@@ -85,11 +85,7 @@ def populate_series_table():
     """
     A single series: Financial Quarters
     """
-    session.add(
-        Series(
-            name='Financial Quarters',
-            first_series_item=1,
-            last_series_item=20))
+    session.add(Series(name='Financial Quarters'))
 
 
 def populate_quarters_table():
@@ -393,13 +389,14 @@ def import_all_returns_to_database():
 
 
 def main():
-    #import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
-    #                   'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-    #merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
-    #                   'datamap-master-to-gmpp')
-    #populate_projects_table()
-    #populate_quarters_table()
-    import_all_returns_to_database()
+    import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
+                       'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+    merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
+                       'datamap-master-to-gmpp')
+    populate_series_table()
+    populate_projects_table()
+    populate_quarters_table()
+    #import_all_returns_to_database()
 
 
 if __name__ == "__main__":

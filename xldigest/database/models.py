@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-#engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
+# engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
 #                       'db.sqlite')
 
 
@@ -29,8 +29,6 @@ class Series(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    first_series_item = Column(Date)
-    last_series_item = Column(Date)
     series_items = relationship("SeriesItem")
 
 
