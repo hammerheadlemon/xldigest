@@ -18,7 +18,7 @@ session = set_up_session(db_pth)
 # Hard-coded for now - this matches the current quarter with the same
 # value in the database so we're not relying on how it's written in
 # BICC template.
-CURRENT_QUARTER = "Q4 2016/17"
+CURRENT_QUARTER = "Q3 2016/17"
 
 
 def _change_dict_val(target, replacement, dictionary):

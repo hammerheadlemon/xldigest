@@ -81,7 +81,7 @@
         </widget>
         <widget class="QWidget" name="tab_4">
          <attribute name="title">
-          <string>Page</string>
+          <string>Import Returns</string>
          </attribute>
          <widget class="ImportReturns" name="importReturns" native="true">
           <property name="geometry">

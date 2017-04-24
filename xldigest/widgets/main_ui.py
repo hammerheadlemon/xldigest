@@ -112,7 +112,7 @@ class Ui_MainXldigestWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainXldigestWindow", "Datamap"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("MainXldigestWindow", "Returns"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainXldigestWindow", "Templates"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("MainXldigestWindow", "Page"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("MainXldigestWindow", "Import Returns"))
         self.finishButton.setText(_translate("MainXldigestWindow", "Finish"))
         self.menuFile.setTitle(_translate("MainXldigestWindow", "File"))
         self.menuTemplates.setTitle(_translate("MainXldigestWindow", "Templates"))
