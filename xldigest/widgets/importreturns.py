@@ -18,6 +18,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.series_item_model = self._pop_series_item_dropdown()
         self.comboSeriesItem.setModel(self.series_item_model)
         self.comboSeriesItem.activated.connect(self._series_item_select)
+        self.selectedCountLabel.setText("")
 
     def get_return_source_files(self):
         print("Launching dialog to choose source files for returns")
@@ -29,6 +30,10 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         if self.import_returns_dir_dialog.exec():
             self.selected_files = self.import_returns_dir_dialog.selectedFiles()
             print(self.selected_files)
+            self.selectedFilesWidget.clear()
+            for s in self.selected_files:
+                self.selectedFilesWidget.addItem(QtWidgets.QListWidgetItem(s))
+        self.selectedCountLabel.setText("{} files selected".format(len(self.selected_files)))
 
     def _portfolio_select(self, index):
         print("got that portfolio sig: {}".format(index))
