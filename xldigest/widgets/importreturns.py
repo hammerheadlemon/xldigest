@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 
 from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
 from xldigest.database.setup import USER_DATA_DIR
@@ -24,6 +24,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.import_returns_dir_dialog = QtWidgets.QFileDialog()
         self.import_returns_dir_dialog.setFileMode(QtWidgets.QFileDialog.ExistingFiles)
         self.import_returns_dir_dialog.setDirectory(USER_DATA_DIR)
+        self.import_returns_dir_dialog.setNameFilter("Excel files (*.xlsx)")
         self.import_returns_dir_dialog.show()
         if self.import_returns_dir_dialog.exec():
             self.selected_files = self.import_returns_dir_dialog.selectedFiles()
