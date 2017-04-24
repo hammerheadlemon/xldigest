@@ -38,7 +38,10 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             print(self.selected_files)
             l = []
             for sfile in self.selected_files:
-                l.append(self._make_model_data_list(sfile, "bollocks"))
+                # we want to replace with section of code with a deployment of
+                # QThread (https://nikolak.com/pyqt-threading-tutorial/"
+                # is a decent example
+                l.append(self._make_model_data_list(sfile, "bollocks", "Project"))
             self.model_selected_returns = SelectedFilesModel(l)
             self.selectedFilesWidget.setModel(self.model_selected_returns)
             self.selectedFilesWidget.horizontalHeader().setStretchLastSection(True)
@@ -106,7 +109,8 @@ class SelectedFilesModel(QtCore.QAbstractTableModel):
     def headerData(self, section, orientation, role):
         headers = [
             "File Name",
-            "Status"
+            "Status",
+            "Project Name"
         ]
         if role == QtCore.Qt.DisplayRole:
             if orientation == QtCore.Qt.Horizontal:
