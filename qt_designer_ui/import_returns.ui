@@ -35,7 +35,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="launchFileDialog">
           <property name="text">
            <string>PushButton</string>
           </property>
@@ -53,7 +53,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox"/>
+         <widget class="QComboBox" name="comboPortfolio"/>
         </item>
        </layout>
       </item>
@@ -67,7 +67,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_2"/>
+         <widget class="QComboBox" name="comboSeries"/>
         </item>
        </layout>
       </item>
@@ -81,7 +81,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_3"/>
+         <widget class="QComboBox" name="comboSeriesItem"/>
         </item>
        </layout>
       </item>
