@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '../qt_designer_ui/main_window.ui'
+# Form implementation generated from reading ui file 'main_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.8
+# Created by: PyQt5 UI code generator 5.7.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainXldigestWindow(object):
     def setupUi(self, MainXldigestWindow):
         MainXldigestWindow.setObjectName("MainXldigestWindow")
-        MainXldigestWindow.resize(488, 396)
+        MainXldigestWindow.resize(816, 687)
         self.centralwidget = QtWidgets.QWidget(MainXldigestWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -66,6 +66,12 @@ class Ui_MainXldigestWindow(object):
         self.templateManagerWidget.setObjectName("templateManagerWidget")
         self.horizontalLayout_6.addWidget(self.templateManagerWidget)
         self.tabWidget.addTab(self.tab_3, "")
+        self.tab_4 = QtWidgets.QWidget()
+        self.tab_4.setObjectName("tab_4")
+        self.importReturns = ImportReturns(self.tab_4)
+        self.importReturns.setGeometry(QtCore.QRect(20, 20, 731, 451))
+        self.importReturns.setObjectName("importReturns")
+        self.tabWidget.addTab(self.tab_4, "")
         self.verticalLayout_2.addWidget(self.tabWidget)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -78,7 +84,7 @@ class Ui_MainXldigestWindow(object):
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
         MainXldigestWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainXldigestWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 488, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 816, 19))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -95,7 +101,7 @@ class Ui_MainXldigestWindow(object):
         self.menubar.addAction(self.menuTemplates.menuAction())
 
         self.retranslateUi(MainXldigestWindow)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(4)
         self.finishButton.clicked.connect(MainXldigestWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainXldigestWindow)
 
@@ -106,11 +112,13 @@ class Ui_MainXldigestWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainXldigestWindow", "Datamap"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("MainXldigestWindow", "Returns"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainXldigestWindow", "Templates"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("MainXldigestWindow", "Page"))
         self.finishButton.setText(_translate("MainXldigestWindow", "Finish"))
         self.menuFile.setTitle(_translate("MainXldigestWindow", "File"))
         self.menuTemplates.setTitle(_translate("MainXldigestWindow", "Templates"))
         self.actionTemplate_Manager.setText(_translate("MainXldigestWindow", "Template Manager..."))
 
 from xldigest.widgets.datamap import DatamapWindow
+from xldigest.widgets.importreturns import ImportReturns
 from xldigest.widgets.returnswindow import ReturnsWindow
 from xldigest.widgets.template_manager_window import TemplateManagerWindow
