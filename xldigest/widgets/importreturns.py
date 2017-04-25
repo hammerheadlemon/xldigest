@@ -45,6 +45,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             self.model_selected_returns = SelectedFilesModel(l)
             self.selectedFilesWidget.setModel(self.model_selected_returns)
             self.selectedFilesWidget.horizontalHeader().setStretchLastSection(True)
+            self.selectedFilesWidget.setItemDelegateForColumn(2, DropDownDelegate(self))
             print(l)
         self.selectedCountLabel.setText("{} files selected".format(len(self.selected_files)))
 
