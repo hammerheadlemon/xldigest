@@ -43,9 +43,9 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 # is a decent example
                 l.append(self._make_model_data_list(sfile, "bollocks", "Project"))
             self.model_selected_returns = SelectedFilesModel(l)
+            self.selectedFilesWidget.setItemDelegateForColumn(2, DropDownDelegate(self))
             self.selectedFilesWidget.setModel(self.model_selected_returns)
             self.selectedFilesWidget.horizontalHeader().setStretchLastSection(True)
-            self.selectedFilesWidget.setItemDelegateForColumn(2, DropDownDelegate(self))
             print(l)
         self.selectedCountLabel.setText("{} files selected".format(len(self.selected_files)))
 
@@ -94,7 +94,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
 
 class DropDownDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent):
-        super(DropDownDelegate, self).__init__(parent)
+        super().__init__(parent)
 
     def createEditor(self, parent, option, index):
         combo = QtWidgets.QComboBox(parent)
