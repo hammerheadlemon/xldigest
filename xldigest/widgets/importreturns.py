@@ -91,6 +91,34 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         return model
 
 
+class DropDownDelegate(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent):
+        super(DropDownDelegate, self).__init__(parent)
+
+    def createEditor(self, parent, option, index):
+        combo = QtWidgets.QComboBox(parent)
+        li = []
+        li.append("Boo")
+        li.append("Smersh")
+        li.append("Conkers")
+        combo.addItems(li)
+        combo.currentIndexChanged.connect(self.currentIndexChangedSlot)
+        return combo
+
+    def currentIndexChangedSlot(self):
+        self.commitData.emit(self.sender())
+
+    def setEditorData(self, editor, index):
+        editor.blockSignals(True)
+        editor.blockSignals(False)
+
+    def setModelData(self, editor, model, index):
+        model.setData(index, editor.currentText())
+
+    def updateEditorGeometry(self, editor, option, index):
+        editor.setGeometry(option.rect)
+
+
 class SelectedFilesModel(QtCore.QAbstractTableModel):
     """
     Status of selected return files. Needed so that we can match up what we're
