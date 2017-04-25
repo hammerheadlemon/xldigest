@@ -51,6 +51,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 # we want to replace with section of code with a deployment of
                 # QThread (https://nikolak.com/pyqt-threading-tutorial/"
                 # is a decent example
+                sfile = sfile.split('/')[-1]
                 l.append(
                     self._make_model_data_list(sfile, "bollocks",
                                                "--Confirm Project Title--"))
@@ -63,8 +64,11 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             self.selectedFilesWidget.horizontalHeader().setStretchLastSection(
                 True)
             print(l)
-        self.selectedCountLabel.setText(
-            "{} files selected".format(len(self.selected_files)))
+        try:
+            self.selectedCountLabel.setText(
+                "{} files selected".format(len(self.selected_files)))
+        except AttributeError:
+            print("No files selected")
 
     def _portfolio_select(self, index):
         print("got that portfolio sig: {}".format(index))
