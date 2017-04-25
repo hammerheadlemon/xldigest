@@ -97,14 +97,15 @@ class DropDownDelegate(QtWidgets.QStyledItemDelegate):
         super().__init__(parent)
 
     def createEditor(self, parent, option, index):
-        combo = QtWidgets.QComboBox(parent)
-        li = []
-        li.append("Boo")
-        li.append("Smersh")
-        li.append("Conkers")
-        combo.addItems(li)
-        combo.currentIndexChanged.connect(self.currentIndexChangedSlot)
-        return combo
+        if index.column() == 2:
+            combo = QtWidgets.QComboBox(parent)
+            li = []
+            li.append("Boo")
+            li.append("Smersh")
+            li.append("Conkers")
+            combo.addItems(li)
+            combo.currentIndexChanged.connect(self.currentIndexChangedSlot)
+            return combo
 
     def currentIndexChangedSlot(self):
         self.commitData.emit(self.sender())
