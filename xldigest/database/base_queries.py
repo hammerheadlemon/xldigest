@@ -1,6 +1,7 @@
 import os
 
-from .models import DatamapItem, Project, ReturnItem, SeriesItem
+from .models import (DatamapItem, Project, ReturnItem, SeriesItem, Portfolio,
+                     Series)
 
 from xldigest.database.setup import set_up_session, USER_DATA_DIR
 
@@ -28,3 +29,26 @@ def single_project_data(quarter_id, project_id):
     d = quarter_data(quarter_id)
     project_data = [[item[0], item[1]] for item in d if item[2] == project_id]
     return project_data
+
+
+def project_names_in_portfolio(portfolio_id: int) -> list:
+    ps = session.query(Project.name).filter(Portfolio.id == portfolio_id).all()
+    return [item[0] for item in ps]
+
+
+def portfolio_names() -> list:
+    pns = session.query(Portfolio.name).all()
+    return [item[0] for item in pns]
+
+
+def series_names() -> list:
+    sns = session.query(Series.name).all()
+    return [item[0] for item in sns]
+
+
+def series_items(series: int) -> list:
+    """
+    Takes a Series id, and returns all SeriesItem objects belonging to it.
+    """
+    sis = session.query(SeriesItem.name).filter(SeriesItem.series == series).all()
+    return [item[0] for item in sis]
