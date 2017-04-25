@@ -156,7 +156,7 @@ class DropDownDelegate(QtWidgets.QStyledItemDelegate):
         if index.column() == 2:
             combo = QtWidgets.QComboBox(parent)
             li = sorted(
-                project_names_in_portfolio(1))  # hard-coded portfolio just now
+                project_names_in_portfolio(1))  # TODO hard-coded portfolio just now
             combo.addItems(li)
             combo.currentIndexChanged.connect(self.currentIndexChangedSlot)
             return combo
