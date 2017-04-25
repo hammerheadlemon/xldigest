@@ -16,7 +16,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.launchFileDialog.clicked.connect(self.get_return_source_files)
+        self.launchFileDialog.clicked.connect(self.get_return_source_files_slot)
         self.portfolio_model = self._pop_portfolio_dropdown()
         self.comboPortfolio.setModel(self.portfolio_model)
         self.comboPortfolio.activated.connect(self._portfolio_select)
@@ -35,8 +35,17 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         """
         return list(args)
 
-    def get_return_source_files(self):
-        print("Launching dialog to choose source files for returns")
+    def get_return_source_files_slot(self):
+        """
+        Triggered when the self.launchFileDialog button is clicked.
+
+        This opens a QFileDialog window and allows the user to select multiple
+        files. These are then used to populuate the SelectedFileModel().
+
+        The selectedFilesWidget is populated by SelectedFileModel. One of its
+        columns is editable using a custom delegate (DropDownDelegate), used
+        to verify which project applies to each file to be imported.
+        """
         self.import_returns_dir_dialog = QtWidgets.QFileDialog()
         self.import_returns_dir_dialog.setFileMode(
             QtWidgets.QFileDialog.ExistingFiles)
@@ -74,10 +83,15 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         print("got that portfolio sig: {}".format(index))
 
     def _series_select(self, index):
+        """
+        This is doing the work of populating the series_model, but also
+        adjusting the series_item_model depending on what is selected.
+        """
         idx = self.series_model.index(0, index)
         try:
             self._selected_series_id = session.query(Series.id).filter(
-                Series.name == self.series_model.data(idx, QtCore.Qt.DisplayRole)).all()[0][0]
+                Series.name == self.series_model.data(
+                    idx, QtCore.Qt.DisplayRole)).all()[0][0]
         except IndexError:
             self._selected_series_id = index + 1
             print("There are no SeriesItems that related to Series: {}".format(
@@ -85,7 +99,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             self.comboSeriesItem.setModel(QtGui.QStandardItemModel())
             self.comboSeriesItem.clear()
         print("got that series sig: {} - index in db: {}".format(
-            self.series_model.data(idx, QtCore.Qt.DisplayRole), self._selected_series_id))
+            self.series_model.data(idx, QtCore.Qt.DisplayRole),
+            self._selected_series_id))
         self.series_item_model = self._pop_series_item_dropdown()
         self.comboSeriesItem.setModel(self.series_item_model)
 
