@@ -41,10 +41,11 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 # we want to replace with section of code with a deployment of
                 # QThread (https://nikolak.com/pyqt-threading-tutorial/"
                 # is a decent example
-                l.append(self._make_model_data_list(sfile, "bollocks", "Project"))
+                l.append(self._make_model_data_list(sfile, "bollocks", "--Confirm Project Title--"))
             self.model_selected_returns = SelectedFilesModel(l)
             self.selectedFilesWidget.setModel(self.model_selected_returns)
             self.selectedFilesWidget.setItemDelegateForColumn(2, DropDownDelegate(self.selectedFilesWidget))
+            self.selectedFilesWidget.setEditTriggers(QtWidgets.QAbstractItemView.CurrentChanged)
             self.selectedFilesWidget.horizontalHeader().setStretchLastSection(True)
             print(l)
         self.selectedCountLabel.setText("{} files selected".format(len(self.selected_files)))
@@ -93,9 +94,15 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
 
 
 class DropDownDelegate(QtWidgets.QStyledItemDelegate):
+    """
+    Used to enable selection of project titles from the database, to associate
+    them with the return file we want to import.
+    """
     def __init__(self, parent):
         super().__init__(parent)
 
+    # Here we create the editor we want to impose upon the cell in the TableView
+    # - in this case it is a combo box.
     def createEditor(self, parent, option, index):
         if index.column() == 2:
             combo = QtWidgets.QComboBox(parent)
@@ -107,12 +114,14 @@ class DropDownDelegate(QtWidgets.QStyledItemDelegate):
             combo.currentIndexChanged.connect(self.currentIndexChangedSlot)
             return combo
 
+    # what do we do when combo selection is changed. This requests that we commit
+    # the data to the model.
     def currentIndexChangedSlot(self):
         self.commitData.emit(self.sender())
 
     def setEditorData(self, editor, index):
-        value = index.model().data(index, QtCore.Qt.EditRole)
-        editor.setCurrentIndex(editor.findText(value))
+        editor.blockSignals(True)
+        editor.blockSignals(False)
 
     def setModelData(self, editor, model, index):
         model.setData(index, editor.currentText())
@@ -160,3 +169,10 @@ class SelectedFilesModel(QtCore.QAbstractTableModel):
             col = index.column()
             value = self.data_in[row][col]
             return value
+
+    # we need this because the model has to accept a change in data from
+    # the ComboDelegate. Without overriding this method, we can change the value
+    # in the combo, but the value is not retained in the model
+    def setData(self, index, value, role=QtCore.Qt.DisplayRole):
+        print("setData", index.row(), index.column(), value)
+        self.data_in[index.row()][index.column()] = value
