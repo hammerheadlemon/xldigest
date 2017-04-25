@@ -43,8 +43,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 # is a decent example
                 l.append(self._make_model_data_list(sfile, "bollocks", "Project"))
             self.model_selected_returns = SelectedFilesModel(l)
-            self.selectedFilesWidget.setItemDelegateForColumn(2, DropDownDelegate(self))
             self.selectedFilesWidget.setModel(self.model_selected_returns)
+            self.selectedFilesWidget.setItemDelegateForColumn(2, DropDownDelegate(self.selectedFilesWidget))
             self.selectedFilesWidget.horizontalHeader().setStretchLastSection(True)
             print(l)
         self.selectedCountLabel.setText("{} files selected".format(len(self.selected_files)))
@@ -110,8 +110,8 @@ class DropDownDelegate(QtWidgets.QStyledItemDelegate):
         self.commitData.emit(self.sender())
 
     def setEditorData(self, editor, index):
-        editor.blockSignals(True)
-        editor.blockSignals(False)
+        value = index.model().data(index, QtCore.Qt.EditRole)
+        editor.setCurrentIndex(editor.findText(value))
 
     def setModelData(self, editor, model, index):
         model.setData(index, editor.currentText())
@@ -148,7 +148,10 @@ class SelectedFilesModel(QtCore.QAbstractTableModel):
                 return section + 1
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled
+        if (index.column() == 2):
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable
+        else:
+            return QtCore.Qt.ItemIsEnabled
 
     def data(self, index, role):
         if index.isValid() and role == QtCore.Qt.DisplayRole:
