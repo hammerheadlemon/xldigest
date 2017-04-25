@@ -11,6 +11,7 @@ from xldigest.process.template import BICCTemplate
 from xldigest.database.models import (DatamapItem, Project, Portfolio,
                                       ReturnItem, Series, SeriesItem)
 
+
 db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
 print(db_pth)
 session = set_up_session(db_pth)
