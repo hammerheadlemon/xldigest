@@ -1,3 +1,4 @@
+import argparse
 import csv
 import os
 
@@ -317,7 +318,7 @@ def populate_projects_table(portfolio_id: int) -> None:
     Populate the project table in the database. The master_transposed.csv
     file is used as the source for this.
     """
-    with open('/home/lemon/Documents/bcompiler/source/master_transposed.csv'
+    with open('/home/lemon/Documents/xldigest/source/master_transposed.csv'
               ) as f:
         reader = csv.DictReader(f)
         project_list = [row['Project/Programme Name'] for row in reader]
@@ -386,7 +387,7 @@ def import_all_returns_to_database(series_item: str) -> None:
     import_single_bicc_return_using_database on each one. Does not distinguish
     between xlsx files and not so ensure no extraenneous files in there.
     """
-    returns_dir = os.path.dirname('/home/lemon/Documents/bcompiler/source/'
+    returns_dir = os.path.dirname('/home/lemon/Documents/xldigest/source/'
                                   'returns/')
     quarter_id = session.query(SeriesItem.id).filter(
         SeriesItem.name == series_item).all()[0][0]
@@ -397,15 +398,30 @@ def import_all_returns_to_database(series_item: str) -> None:
 
 
 def main():
-    # import_datamap_csv('/home/lemon/Documents/bcompiler/source/'
-    #                    'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
-    # merge_gmpp_datamap('/home/lemon/Documents/bcompiler/source/'
-    #                    'datamap-master-to-gmpp')
-    # populate_portfolio_table()
-    # populate_series_table()
-    # populate_projects_table(1)
-    # populate_quarters_table()
-    import_all_returns_to_database(CURRENT_QUARTER)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-i",
+        "--initial",
+        help="Creates all the necessary tables. Run first",
+        action="store_true")
+    parser.add_argument(
+        "-s",
+        "--secondary",
+        help="Imports returns",
+        action="store_true")
+    parser.parse_args()
+    args = parser.parse_args()
+    if args.initial:
+        import_datamap_csv('/home/lemon/Documents/xldigest/source/'
+                           'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+        merge_gmpp_datamap('/home/lemon/Documents/xldigest/source/'
+                           'datamap-master-to-gmpp')
+        populate_portfolio_table()
+        populate_series_table()
+        populate_projects_table(1)
+        populate_quarters_table()
+    elif args.secondary:
+        import_all_returns_to_database(CURRENT_QUARTER)
 
 
 if __name__ == "__main__":
