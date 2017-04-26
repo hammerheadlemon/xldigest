@@ -20,7 +20,8 @@ session = set_up_session(db_pth)
 # Hard-coded for now - this matches the current quarter with the same
 # value in the database so we're not relying on how it's written in
 # BICC template.
-CURRENT_QUARTER = "Q3 2016/17"
+# CURRENT_QUARTER = "Q3 2016/17"
+CURRENT_QUARTER = None
 
 
 def _change_dict_val(target, replacement, dictionary):
@@ -407,8 +408,10 @@ def main():
     parser.add_argument(
         "-s",
         "--secondary",
-        help="Imports returns",
-        action="store_true")
+        help=
+        "Imports returns. You must include a suitable string for which the series item, e.g 'Q4 2014/15'",
+        nargs=1,
+        metavar="QUARTER")
     parser.parse_args()
     args = parser.parse_args()
     if args.initial:
@@ -421,6 +424,7 @@ def main():
         populate_projects_table(1)
         populate_quarters_table()
     elif args.secondary:
+        CURRENT_QUARTER = args.secondary[0]
         import_all_returns_to_database(CURRENT_QUARTER)
 
 
