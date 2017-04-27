@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>baseWizard</class>
- <widget class="QWizard" name="baseWizard">
+ <class>base_import_wizard</class>
+ <widget class="QWizard" name="base_import_wizard">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -186,6 +186,16 @@
        </item>
       </layout>
      </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="series_added_label">
+      <property name="text">
+       <string>SERIES ADDED</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QTableWidget" name="added_series_table"/>
     </item>
    </layout>
   </widget>
