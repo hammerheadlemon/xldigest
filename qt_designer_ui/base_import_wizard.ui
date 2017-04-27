@@ -28,7 +28,7 @@
        <item row="2" column="2">
         <widget class="QPushButton" name="add_project_button">
          <property name="text">
-          <string>Select</string>
+          <string>Add Project</string>
          </property>
         </widget>
        </item>
@@ -81,7 +81,7 @@
        <item row="1" column="2">
         <widget class="QPushButton" name="create_portfolio_button">
          <property name="text">
-          <string>Select</string>
+          <string>Create</string>
          </property>
         </widget>
        </item>
@@ -114,14 +114,14 @@
        <item row="2" column="2">
         <widget class="QPushButton" name="create_series_item_button">
          <property name="text">
-          <string>Select</string>
+          <string>Add Series Item</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="create_series_item_label">
          <property name="text">
-          <string>Create Series Item</string>
+          <string>Add Series Item to Series</string>
          </property>
         </widget>
        </item>
@@ -151,7 +151,7 @@
        <item row="1" column="2">
         <widget class="QPushButton" name="create_series_button">
          <property name="text">
-          <string>Select</string>
+          <string>Create</string>
          </property>
         </widget>
        </item>
@@ -195,7 +195,7 @@
      </widget>
     </item>
     <item row="2" column="0">
-     <widget class="QTableWidget" name="added_series_table"/>
+     <widget class="QTableWidget" name="added_series_item_table"/>
     </item>
    </layout>
   </widget>
