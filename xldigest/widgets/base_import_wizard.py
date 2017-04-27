@@ -17,7 +17,8 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
             self._create_portfolio_diag)
         self.add_project_button.clicked.connect(self._add_project_diag)
         self.create_series_button.clicked.connect(self._create_series_diag)
-        self.create_series_item_button.clicked.connect(self._add_series_item_diag)
+        self.create_series_item_button.clicked.connect(
+            self._add_series_item_diag)
         self.portfolio_added_label.setEnabled(False)
         self.series_added_label.setEnabled(False)
         self.added_projects_table.setColumnCount(1)
@@ -30,6 +31,7 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
             0, QtWidgets.QTableWidgetItem("Series Items Added"))
         self.added_series_item_table.horizontalHeader().setStretchLastSection(
             True)
+        self.setWindowTitle("Set up xldigest application")
 
     def _create_portfolio_diag(self):
         diag = AddPortfolioDialog()

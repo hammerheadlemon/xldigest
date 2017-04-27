@@ -32,8 +32,26 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
 
     def _launch_wizard_slot(self):
-        self.base_wizard = BaseImportWizard()
-        self.base_wizard.exec()
+        warning_dialog = QtWidgets.QDialog(parent=self)
+        warning_dialog.setWindowTitle("Here be dragons!")
+        warning_label = QtWidgets.QLabel("<b>WARNING</b>: Completing this wizard will "
+                                         "delete and re-create any application "
+                                         "database from scratch, resulting "
+                                         "in data loss.<br><br>"
+                                         "If you proceed, you can still Cancel"
+                                         " the Wizard at any time.")
+        buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok |
+                                               QtWidgets.QDialogButtonBox.Cancel)
+        grid = QtWidgets.QGridLayout()
+        grid.addWidget(warning_label, 0, 0)
+        grid.addWidget(buttonBox, 1, 0, 1, 2)
+        warning_dialog.setLayout(grid)
+        buttonBox.accepted.connect(warning_dialog.accept)
+        buttonBox.rejected.connect(warning_dialog.reject)
+        warning_dialog.show()
+        if warning_dialog.exec_():
+            self.base_wizard = BaseImportWizard()
+            self.base_wizard.exec()
 
     def _make_model_data_list(self, *args):
         """
