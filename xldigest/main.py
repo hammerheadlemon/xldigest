@@ -29,7 +29,7 @@ class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
         self.toolBar.addAction(QtGui.QIcon(self.overviewIcon), "Overview")
 
         self.datamapIcon = QtGui.QPixmap(':/tools.png')
-        self.toolBar.addAction(QtGui.QIcon(self.datamapIcon), "Datamaps")
+        self.toolBar.addAction(QtGui.QIcon(self.datamapIcon), "Datamap")
 
         self.returnsIcon = QtGui.QPixmap(':/upload.png')
         self.toolBar.addAction(QtGui.QIcon(self.returnsIcon), "Returns")
@@ -39,13 +39,6 @@ class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
 
         self.importIcon = QtGui.QPixmap(':/arrow-down.png')
         self.toolBar.addAction(QtGui.QIcon(self.importIcon), "Imports")
-
-        self.actionTemplate_Manager.triggered.connect(
-            self._openTemplateManagerWindow_slot)
-
-    def _openTemplateManagerWindow_slot(self):
-        self.templateManagerWindow = TemplateManagerWindow()
-        self.templateManagerWindow.show()
 
 
 def main():
