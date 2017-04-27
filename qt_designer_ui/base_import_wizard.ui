@@ -19,7 +19,7 @@
      <widget class="QGroupBox" name="groupBox">
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="2" column="2">
-        <widget class="QPushButton" name="pushButton_5">
+        <widget class="QPushButton" name="add_project_button">
          <property name="text">
           <string>Select</string>
          </property>
@@ -58,21 +58,21 @@
         </spacer>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_9">
+        <widget class="QLabel" name="add_project_label">
          <property name="text">
           <string>Add Projects</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_8">
+        <widget class="QLabel" name="create_portfolio_label">
          <property name="text">
           <string>Create Portfolio</string>
          </property>
         </widget>
        </item>
        <item row="1" column="2">
-        <widget class="QPushButton" name="pushButton_4">
+        <widget class="QPushButton" name="create_portfolio_button">
          <property name="text">
           <string>Select</string>
          </property>
@@ -102,14 +102,14 @@
      <widget class="QGroupBox" name="groupBox_2">
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="2" column="2">
-        <widget class="QPushButton" name="pushButton_7">
+        <widget class="QPushButton" name="create_series_item_button">
          <property name="text">
           <string>Select</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_10">
+        <widget class="QLabel" name="create_series_item_label">
          <property name="text">
           <string>Create Series Item</string>
          </property>
@@ -132,14 +132,14 @@
         </spacer>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_11">
+        <widget class="QLabel" name="create_series_label">
          <property name="text">
           <string>Create Series</string>
          </property>
         </widget>
        </item>
        <item row="1" column="2">
-        <widget class="QPushButton" name="pushButton_6">
+        <widget class="QPushButton" name="create_series_button">
          <property name="text">
           <string>Select</string>
          </property>
@@ -221,14 +221,14 @@
         </spacer>
        </item>
        <item row="1" column="2">
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="select_datamap_button">
          <property name="text">
           <string>Select</string>
          </property>
         </widget>
        </item>
        <item row="1" column="3">
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="selected_datamap_file_label">
          <property name="text">
           <string>TextLabel</string>
          </property>
@@ -261,14 +261,14 @@
         </spacer>
        </item>
        <item row="2" column="2">
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="select_gmpp_datamap_button">
          <property name="text">
           <string>Select</string>
          </property>
         </widget>
        </item>
        <item row="2" column="3">
-        <widget class="QLabel" name="label_5">
+        <widget class="QLabel" name="selected_gmpp_datamap_file_label">
          <property name="text">
           <string>TextLabel</string>
          </property>
@@ -301,14 +301,14 @@
         </spacer>
        </item>
        <item row="3" column="2">
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="select_transposed_master_button">
          <property name="text">
           <string>Select</string>
          </property>
         </widget>
        </item>
        <item row="3" column="3">
-        <widget class="QLabel" name="label_6">
+        <widget class="QLabel" name="selected_transposed_master_file_label">
          <property name="text">
           <string>TextLabel</string>
          </property>
