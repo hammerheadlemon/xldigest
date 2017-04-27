@@ -15,8 +15,12 @@
   </property>
   <widget class="QWizardPage" name="wizardPage1">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="0">
-     <widget class="QTableView" name="tableView"/>
+    <item row="1" column="0">
+     <widget class="QLabel" name="portfolio_added_label">
+      <property name="text">
+       <string>PORTFOLIO ADDED</string>
+      </property>
+     </widget>
     </item>
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox">
@@ -97,12 +101,8 @@
       </layout>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="portfolio_added_label">
-      <property name="text">
-       <string>PORTFOLIO ADDED</string>
-      </property>
-     </widget>
+    <item row="2" column="0">
+     <widget class="QTableWidget" name="added_projects_table"/>
     </item>
    </layout>
   </widget>
