@@ -10,12 +10,15 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_baseWizard):
         self.setupUi(self)
         self.projects = []
         self.portfolio = None
-        self.create_portfolio_button.clicked.connect(self._create_portfolio_diag)
+        self.create_portfolio_button.clicked.connect(
+            self._create_portfolio_diag)
         self.add_project_button.clicked.connect(self._add_project_diag)
         self.portfolio_added_label.setEnabled(False)
         self.added_projects_table.setColumnCount(1)
-        self.added_projects_table.horizontalHeader().setStretchLastSection(True)
-
+        self.added_projects_table.setHorizontalHeaderItem(
+            0, QtWidgets.QTableWidgetItem("Projects Added"))
+        self.added_projects_table.horizontalHeader().setStretchLastSection(
+            True)
 
     def _create_portfolio_diag(self):
         diag = AddPortfolioDialog()
@@ -29,11 +32,8 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_baseWizard):
         diag = AddProjectDialog()
         if diag.exec_():
             new_project_name = diag.name_lineEdit.text()
-            print(new_project_name)
             self.projects.append(new_project_name)
             rows = self.added_projects_table.rowCount()
-            print("Rows in table: {}".format(rows))
             self.added_projects_table.insertRow(rows)
-            print("Rows in table: {}".format(self.added_projects_table.rowCount()))
             p_add = QtWidgets.QTableWidgetItem(new_project_name)
             self.added_projects_table.setItem(rows, 0, p_add)

@@ -33,7 +33,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
 
     def _launch_wizard_slot(self):
         self.base_wizard = BaseImportWizard()
-        self.base_wizard.show()
+        self.base_wizard.exec()
 
     def _make_model_data_list(self, *args):
         """
