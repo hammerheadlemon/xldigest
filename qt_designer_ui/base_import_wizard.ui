@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>658</width>
-    <height>233</height>
+    <height>420</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,9 @@
   </property>
   <widget class="QWizardPage" name="wizardPage1">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="0">
+     <widget class="QTableView" name="tableView"/>
+    </item>
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox">
       <layout class="QGridLayout" name="gridLayout_2">
@@ -60,7 +63,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="add_project_label">
          <property name="text">
-          <string>Add Projects</string>
+          <string>Add Project to Portfolio</string>
          </property>
         </widget>
        </item>
@@ -92,6 +95,13 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="portfolio_added_label">
+      <property name="text">
+       <string>PORTFOLIO ADDED</string>
+      </property>
      </widget>
     </item>
    </layout>
