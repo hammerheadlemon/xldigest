@@ -8,6 +8,9 @@
 import sys
 
 from PyQt5 import QtWidgets, QtGui, QtCore
+
+import icons_rc
+
 from xldigest.widgets.main_ui import Ui_MainXldigestWindow
 from xldigest.widgets.template_manager_window import TemplateManagerWindow
 
@@ -22,19 +25,19 @@ class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
         self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
 
-        self.overviewIcon = QtGui.QPixmap('/home/lemon/Downloads/icons_tmp/circle-icons/one-color/png/64px/play.png')
+        self.overviewIcon = QtGui.QPixmap(':/play.png')
         self.toolBar.addAction(QtGui.QIcon(self.overviewIcon), "Overview")
 
-        self.datamapIcon = QtGui.QPixmap('/home/lemon/Downloads/icons_tmp/circle-icons/one-color/png/64px/tools.png')
+        self.datamapIcon = QtGui.QPixmap(':/tools.png')
         self.toolBar.addAction(QtGui.QIcon(self.datamapIcon), "Datamaps")
 
-        self.returnsIcon = QtGui.QPixmap('/home/lemon/Downloads/icons_tmp/circle-icons/one-color/png/64px/upload.png')
+        self.returnsIcon = QtGui.QPixmap(':/upload.png')
         self.toolBar.addAction(QtGui.QIcon(self.returnsIcon), "Returns")
 
-        self.templatesIcon = QtGui.QPixmap('/home/lemon/Downloads/icons_tmp/circle-icons/one-color/png/64px/dev.png')
+        self.templatesIcon = QtGui.QPixmap(':/dev.png')
         self.toolBar.addAction(QtGui.QIcon(self.templatesIcon), "Templates")
 
-        self.importIcon = QtGui.QPixmap('/home/lemon/Downloads/icons_tmp/circle-icons/one-color/png/64px/arrow-down.png')
+        self.importIcon = QtGui.QPixmap(':/arrow-down.png')
         self.toolBar.addAction(QtGui.QIcon(self.importIcon), "Imports")
 
         self.actionTemplate_Manager.triggered.connect(
