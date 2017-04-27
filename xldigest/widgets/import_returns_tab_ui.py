@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ImportManager(object):
     def setupUi(self, ImportManager):
         ImportManager.setObjectName("ImportManager")
-        ImportManager.resize(669, 598)
+        ImportManager.resize(683, 618)
         self.gridLayout_3 = QtWidgets.QGridLayout(ImportManager)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.gridLayout_2 = QtWidgets.QGridLayout()
@@ -67,6 +67,9 @@ class Ui_ImportManager(object):
         self.selectedCountLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.selectedCountLabel.setObjectName("selectedCountLabel")
         self.gridLayout.addWidget(self.selectedCountLabel, 2, 0, 1, 1)
+        self.base_setup_launch_wizard = QtWidgets.QPushButton(ImportManager)
+        self.base_setup_launch_wizard.setObjectName("base_setup_launch_wizard")
+        self.gridLayout.addWidget(self.base_setup_launch_wizard, 3, 0, 1, 1)
         self.gridLayout_2.addLayout(self.gridLayout, 1, 0, 1, 1)
         self.gridLayout_3.addLayout(self.gridLayout_2, 0, 0, 1, 1)
 
@@ -83,4 +86,5 @@ class Ui_ImportManager(object):
         self.label_6.setText(_translate("ImportManager", "4. Select Series Item"))
         self.label.setText(_translate("ImportManager", "Files selected for import:"))
         self.selectedCountLabel.setText(_translate("ImportManager", "TextLabel"))
+        self.base_setup_launch_wizard.setText(_translate("ImportManager", "Basic Setup Wizard"))
 

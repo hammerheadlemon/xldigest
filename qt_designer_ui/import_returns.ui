@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>669</width>
-    <height>598</height>
+    <width>683</width>
+    <height>618</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -99,6 +99,13 @@
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QPushButton" name="base_setup_launch_wizard">
+         <property name="text">
+          <string>Basic Setup Wizard</string>
          </property>
         </widget>
        </item>

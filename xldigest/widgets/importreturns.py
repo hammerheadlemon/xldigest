@@ -3,6 +3,7 @@ import os
 from PyQt5 import QtWidgets, QtGui, QtCore
 
 from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
+from xldigest.widgets.base_import_wizard import BaseImportWizard
 from xldigest.database.setup import USER_DATA_DIR, set_up_session
 from xldigest.database.models import Portfolio, Series, SeriesItem
 from xldigest.database.base_queries import (
@@ -28,6 +29,11 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.comboSeriesItem.setModel(self.series_item_model)
         self.comboSeriesItem.activated.connect(self._series_item_select)
         self.selectedCountLabel.setText("")
+        self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
+
+    def _launch_wizard_slot(self):
+        self.base_wizard = BaseImportWizard()
+        self.base_wizard.show()
 
     def _make_model_data_list(self, *args):
         """
