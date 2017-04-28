@@ -15,8 +15,9 @@ test_requirements = [
 
 setup(
     name='xldigest',
-    version='0.0.1',
+    version='0.2dev',
     description="Digest Excel files",
+    long_description=open('README')
     author="Matthew Lemon",
     author_email='matt@matthewlemon.com',
     url='https://github.com/hammerheadlemon/xldigest',
@@ -31,11 +32,12 @@ setup(
     },
     install_requires=requirements,
     zip_safe=False,
-    keywords='xldigest',
+    keywords='Excel, spreadsheet, collection, database, analysis',
     classifiers=[
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
     test_suite='tests',
-    tests_require=test_requirements)
+    tests_require=test_requirements
+    license='MIT'
+)
