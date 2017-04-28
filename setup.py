@@ -26,6 +26,7 @@ setup(
         'xldigest.database', 'xldigest.widgets', 'xldigest.analysis',
         'xldigest.tests'
     ],
+    py_modules=['icons_rc.py']
     entry_points={
         'console_scripts':
         ['xldigest-populate = xldigest.database.populate:main']
