@@ -1,11 +1,43 @@
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey
+import os
+
+from xldigest.database.setup import USER_DATA_DIR
+
+from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
-                       'db.sqlite')
+# engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
+#                       'db.sqlite')
+
+
+engine = create_engine(os.path.join('sqlite:////', USER_DATA_DIR[1:], 'db.sqlite'))
+
+
+class SeriesItem(Base):
+    __tablename__ = 'series_items'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    series = Column(Integer, ForeignKey('series.id'))
+    start_date = Column(Date)
+    end_date = Column(Date)
+
+
+class Series(Base):
+    __tablename__ = 'series'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    series_items = relationship("SeriesItem")
+
+
+class Portfolio(Base):
+    __tablename__ = 'portfolios'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    projects = relationship("Project")
 
 
 class Project(Base):
@@ -13,17 +45,21 @@ class Project(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    portfolio = Column(Integer, ForeignKey('portfolios.id'))
     returnitems = relationship("ReturnItem")
 
     def __repr__(self):
         return "<Project(name='{0}')>".format(self.name)
 
 
-class Quarter(Base):
-    __tablename__ = 'quarters'
+class RetainedSourceFile(Base):
+    __tablename__ = 'retained_source_files'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    project_id = Column(Integer, ForeignKey('projects.id'))
+    portfolio_id = Column(Integer, ForeignKey('portfolios.id'))
+    series_item_id = Column(Integer, ForeignKey('series_items.id'))
+    uuid = Column(String)
 
 
 class DatamapItem(Base):
@@ -47,13 +83,13 @@ class ReturnItem(Base):
 
     id = Column(Integer, primary_key=True)
     project_id = Column(Integer, ForeignKey('projects.id'))
-    quarter_id = Column(Integer, ForeignKey('quarters.id'))
+    series_item_id = Column(Integer, ForeignKey('series_items.id'))
     datamap_item_id = Column(Integer, ForeignKey('datamap_items.id'))
     value = Column(String)
 
     def __repr__(self):
-        return ("<ReturnItem(Project: {0}, Quarter for {1}, "
-                "for DMI: {2}>").format(self.project_id, self.quarter_id,
+        return ("<ReturnItem(Project: {0}, SeriesItem for {1}, "
+                "for DMI: {2}>").format(self.project_id, self.series_item_id,
                                         self.datamap_item_id)
 
 

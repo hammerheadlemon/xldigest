@@ -1,20 +1,16 @@
+import os
 import sys
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
 from xldigest.database.models import DatamapItem
+from xldigest.database.setup import set_up_session, USER_DATA_DIR
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
 
-engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
-                       'db.sqlite')
-
-Session = sessionmaker(bind=engine)
-
-session = Session()
+db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
+session = set_up_session(db_pth)
 
 
 class DatamapTableModel(QtCore.QAbstractTableModel):

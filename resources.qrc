@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="play.png">images/play.png</file> 
+    <file alias="tools.png">images/tools.png</file>
+    <file alias="upload.png">images/upload.png</file>
+    <file alias="dev.png">images/dev.png</file>
+    <file alias="arrow-down.png">images/arrow-down.png</file>
+</qresource>
+</RCC>

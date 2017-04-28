@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 .ropeproject/
-
+jkk
 # Distribution / packaging
 .Python
 env/
@@ -60,5 +60,6 @@ docs/_build/
 # PyBuilder
 target/
 xldigest/db.sqlite
-db.sqlite
+db.sqlite*
 db.sqlite_true
+images/

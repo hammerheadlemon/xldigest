@@ -1,9 +1,14 @@
 import csv
 import os
-from datetime import datetime
+import sqlite3
 import pytest
+import shutil
+
+from tempfile import gettempdir
 
 from openpyxl import Workbook
+
+TMP_DIR = gettempdir()
 
 ws_summary_B5_rand = [
     'Cookfield, Rebuild',
@@ -177,6 +182,186 @@ ws_resources_E17_rand = [
 ]
 
 
+dm_data = [
+    ('Project/Programme Name', 'Summary', 'A5', 'GMPP Sheet', 'A15', None),
+    ('SRO Name', 'Summary', 'B5', 'GMPP Sheet', 'B15', None),
+    ('SRO Age', 'Summary', 'C5', 'GMPP Sheet', 'C15', None),
+    ('Top 37', 'Summary', 'I5', 'GMPP Sheet', 'C29', None),
+    ('DfT Business Plan', 'Summary', 'I6', 'GMPP Sheet', 'C30', None),
+    ('DFT ID Number', 'Summary', 'B6', 'GMPP Sheet', 'C31', None),
+    ('Working Contact Name', 'Summary', 'H8', 'GMPP Sheet', 'C32', None),
+    ('Working Contact Telephone', 'Summary', 'H9', 'GMPP Sheet', 'C33', None),
+    ('Working Contact Email', 'Summary', 'H10', 'GMPP Sheet', 'C34', None),
+    ('DfT Group', 'Summary', 'B8', 'GMPP Sheet', 'C35', None),
+    ('DfT Division', 'Summary', 'B9', 'GMPP Sheet', 'C36', None),
+    ('Agency or delivery partner (GMPP - Delivery Organisation primary)',
+     'Summary', 'B10', 'GMPP Sheet', 'C37', None),
+]
+
+return_data = [
+    (1, 1, 1, "P1 Q1 DM1"),
+    (1, 1, 2, "P1 Q1 DM2"),
+    (1, 1, 3, "P1 Q1 DM3"),
+    (1, 1, 4, "P1 Q1 DM4"),
+    (1, 1, 5, "P1 Q1 DM5"),
+    (1, 1, 6, "P1 Q1 DM6"),
+    (1, 1, 7, "P1 Q1 DM7"),
+    (1, 1, 8, "P1 Q1 DM8"),
+    (1, 1, 9, "P1 Q1 DM9"),
+    (1, 1, 10, "P1 Q1 DM10"),
+    (1, 1, 11, "P1 Q1 DM11"),
+    (1, 1, 12, "P1 Q1 DM12"),
+    (2, 1, 1, "P2 Q1 DM1"),
+    (2, 1, 2, "P2 Q1 DM2"),
+    (2, 1, 3, "P2 Q1 DM3"),
+    (2, 1, 4, "P2 Q1 DM4"),
+    (2, 1, 5, "P2 Q1 DM5"),
+    (2, 1, 6, "P2 Q1 DM6"),
+    (2, 1, 7, "P2 Q1 DM7"),
+    (2, 1, 8, "P2 Q1 DM8"),
+    (2, 1, 9, "P2 Q1 DM9"),
+    (2, 1, 10, "P2 Q1 DM10"),
+    (2, 1, 11, "P2 Q1 DM11"),
+    (2, 1, 12, "P2 Q1 DM12"),
+    (1, 2, 1, "P1 Q2 DM1"),
+    (1, 2, 2, "P1 Q2 DM2"),
+    (1, 2, 3, "P1 Q2 DM3"),
+    (1, 2, 4, "P1 Q2 DM4"),
+    (1, 2, 5, "P1 Q2 DM5"),
+    (1, 2, 6, "P1 Q2 DM6"),
+    (1, 2, 7, "P1 Q2 DM7"),
+    (1, 2, 8, "P1 Q2 DM8"),
+    (1, 2, 9, "P1 Q2 DM9"),
+    (1, 2, 10, "P1 Q2 DM10"),
+    (1, 2, 11, "P1 Q2 DM11"),
+    (1, 2, 12, "P1 Q2 DM12"),
+    (2, 2, 1, "P2 Q2 DM1"),
+    (2, 2, 2, "P2 Q2 DM2"),
+    (2, 2, 3, "P2 Q2 DM3"),
+    (2, 2, 4, "P2 Q2 DM4"),
+    (2, 2, 5, "P2 Q2 DM5"),
+    (2, 2, 6, "P2 Q2 DM6"),
+    (2, 2, 7, "P2 Q2 DM7"),
+    (2, 2, 8, "P2 Q2 DM8"),
+    (2, 2, 9, "P2 Q2 DM9"),
+    (2, 2, 10, "P2 Q2 DM10"),
+    (2, 2, 11, "P2 Q2 DM11"),
+    (2, 2, 12, "P2 Q2 DM12"),
+]
+
+
+@pytest.fixture
+def sqlite3_db_file():
+    db_file = os.path.join(TMP_DIR, "test.db")
+    conn = sqlite3.connect(db_file)
+    c = conn.cursor()
+
+    c.execute("DROP TABLE IF EXISTS projects")
+    c.execute("DROP TABLE IF EXISTS datamap_items")
+    c.execute("DROP TABLE IF EXISTS returns")
+    c.execute("DROP TABLE IF EXISTS portfolios")
+    c.execute("DROP TABLE IF EXISTS series")
+    c.execute("DROP TABLE IF EXISTS series_items")
+    c.execute("DROP TABLE IF EXISTS  retained_source_files")
+
+    c.execute("""CREATE TABLE projects
+              (id integer PRIMARY KEY, name text, portfolio id)""")
+    c.execute("""CREATE TABLE datamap_items
+              (id integer PRIMARY KEY,
+              key text,
+              bicc_sheet text,
+              bicc_cellref text,
+              gmpp_sheet text,
+              gmpp_cellref text,
+              bicc_ver_form text
+              )"""
+              )
+    c.execute("""CREATE TABLE returns
+              (id integer PRIMARY KEY,
+              project_id integer,
+              series_item_id integer,
+              datamap_item_id integer,
+              value text,
+              FOREIGN KEY (project_id) REFERENCES projects(id),
+              FOREIGN KEY (series_item_id) REFERENCES series_items(id),
+              FOREIGN KEY (datamap_item_id) REFERENCES datamap_items(id)
+              )""")
+
+    c.execute("""CREATE TABLE portfolios
+              (id integer PRIMARY KEY,
+              name text)"""
+              )
+
+    c.execute("""CREATE TABLE series
+              (id integer PRIMARY KEY,
+              name text)"""
+              )
+    c.execute("""CREATE TABLE series_items
+              (id integer PRIMARY KEY,
+              name text,
+              start_date text,
+              end_date text,
+              series_id integer,
+              FOREIGN KEY (series_id) REFERENCES series(id)
+              )""")
+    c.execute("""CREATE TABLE retained_source_files
+              (id integer PRIMARY KEY,
+              project_id integer,
+              portfolio_id integer,
+              series_item_id integer,
+              uuid text,
+              FOREIGN KEY (project_id) REFERENCES projects(id),
+              FOREIGN KEY (portfolio_id) REFERENCES portfolios(id),
+              FOREIGN KEY (series_item_id) REFERENCES series_items(id)
+              )""")
+
+    c.execute("INSERT INTO portfolios (name) VALUES('Tier 1 Projects')")
+    c.execute("INSERT INTO series (name) VALUES('Financial Quarters')")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q1 2013/14', '2013-04-01', '2013-06-30', 1 )""")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q2 2013/14', '2013-04-01', '2013-06-30', 1 )""")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q3 2013/14', '2013-04-01', '2013-06-30', 1 )""")
+    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
+              VALUES('Q5 2013/14', '2013-04-01', '2013-06-30', 1 )""")
+
+    c.execute("INSERT INTO projects (name, portfolio) VALUES('Project 1', 1)")
+    c.execute("INSERT INTO projects (name, portfolio) VALUES('Project 2', 1)")
+    c.execute("INSERT INTO projects (name, portfolio) VALUES('Project 3', 1)")
+
+#    c.execute("""INSERT INTO retained_source_files (portfolio_id, project_id, series_item_id)
+#              VALUES(1, 1, 1)""")
+
+    c.executemany(
+        ("INSERT INTO datamap_items (key, bicc_sheet, "
+         "bicc_cellref, gmpp_sheet, gmpp_cellref, bicc_ver_form) VALUES"
+         "(?, ?, ?, ?, ?, ?)"), dm_data)
+
+    c.executemany(
+        ("INSERT INTO returns (project_id, series_item_id, datamap_item_id, value)"
+         " VALUES (?, ?, ?, ?)"), return_data)
+
+    conn.commit()
+    c.close()
+    conn.close()
+    return db_file
+    # os.unlink(os.path.join(TMP_DIR, 'test.db')
+
+
+@pytest.fixture
+def test_blank_xls():
+    wb = Workbook()
+    wb.create_sheet('Summary')
+    wb.create_sheet('Finance & Benefits')
+    wb.create_sheet('Approval & Project milestones')
+    wb.create_sheet('Resources')
+    wb.create_sheet('Assurance planning')
+    wb.create_sheet('GMPP info')
+    wb.save(os.path.join(TMP_DIR, 'test.xlsx'))
+    return(os.path.join(TMP_DIR, 'test.xlsx'))
+
+
 @pytest.fixture
 def bicc_return():
     wb = Workbook()
@@ -241,9 +426,9 @@ def bicc_return():
     ws_assurance['A17'].value = 'Review Point 4 MPRG'
     ws_assurance['E17'].value = 'Amber/Green'
 
-    wb.save('/tmp/test-bicc-return.xlsx')
-    yield '/tmp/test-bicc-return.xlsx'
-    os.unlink('/tmp/test-bicc-return.xlsx')
+    wb.save(os.path.join(TMP_DIR, 'test-bicc-return.xlsx'))
+    yield os.path.join(TMP_DIR, 'test-bicc-return.xlsx')
+    os.unlink(os.path.join(TMP_DIR, 'test-bicc-return.xlsx'))
 
 
 @pytest.fixture
@@ -306,11 +491,42 @@ def mock_datamap_source_file():
             'yellow', 'd/mm/yy', 'Capability RAG'
         ]
     ]
-    with open('/tmp/mock_datamap.csv', 'w') as f:
+    with open(os.path.join(TMP_DIR, 'mock_datamap.csv'), 'w') as f:
         datamap_writer = csv.writer(f, delimiter=',')
         f.write('cell_key,template_sheet,cell_reference,bg_colour,fg_colour'
                 ',number_format,verification_list\n')
         for item in data:
             datamap_writer.writerow(item)
-    yield '/tmp/mock_datamap.csv'
-    os.unlink('/tmp/mock_datamap.csv')
+    yield os.path.join(TMP_DIR, 'mock_datamap.csv')
+    os.unlink(os.path.join(TMP_DIR, 'mock_datamap.csv'))
+
+
+def mock_blank_xlsx_file(source_dir: str, empty: bool=False, mix: bool=False) -> None:
+    wb = Workbook()
+    wb.create_sheet('Test')
+
+    # Test sheet fixtures
+    ws_summary = wb['Test']
+    ws_summary['A5'].value = 'Project/Programme Name'
+    ws_summary['B5'].value = ws_summary_B5_rand[0]
+    ws_summary['A8'].value = 'DfT Group'
+    ws_summary['B8'].value = ws_summary_B8_rand[0]
+    try:
+        os.mkdir(source_dir)
+        wb.save(os.path.join(os.path.abspath(source_dir), 'test-blank.xlsx'))
+        if mix:  # we want to throw another file type in there
+            with open(source_dir + '/' + 'baws.txt', 'w') as f:
+                f.write("Some random bollocks")
+        if empty:  # we want the dir but no files in it
+            for test_file in os.path.abspath(source_dir):
+                os.unlink(os.path.abspath(source_dir).join(test_file))
+    except:
+        shutil.rmtree(source_dir)
+        os.mkdir(source_dir)
+        wb.save(os.path.join(os.path.abspath(source_dir), 'test-blank.xlsx'))
+        if mix:
+            with open(source_dir + '/' + 'baws.txt', 'w') as f:
+                f.write("Some random bollocks")
+        if empty:
+            for test_file in os.listdir(os.path.abspath(source_dir)):
+                os.unlink(os.path.join(os.path.abspath(source_dir), test_file))
