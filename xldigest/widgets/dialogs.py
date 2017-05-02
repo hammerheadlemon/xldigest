@@ -72,4 +72,4 @@ class AddDatamapFromCSVDialog(QtWidgets.QFileDialog):
         super().__init__(parent)
         self.setFileMode(QtWidgets.QFileDialog.ExistingFile)
         self.setDirectory(USER_DATA_DIR)
-        self.exec_()
+        self.exec()
