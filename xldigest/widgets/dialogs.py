@@ -1,5 +1,7 @@
 from PyQt5 import QtWidgets
 
+from xldigest.database.setup import USER_DATA_DIR, set_up_session
+
 
 class AddPortfolioDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -64,3 +66,10 @@ class AddSeriesItemDialog(QtWidgets.QDialog):
         buttonBox.accepted.connect(self.accept)
         buttonBox.rejected.connect(self.reject)
 
+
+class AddDatamapFromCSVDialog(QtWidgets.QFileDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFileMode(QtWidgets.QFileDialog.ExistingFile)
+        self.setDirectory(USER_DATA_DIR)
+        self.exec_()

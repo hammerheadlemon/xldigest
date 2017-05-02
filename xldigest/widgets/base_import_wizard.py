@@ -2,7 +2,8 @@ from PyQt5 import QtWidgets
 
 from xldigest.widgets.base_import_wizard_ui import Ui_base_import_wizard
 from xldigest.widgets.dialogs import (AddPortfolioDialog, AddProjectDialog,
-                                      AddSeriesDialog, AddSeriesItemDialog)
+                                      AddSeriesDialog, AddSeriesItemDialog,
+                                      AddDatamapFromCSVDialog)
 
 
 class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
@@ -13,12 +14,15 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         self.portfolio = None
         self.series = None
         self.series_items = []
+
         self.create_portfolio_button.clicked.connect(
             self._create_portfolio_diag)
         self.add_project_button.clicked.connect(self._add_project_diag)
         self.create_series_button.clicked.connect(self._create_series_diag)
         self.create_series_item_button.clicked.connect(
             self._add_series_item_diag)
+        self.select_datamap_button.clicked.connect(self._add_datamap_csv_diag)
+
         self.portfolio_added_label.setEnabled(False)
         self.series_added_label.setEnabled(False)
         self.added_projects_table.setColumnCount(1)
@@ -68,3 +72,9 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
             self.added_series_item_table.insertRow(rows)
             si_add = QtWidgets.QTableWidgetItem(new_series_item_name)
             self.added_series_item_table.setItem(rows, 0, si_add)
+
+    def _add_datamap_csv_diag(self):
+        diag = AddDatamapFromCSVDialog()
+        if diag.exec_():
+            self.selected_csv_file = diag.selectedFiles()[0]
+            self.selected_datamap_file_label.setText(self.selected_csv_file)
