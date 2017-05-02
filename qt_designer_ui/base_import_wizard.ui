@@ -343,7 +343,7 @@
     <item row="1" column="0">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QTableWidget" name="tableWidget">
+       <widget class="QTableWidget" name="imported_datamap_table">
         <property name="rowCount">
          <number>3</number>
         </property>

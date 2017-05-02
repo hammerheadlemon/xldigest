@@ -37,6 +37,18 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
             True)
         self.setWindowTitle("Set up xldigest application")
 
+        # datamap page table
+        self.imported_datamap_table.setItem(0, 0, QtWidgets.QTableWidgetItem(
+            "Datamap File:"))
+        self.imported_datamap_table.setItem(1, 0, QtWidgets.QTableWidgetItem(
+            "GMPP Datamap File:"))
+        self.imported_datamap_table.setItem(2, 0, QtWidgets.QTableWidgetItem(
+            "Transposed Master File:"))
+        self.imported_datamap_table.setHorizontalHeaderItem(
+            0, QtWidgets.QTableWidgetItem("Description"))
+        self.imported_datamap_table.setHorizontalHeaderItem(
+            1, QtWidgets.QTableWidgetItem("File Name"))
+
     def _create_portfolio_diag(self):
         diag = AddPortfolioDialog()
         if diag.exec_():
@@ -76,5 +88,6 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
     def _add_datamap_csv_diag(self):
         diag = AddDatamapFromCSVDialog()
         if diag.exec_():
-            self.selected_csv_file = diag.selectedFiles()[0]
-            self.selected_datamap_file_label.setText(self.selected_csv_file)
+            self.selected_csv_file = diag.selectedFiles()[0].split('/')[-1]
+            self.imported_datamap_table.setItem(
+                0, 1, QtWidgets.QTableWidgetItem(self.selected_csv_file))
