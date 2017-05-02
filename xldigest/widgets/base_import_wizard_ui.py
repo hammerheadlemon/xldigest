@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'qt_designer_ui/base_import_wizard.ui'
+# Form implementation generated from reading ui file 'base_import_wizard.ui'
 #
-# Created by: PyQt5 UI code generator 5.7.1
+# Created by: PyQt5 UI code generator 5.8
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -140,6 +140,17 @@ class Ui_base_import_wizard(object):
         self.selected_transposed_master_file_label.setObjectName("selected_transposed_master_file_label")
         self.gridLayout_6.addWidget(self.selected_transposed_master_file_label, 3, 3, 1, 1)
         self.gridLayout_5.addWidget(self.groupBox_3, 0, 0, 1, 1)
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.tableWidget = QtWidgets.QTableWidget(self.wizardPage)
+        self.tableWidget.setRowCount(3)
+        self.tableWidget.setColumnCount(2)
+        self.tableWidget.setObjectName("tableWidget")
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
+        self.verticalLayout.addWidget(self.tableWidget)
+        spacerItem7 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem7)
+        self.gridLayout_5.addLayout(self.verticalLayout, 1, 0, 1, 1)
         base_import_wizard.addPage(self.wizardPage)
 
         self.retranslateUi(base_import_wizard)
