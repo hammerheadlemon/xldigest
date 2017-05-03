@@ -25,10 +25,15 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         # buttons
         self.create_portfolio_button.clicked.connect(
             self._create_portfolio_diag)
+
         self.add_project_button.clicked.connect(self._add_project_diag)
+        self.add_project_button.setEnabled(False)
+
         self.create_series_button.clicked.connect(self._create_series_diag)
         self.create_series_item_button.clicked.connect(
             self._add_series_item_diag)
+        self.create_series_item_button.setEnabled(False)
+
         self.select_datamap_button.clicked.connect(self._add_datamap_csv_diag)
         self.select_gmpp_datamap_button.clicked.connect(self._add_gmpp_datamap_csv_diag)
         self.select_transposed_master_button.clicked.connect(self._add_transposed_master_diag)
@@ -99,7 +104,7 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
             self.portfolio = diag.name_lineEdit.text()
             self.portfolio_added_label.setEnabled(True)
             self.portfolio_added_label.setText(self.portfolio)
-            print(diag.name_lineEdit.text())
+            self.add_project_button.setEnabled(True)
 
     def _add_project_diag(self):
         diag = AddProjectDialog()
@@ -117,7 +122,7 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
             self.series = diag.name_lineEdit.text()
             self.series_added_label.setEnabled(True)
             self.series_added_label.setText(self.series)
-            print(diag.name_lineEdit.text())
+            self.create_series_item_button.setEnabled(True)
 
     def _add_series_item_diag(self):
         diag = AddSeriesItemDialog()

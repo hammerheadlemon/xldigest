@@ -17,7 +17,50 @@ from xldigest.database.base_queries import (
 db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
 session = set_up_session(db_pth)
 
-verification_html_template = USER_DATA_DIR + '/ver_tmp.mako'
+verification_template = """
+<h1>Confirmation required</h1>
+
+<p>You are about to create the following entities in the database. Click OK if you are content
+     or Cancel to exit the set-up wizard.
+ </p>
+
+
+<h3>Portfolio</h3>
+
+<table>
+    <tr>
+        <td>${data['portfolio']}</td>
+    </tr>
+</table>
+
+<h3>Projects</h3>
+
+<table>
+    % for p in data['projects']:
+        <tr>
+            <td>${p}</td>
+        </tr>
+    % endfor
+</table>
+
+<h3>Series</h3>
+
+<table>
+    <tr>
+        <td>${data['series']}</td>
+    </tr>
+</table>
+
+<h3>Series Items</h3>
+
+<table>
+    % for p in data['series_items']:
+        <tr>
+            <td>${p}</td>
+        </tr>
+    % endfor
+</table>
+"""
 
 
 class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
@@ -68,7 +111,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         Takes a dict and parses it into an HTML table.
         """
         print(data)
-        template = Template(filename=verification_html_template)
+        template = Template(verification_template)
         buf = StringIO()
         ctx = Context(buf, data=data)
         template.render_context(ctx)
