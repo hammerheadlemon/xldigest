@@ -51,7 +51,23 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         warning_dialog.show()
         if warning_dialog.exec_():
             self.base_wizard = BaseImportWizard()
-            self.base_wizard.exec()
+            if self.base_wizard.exec_():
+                self.base_wizard.populate_data()
+                data = self.base_wizard.wizard_data
+                self.verify_wizard_data(data)
+
+    def verify_wizard_data(self, data):
+        diag = QtWidgets.QDialog(self.base_wizard)
+        diag.setWindowTitle("Verify initial set-up")
+        buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok |
+                                               QtWidgets.QDialogButtonBox.Cancel)
+        grid = QtWidgets.QGridLayout()
+        grid.addWidget(buttonBox, 1, 0, 1, 2)
+        diag.setLayout(grid)
+        buttonBox.accepted.connect(diag.accept)
+        buttonBox.rejected.connect(diag.reject)
+        if diag.exec_():
+            print(data)
 
     def _make_model_data_list(self, *args):
         """

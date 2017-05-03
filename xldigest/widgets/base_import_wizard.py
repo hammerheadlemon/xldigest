@@ -16,6 +16,8 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         self.portfolio = None
         self.series = None
         self.series_items = []
+        self.wizard_data = {}
+
 
         # signals
         # --------
@@ -71,6 +73,17 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
             0, QtWidgets.QTableWidgetItem("Description"))
         self.imported_datamap_table.setHorizontalHeaderItem(
             1, QtWidgets.QTableWidgetItem("File Name"))
+
+    def populate_data(self):
+        self.wizard_data = {
+            'projects': self.projects,
+            'portfolio': self.portfolio,
+            'series': self.series,
+            'series_items': self.series_items,
+            'datamap_csv': self.selected_csv_file[0].split('/')[-1],
+            'gmpp_datamap_csv': self.selected_gmpp_csv_file[0].split('/')[-1],
+            'transposed_master': self.selected_transposed_master_file
+        }
 
     def _clicked_cell_dispathcher(self, row, col):
         if row == 0 and col == 1:
