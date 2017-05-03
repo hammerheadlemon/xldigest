@@ -86,7 +86,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         buttonBox.accepted.connect(diag.accept)
         buttonBox.rejected.connect(diag.reject)
         label = QtWidgets.QLabel(self._parse_data(data))
-        grid.addWidget(label)
+        grid.addWidget(label, 0, 0)
         if diag.exec_():
             print(data)
 
