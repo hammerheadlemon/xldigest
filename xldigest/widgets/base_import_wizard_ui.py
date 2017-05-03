@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'base_import_wizard.ui'
 #
-# Created by: PyQt5 UI code generator 5.8
+# Created by: PyQt5 UI code generator 5.8.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -111,10 +111,6 @@ class Ui_base_import_wizard(object):
         self.select_datamap_button = QtWidgets.QPushButton(self.groupBox_3)
         self.select_datamap_button.setObjectName("select_datamap_button")
         self.gridLayout_6.addWidget(self.select_datamap_button, 1, 2, 1, 1)
-        self.selected_datamap_file_label = QtWidgets.QLabel(self.groupBox_3)
-        self.selected_datamap_file_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.selected_datamap_file_label.setObjectName("selected_datamap_file_label")
-        self.gridLayout_6.addWidget(self.selected_datamap_file_label, 1, 3, 1, 1)
         self.label_2 = QtWidgets.QLabel(self.groupBox_3)
         self.label_2.setObjectName("label_2")
         self.gridLayout_6.addWidget(self.label_2, 2, 0, 1, 1)
@@ -123,10 +119,6 @@ class Ui_base_import_wizard(object):
         self.select_gmpp_datamap_button = QtWidgets.QPushButton(self.groupBox_3)
         self.select_gmpp_datamap_button.setObjectName("select_gmpp_datamap_button")
         self.gridLayout_6.addWidget(self.select_gmpp_datamap_button, 2, 2, 1, 1)
-        self.selected_gmpp_datamap_file_label = QtWidgets.QLabel(self.groupBox_3)
-        self.selected_gmpp_datamap_file_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.selected_gmpp_datamap_file_label.setObjectName("selected_gmpp_datamap_file_label")
-        self.gridLayout_6.addWidget(self.selected_gmpp_datamap_file_label, 2, 3, 1, 1)
         self.label_3 = QtWidgets.QLabel(self.groupBox_3)
         self.label_3.setObjectName("label_3")
         self.gridLayout_6.addWidget(self.label_3, 3, 0, 1, 1)
@@ -135,10 +127,6 @@ class Ui_base_import_wizard(object):
         self.select_transposed_master_button = QtWidgets.QPushButton(self.groupBox_3)
         self.select_transposed_master_button.setObjectName("select_transposed_master_button")
         self.gridLayout_6.addWidget(self.select_transposed_master_button, 3, 2, 1, 1)
-        self.selected_transposed_master_file_label = QtWidgets.QLabel(self.groupBox_3)
-        self.selected_transposed_master_file_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.selected_transposed_master_file_label.setObjectName("selected_transposed_master_file_label")
-        self.gridLayout_6.addWidget(self.selected_transposed_master_file_label, 3, 3, 1, 1)
         self.gridLayout_5.addWidget(self.groupBox_3, 0, 0, 1, 1)
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
@@ -174,11 +162,8 @@ class Ui_base_import_wizard(object):
         self.label_7.setText(_translate("base_import_wizard", "3. Datamap Files"))
         self.label.setText(_translate("base_import_wizard", "Select a datamap CSV file"))
         self.select_datamap_button.setText(_translate("base_import_wizard", "Select"))
-        self.selected_datamap_file_label.setText(_translate("base_import_wizard", "TextLabel"))
         self.label_2.setText(_translate("base_import_wizard", "Select a GMPP datamap CSV file"))
         self.select_gmpp_datamap_button.setText(_translate("base_import_wizard", "Select"))
-        self.selected_gmpp_datamap_file_label.setText(_translate("base_import_wizard", "TextLabel"))
         self.label_3.setText(_translate("base_import_wizard", "Select a transposed_master CSV file"))
         self.select_transposed_master_button.setText(_translate("base_import_wizard", "Select"))
-        self.selected_transposed_master_file_label.setText(_translate("base_import_wizard", "TextLabel"))
 
