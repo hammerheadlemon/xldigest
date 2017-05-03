@@ -13,7 +13,8 @@ class AddPortfolioDialog(QtWidgets.QDialog):
         if not AddPortfolioDialog.portfolio:
             self.name_lineEdit = QtWidgets.QLineEdit()
         else:
-            self.name_lineEdit = QtWidgets.QLineEdit(AddPortfolioDialog.portfolio)
+            self.name_lineEdit = QtWidgets.QLineEdit(
+                AddPortfolioDialog.portfolio)
         self.buttonBox = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
@@ -37,7 +38,8 @@ class AddPortfolioDialog(QtWidgets.QDialog):
         enabled = False
         if not self.name_lineEdit.text() == "":
             enabled = True
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(enabled)
+        self.buttonBox.button(
+            QtWidgets.QDialogButtonBox.Ok).setEnabled(enabled)
 
 
 class AddProjectDialog(QtWidgets.QDialog):
@@ -63,23 +65,47 @@ class AddProjectDialog(QtWidgets.QDialog):
         enabled = False
         if not self.name_lineEdit.text() == "":
             enabled = True
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(enabled)
+        self.buttonBox.button(
+            QtWidgets.QDialogButtonBox.Ok).setEnabled(enabled)
 
 
 class AddSeriesDialog(QtWidgets.QDialog):
+
+    series = None
+
     def __init__(self, parent=None):
         super().__init__(parent)
         name_label = QtWidgets.QLabel("Series Name")
-        self.name_lineEdit = QtWidgets.QLineEdit()
-        buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok |
-                                               QtWidgets.QDialogButtonBox.Cancel)
+        if not AddSeriesDialog.series:
+            self.name_lineEdit = QtWidgets.QLineEdit()
+        else:
+            print("In the else: {}".format(AddSeriesDialog.series))
+            self.name_lineEdit = QtWidgets.QLineEdit(
+                AddSeriesDialog.series)
+        self.buttonBox = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
         grid = QtWidgets.QGridLayout()
         grid.addWidget(name_label, 0, 0)
         grid.addWidget(self.name_lineEdit, 0, 1)
-        grid.addWidget(buttonBox, 2, 0, 1, 2)
+        grid.addWidget(self.buttonBox, 2, 0, 1, 2)
         self.setLayout(grid)
-        buttonBox.accepted.connect(self.accept)
-        buttonBox.rejected.connect(self.reject)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        # signals
+        self.name_lineEdit.textEdited.connect(self.updateUi)
+
+    def set_line_edit_value(self):
+        AddSeriesDialog.series = self.name_lineEdit.text()
+        return AddSeriesDialog.series
+
+    def updateUi(self):
+        enabled = False
+        if not self.name_lineEdit.text() == "":
+            enabled = True
+        self.buttonBox.button(
+            QtWidgets.QDialogButtonBox.Ok).setEnabled(enabled)
 
 
 class AddSeriesItemDialog(QtWidgets.QDialog):
@@ -87,8 +113,8 @@ class AddSeriesItemDialog(QtWidgets.QDialog):
         super().__init__(parent)
         name_label = QtWidgets.QLabel("Series Item Name")
         self.name_lineEdit = QtWidgets.QLineEdit()
-        buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok |
-                                               QtWidgets.QDialogButtonBox.Cancel)
+        buttonBox = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
         grid = QtWidgets.QGridLayout()
         grid.addWidget(name_label, 0, 0)
         grid.addWidget(self.name_lineEdit, 1, 1)

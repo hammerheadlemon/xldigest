@@ -119,7 +119,8 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
     def _create_series_diag(self):
         diag = AddSeriesDialog()
         if diag.exec_():
-            self.series = diag.name_lineEdit.text()
+            self.series = diag.set_line_edit_value()
+            print("From caller: {}".format(self.series))
             self.series_added_label.setEnabled(True)
             self.series_added_label.setText(self.series)
             self.create_series_item_button.setEnabled(True)
