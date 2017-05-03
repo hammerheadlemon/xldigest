@@ -24,6 +24,9 @@ verification_template = """
      or Cancel to exit the set-up wizard.
  </p>
 
+ <p style="color:red"><strong>Any existing database file will be destroyed and recreated
+  if you go ahead.</strong></p>
+
 
 <h3>Portfolio</h3>
 
