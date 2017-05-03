@@ -101,7 +101,7 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
     def _create_portfolio_diag(self):
         diag = AddPortfolioDialog()
         if diag.exec_():
-            self.portfolio = diag.name_lineEdit.text()
+            self.portfolio = diag.set_line_edit_value()
             self.portfolio_added_label.setEnabled(True)
             self.portfolio_added_label.setText(self.portfolio)
             self.add_project_button.setEnabled(True)
