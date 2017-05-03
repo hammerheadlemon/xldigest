@@ -1,7 +1,7 @@
 from setuptools import setup
 
 requirements = [
-    'pyqt5', 'openpyxl', 'python-dateutil', 'sqlalchemy', 'appdirs'
+    'pyqt5', 'openpyxl', 'python-dateutil', 'sqlalchemy', 'appdirs', 'Mako'
 ]
 
 test_requirements = [

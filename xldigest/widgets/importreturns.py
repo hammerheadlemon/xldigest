@@ -2,6 +2,11 @@ import os
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 
+from mako.template import Template
+from mako.runtime import Context
+
+from io import StringIO
+
 from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
 from xldigest.widgets.base_import_wizard import BaseImportWizard
 from xldigest.database.setup import USER_DATA_DIR, set_up_session, USER_HOME
@@ -11,6 +16,8 @@ from xldigest.database.base_queries import (
 
 db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
 session = set_up_session(db_pth)
+
+verification_html_template = USER_DATA_DIR + '/ver_tmp.mako'
 
 
 class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
@@ -56,19 +63,17 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 data = self.base_wizard.wizard_data
                 self.verify_wizard_data(data)
 
-    def parse_data(self, data):
+    def _parse_data(self, data):
         """
         Takes a dict and parses it into an HTML table.
         """
-        no_projects = len(data['projects'])
-        no_series_items = len(data['series_items'])
-        base_porfolio_str = """
-        <tr><td><strong>Portfolio</strong>:</td><td>{}</td></tr>
-        """.format(data['portfolio'])
-        output_html = """
-        <table>{}</table>
-        """.format(base_porfolio_str)
-        return output_html
+        print(data)
+        template = Template(filename=verification_html_template)
+        buf = StringIO()
+        ctx = Context(buf, data=data)
+        template.render_context(ctx)
+        print(buf.getvalue())
+        return (buf.getvalue())
 
     def verify_wizard_data(self, data):
         diag = QtWidgets.QDialog(self.base_wizard)
@@ -80,7 +85,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         diag.setLayout(grid)
         buttonBox.accepted.connect(diag.accept)
         buttonBox.rejected.connect(diag.reject)
-        label = QtWidgets.QLabel(self.parse_data(data))
+        label = QtWidgets.QLabel(self._parse_data(data))
         grid.addWidget(label)
         if diag.exec_():
             print(data)
