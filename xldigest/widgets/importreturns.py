@@ -56,6 +56,20 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 data = self.base_wizard.wizard_data
                 self.verify_wizard_data(data)
 
+    def parse_data(self, data):
+        """
+        Takes a dict and parses it into an HTML table.
+        """
+        no_projects = len(data['projects'])
+        no_series_items = len(data['series_items'])
+        base_porfolio_str = """
+        <tr><td><strong>Portfolio</strong>:</td><td>{}</td></tr>
+        """.format(data['portfolio'])
+        output_html = """
+        <table>{}</table>
+        """.format(base_porfolio_str)
+        return output_html
+
     def verify_wizard_data(self, data):
         diag = QtWidgets.QDialog(self.base_wizard)
         diag.setWindowTitle("Verify initial set-up")
@@ -66,6 +80,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         diag.setLayout(grid)
         buttonBox.accepted.connect(diag.accept)
         buttonBox.rejected.connect(diag.reject)
+        label = QtWidgets.QLabel(self.parse_data(data))
+        grid.addWidget(label)
         if diag.exec_():
             print(data)
 

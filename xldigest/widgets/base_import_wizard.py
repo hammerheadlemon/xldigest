@@ -123,7 +123,7 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         diag = AddSeriesItemDialog()
         if diag.exec_():
             new_series_item_name = diag.name_lineEdit.text()
-            self.projects.append(new_series_item_name)
+            self.series_items.append(new_series_item_name)
             rows = self.added_series_item_table.rowCount()
             self.added_series_item_table.insertRow(rows)
             si_add = QtWidgets.QTableWidgetItem(new_series_item_name)
