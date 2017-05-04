@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'qt_designer_ui/main_window.ui'
+# Form implementation generated from reading ui file 'main_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.7.1
+# Created by: PyQt5 UI code generator 5.8.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -29,17 +29,14 @@ class Ui_MainXldigestWindow(object):
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.tab)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.projectSummary = QtWidgets.QTableView(self.tab)
-        self.projectSummary.setObjectName("projectSummary")
-        self.projectSummary.horizontalHeader().setStretchLastSection(True)
-        self.horizontalLayout.addWidget(self.projectSummary)
+        self.overviewWidget = OverviewWidget(self.tab)
+        self.overviewWidget.setObjectName("overviewWidget")
+        self.horizontalLayout.addWidget(self.overviewWidget)
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.tab_2)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
@@ -51,7 +48,6 @@ class Ui_MainXldigestWindow(object):
         self.tab_5 = QtWidgets.QWidget()
         self.tab_5.setObjectName("tab_5")
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.tab_5)
-        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.returnsWidget = ReturnsWindow(self.tab_5)
         self.returnsWidget.setObjectName("returnsWidget")
@@ -60,7 +56,6 @@ class Ui_MainXldigestWindow(object):
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.tab_3)
-        self.horizontalLayout_6.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.templateManagerWidget = TemplateManagerWindow(self.tab_3)
         self.templateManagerWidget.setObjectName("templateManagerWidget")
@@ -69,7 +64,6 @@ class Ui_MainXldigestWindow(object):
         self.tab_4 = QtWidgets.QWidget()
         self.tab_4.setObjectName("tab_4")
         self.gridLayout = QtWidgets.QGridLayout(self.tab_4)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
         self.importReturns = ImportReturns(self.tab_4)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -98,7 +92,7 @@ class Ui_MainXldigestWindow(object):
         self.actionTemplate_Manager.setObjectName("actionTemplate_Manager")
 
         self.retranslateUi(MainXldigestWindow)
-        self.tabWidget.setCurrentIndex(4)
+        self.tabWidget.setCurrentIndex(0)
         self.finishButton.clicked.connect(MainXldigestWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainXldigestWindow)
 
@@ -115,5 +109,6 @@ class Ui_MainXldigestWindow(object):
 
 from xldigest.widgets.datamap import DatamapWindow
 from xldigest.widgets.importreturns import ImportReturns
+from xldigest.widgets.overview import OverviewWidget
 from xldigest.widgets.returnswindow import ReturnsWindow
 from xldigest.widgets.template_manager_window import TemplateManagerWindow

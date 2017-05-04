@@ -105,7 +105,6 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         if warning_dialog.exec_():
             self.base_wizard = BaseImportWizard()
             if self.base_wizard.exec_():
-                print(self.base_wizard.result())
                 self.base_wizard.populate_data()
                 data = self.base_wizard.wizard_data
                 self.verify_wizard_data(data)
