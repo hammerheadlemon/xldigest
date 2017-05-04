@@ -18,7 +18,6 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         self.series_items = []
         self.wizard_data = {}
 
-
         # signals
         # --------
 
@@ -79,21 +78,51 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         self.imported_datamap_table.setHorizontalHeaderItem(
             1, QtWidgets.QTableWidgetItem("File Name"))
 
-    def populate_data(self):
+        self.wizardPage1.validatePage = self.val1
+        self.wizardPage2.validatePage = self.val2
+        self.wizardPage.validatePage = self.val
+
+    def val1(self):
+        if len(self.projects) == 0:
+            return False
+        elif not self.portfolio:
+            return False
+        else:
+            return True
+
+    def val2(self):
+        if len(self.series_items) == 0:
+            return False
+        elif not self.series:
+            return False
+        else:
+            return True
+
+    def val(self):
         try:
-            self.wizard_data = {
-                'projects': self.projects,
-                'portfolio': self.portfolio,
-                'series': self.series,
-                'series_items': self.series_items,
-                'datamap_csv': self.selected_csv_file[0].split('/')[-1],
-                'gmpp_datamap_csv': self.selected_gmpp_csv_file[0].split('/')[-1],
-                'transposed_master': self.selected_transposed_master_file
-            }
+            assert self.selected_csv_file
         except AttributeError:
-            error_diag = QtWidgets.QErrorMessage()
-            if error_diag.exec_():
-                self.close()
+            return False
+        try:
+            assert self.selected_gmpp_csv_file
+        except AttributeError:
+            return False
+        try:
+            assert self.selected_transposed_master_file
+        except AttributeError:
+            return False
+        return True
+
+    def populate_data(self):
+        self.wizard_data = {
+            'projects': self.projects,
+            'portfolio': self.portfolio,
+            'series': self.series,
+            'series_items': self.series_items,
+            'datamap_csv': self.selected_csv_file[0].split('/')[-1],
+            'gmpp_datamap_csv': self.selected_gmpp_csv_file[0].split('/')[-1],
+            'transposed_master': self.selected_transposed_master_file
+        }
 
     def _clicked_cell_dispathcher(self, row, col):
         if row == 0 and col == 1:
@@ -125,7 +154,6 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         diag = AddSeriesDialog()
         if diag.exec_():
             self.series = diag.set_line_edit_value()
-            print("From caller: {}".format(self.series))
             self.series_added_label.setEnabled(True)
             self.series_added_label.setText(self.series)
             self.create_series_item_button.setEnabled(True)

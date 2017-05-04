@@ -31,7 +31,6 @@ class AddPortfolioDialog(QtWidgets.QDialog):
 
     def set_line_edit_value(self):
         AddPortfolioDialog.portfolio = self.name_lineEdit.text()
-        print(AddPortfolioDialog.portfolio)
         return AddPortfolioDialog.portfolio
 
     def updateUi(self):
