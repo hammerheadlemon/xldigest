@@ -15,6 +15,11 @@ import icons_rc
 
 from xldigest.widgets.main_ui import Ui_MainXldigestWindow
 from xldigest.widgets.base_import_wizard import BaseImportWizard
+from xldigest.widgets.datamap import DatamapWindow
+from xldigest.widgets.overview import OverviewWidget
+from xldigest.widgets.returnswindow import ReturnsWindow
+from xldigest.widgets.template_manager_window import TemplateManagerWindow
+from xldigest.widgets.importreturns import ImportReturns
 from xldigest.database.setup import USER_DATA_DIR
 
 
@@ -39,24 +44,44 @@ class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
 
         self.overviewIcon = QtGui.QPixmap(':/play.png')
-        self.toolBar.addAction(QtGui.QIcon(self.overviewIcon), "Overview")
+        self.toolBar.addAction(QtGui.QIcon(self.overviewIcon), "Overview", self.set_overview_central)
 
         self.datamapIcon = QtGui.QPixmap(':/tools.png')
-        self.toolBar.addAction(QtGui.QIcon(self.datamapIcon), "Datamap")
+        self.toolBar.addAction(QtGui.QIcon(self.datamapIcon), "Datamap", self.set_datamap_central)
 
         self.returnsIcon = QtGui.QPixmap(':/upload.png')
-        self.toolBar.addAction(QtGui.QIcon(self.returnsIcon), "Returns")
+        self.toolBar.addAction(QtGui.QIcon(self.returnsIcon), "Returns", self.set_returns_central)
 
         self.templatesIcon = QtGui.QPixmap(':/dev.png')
-        self.toolBar.addAction(QtGui.QIcon(self.templatesIcon), "Templates")
+        self.toolBar.addAction(QtGui.QIcon(self.templatesIcon), "Templates", self.set_template_central)
 
         self.importIcon = QtGui.QPixmap(':/arrow-down.png')
-        self.toolBar.addAction(QtGui.QIcon(self.importIcon), "Imports")
+        self.toolBar.addAction(QtGui.QIcon(self.importIcon), "Imports", self.set_import_central)
 
         if not DATABASE_PRESENT:
             self.overviewWidget.databasePresentLabel.setEnabled(True)
             self.overviewWidget.baseSetupButton.setEnabled(True)
             self.overviewWidget.baseSetupButton.clicked.connect(self._launch_wizard)
+
+    def set_import_central(self):
+        self.i_widget = ImportReturns()
+        self.setCentralWidget(self.i_widget)
+
+    def set_template_central(self):
+        self.t_widget = TemplateManagerWindow()
+        self.setCentralWidget(self.t_widget)
+
+    def set_datamap_central(self):
+        self.dm_widget = DatamapWindow()
+        self.setCentralWidget(self.dm_widget)
+
+    def set_overview_central(self):
+        self.o_widget = OverviewWidget()
+        self.setCentralWidget(self.o_widget)
+
+    def set_returns_central(self):
+        self.r_widget = ReturnsWindow()
+        self.setCentralWidget(self.r_widget)
 
     def _launch_wizard(self):
         wizard = BaseImportWizard()
