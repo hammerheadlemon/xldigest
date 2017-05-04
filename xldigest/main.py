@@ -64,23 +64,23 @@ class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
             self.overviewWidget.baseSetupButton.clicked.connect(self._launch_wizard)
 
     def set_import_central(self):
-        self.i_widget = ImportReturns()
+        self.i_widget = ImportReturns(self)
         self.setCentralWidget(self.i_widget)
 
     def set_template_central(self):
-        self.t_widget = TemplateManagerWindow()
+        self.t_widget = TemplateManagerWindow(self)
         self.setCentralWidget(self.t_widget)
 
     def set_datamap_central(self):
-        self.dm_widget = DatamapWindow()
+        self.dm_widget = DatamapWindow(self)
         self.setCentralWidget(self.dm_widget)
 
     def set_overview_central(self):
-        self.o_widget = OverviewWidget()
+        self.o_widget = OverviewWidget(self)
         self.setCentralWidget(self.o_widget)
 
     def set_returns_central(self):
-        self.r_widget = ReturnsWindow()
+        self.r_widget = ReturnsWindow(self)
         self.setCentralWidget(self.r_widget)
 
     def _launch_wizard(self):
