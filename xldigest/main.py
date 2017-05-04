@@ -12,7 +12,6 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import icons_rc
 
 from xldigest.widgets.main_ui import Ui_MainXldigestWindow
-from xldigest.widgets.template_manager_window import TemplateManagerWindow
 
 
 class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
