@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>445</width>
-    <height>376</height>
+    <width>640</width>
+    <height>657</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
        <property name="title">
         <string>Project/Portfolio List</string>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QTableView" name="tableView"/>
         </item>
@@ -36,6 +36,26 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QListWidget" name="listWidget"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="databasePresentLabel">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>No database present - please use Base Setup Wizard to initialise application</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="baseSetupButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Base Setup Wizard</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
