@@ -21,7 +21,7 @@ from xldigest.widgets.overview import OverviewWidget
 from xldigest.widgets.returnswindow import ReturnsWindow
 from xldigest.widgets.template_manager_window import TemplateManagerWindow
 from xldigest.widgets.importreturns import ImportReturns
-from xldigest.database.setup import USER_DATA_DIR, set_up_session, DATABASE_PRESENT
+from xldigest.database.setup import USER_DATA_DIR, test_db
 from xldigest.startup import main_startup
 
 
@@ -85,7 +85,7 @@ class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
 
 
 def main():
-    if not DATABASE_PRESENT:
+    if not test_db():
         application = QtWidgets.QApplication(sys.argv)
         wiz = BaseImportWizard()
         if wiz.exec_():

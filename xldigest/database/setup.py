@@ -8,12 +8,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
+
 APPNAME = 'xldigest'
 APPAUTHOR = 'MRLemon'
 USER_DATA_DIR = appdirs.user_data_dir(APPNAME, APPAUTHOR)
 USER_HOME = os.path.expanduser('~')
-DB_PATH = None
-SESSION = None
+DB_PATH = os.path.join(USER_DATA_DIR, 'db.sqlite')
 
 if not os.path.exists(USER_DATA_DIR):
     os.makedirs(USER_DATA_DIR)
@@ -29,15 +29,20 @@ def set_up_session(db_file):
     return Session()
 
 
+try:
+    SESSION = set_up_session(DB_PATH)
+except:
+    SESSON = None
+
+
 def test_db():
-    if Path(USER_DATA_DIR + '/db.sqlite').is_file():
-        DB_PATH = os.path.join(USER_DATA_DIR, 'db.sqlite')
-        SESSION = set_up_session(DB_PATH)
-        return True
-    else:
-        SESSION = None
-        DB_PATH = None
-        return False
+    from xldigest.database.models import Portfolio
+    session = set_up_session(DB_PATH)
+    try:
+        session.query(Portfolio.name).all()
+        SESSION = session
+    except:
+        pass
 
 
-DATABASE_PRESENT = test_db()
+test_db()
