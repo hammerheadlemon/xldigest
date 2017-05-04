@@ -84,233 +84,34 @@ def merge_gmpp_datamap(source_file):
     session.commit()
 
 
-def populate_series_table() -> None:
+def populate_series_table(series_name) -> None:
     """
     A single series: Financial Quarters
     """
-    session.add(Series(name='Financial Quarters'))
+    session.add(Series(name=series_name))
     session.commit()
 
 
-def populate_quarters_table():
+def populate_series_item_table(series_items: list=None):
     """
     Populate basic Quarter information as SeriesItem objects.
     """
     #  1
-    session.add(
-        SeriesItem(
-            name='Q1 2012/13',
-            series=1,
-            start_date=date(2012, 4, 1),
-            end_date=date(2012, 6, 30)))
-    session.add(
-        SeriesItem(
-            name='Q2 2012/13',
-            series=1,
-            start_date=date(2012, 7, 1),
-            end_date=date(2012, 9, 30)))
-    session.add(
-        SeriesItem(
-            name='Q3 2012/13',
-            series=1,
-            start_date=date(2012, 10, 1),
-            end_date=date(2012, 12, 31)))
-    session.add(
-        SeriesItem(
-            name='Q4 2012/13',
-            series=1,
-            start_date=date(2013, 1, 1),
-            end_date=date(2013, 3, 31)))
-
-    #  2
-    session.add(
-        SeriesItem(
-            name='Q1 2013/14',
-            series=1,
-            start_date=date(2013, 4, 1),
-            end_date=date(2013, 6, 30)))
-    session.add(
-        SeriesItem(
-            name='Q2 2013/14',
-            series=1,
-            start_date=date(2013, 7, 1),
-            end_date=date(2013, 9, 30)))
-    session.add(
-        SeriesItem(
-            name='Q3 2013/14',
-            series=1,
-            start_date=date(2013, 10, 1),
-            end_date=date(2013, 12, 31)))
-    session.add(
-        SeriesItem(
-            name='Q4 2013/14',
-            series=1,
-            start_date=date(2014, 1, 1),
-            end_date=date(2014, 3, 31)))
-
-    #  3
-    session.add(
-        SeriesItem(
-            name='Q1 2014/15',
-            series=1,
-            start_date=date(2014, 4, 1),
-            end_date=date(2014, 6, 30)))
-    session.add(
-        SeriesItem(
-            name='Q2 2014/15',
-            series=1,
-            start_date=date(2014, 7, 1),
-            end_date=date(2014, 9, 30)))
-    session.add(
-        SeriesItem(
-            name='Q3 2014/15',
-            series=1,
-            start_date=date(2014, 10, 1),
-            end_date=date(2014, 12, 31)))
-    session.add(
-        SeriesItem(
-            name='Q4 2014/15',
-            series=1,
-            start_date=date(2015, 1, 1),
-            end_date=date(2015, 3, 31)))
-
-    #  4
-    session.add(
-        SeriesItem(
-            name='Q1 2015/16',
-            series=1,
-            start_date=date(2015, 4, 1),
-            end_date=date(2015, 6, 30)))
-    session.add(
-        SeriesItem(
-            name='Q2 2015/16',
-            series=1,
-            start_date=date(2015, 7, 1),
-            end_date=date(2015, 9, 30)))
-    session.add(
-        SeriesItem(
-            name='Q3 2015/16',
-            series=1,
-            start_date=date(2015, 10, 1),
-            end_date=date(2015, 12, 31)))
-    session.add(
-        SeriesItem(
-            name='Q4 2015/16',
-            series=1,
-            start_date=date(2016, 1, 1),
-            end_date=date(2016, 3, 31)))
-
-    #  5
-    session.add(
-        SeriesItem(
-            name='Q1 2016/17',
-            series=1,
-            start_date=date(2016, 4, 1),
-            end_date=date(2016, 6, 30)))
-    session.add(
-        SeriesItem(
-            name='Q2 2016/17',
-            series=1,
-            start_date=date(2016, 7, 1),
-            end_date=date(2016, 9, 30)))
-    session.add(
-        SeriesItem(
-            name='Q3 2016/17',
-            series=1,
-            start_date=date(2016, 10, 1),
-            end_date=date(2016, 12, 31)))
-    session.add(
-        SeriesItem(
-            name='Q4 2016/17',
-            series=1,
-            start_date=date(2017, 1, 1),
-            end_date=date(2017, 3, 31)))
-
-    #  6
-    session.add(
-        SeriesItem(
-            name='Q1 2017/18',
-            series=1,
-            start_date=date(2017, 4, 1),
-            end_date=date(2017, 6, 30)))
-    session.add(
-        SeriesItem(
-            name='Q2 2017/18',
-            series=1,
-            start_date=date(2017, 7, 1),
-            end_date=date(2017, 9, 30)))
-    session.add(
-        SeriesItem(
-            name='Q3 2017/18',
-            series=1,
-            start_date=date(2017, 10, 1),
-            end_date=date(2017, 12, 31)))
-    session.add(
-        SeriesItem(
-            name='Q4 2017/18',
-            series=1,
-            start_date=date(2018, 1, 1),
-            end_date=date(2018, 3, 31)))
-
-    #  7
-    session.add(
-        SeriesItem(
-            name='Q1 2018/19',
-            series=1,
-            start_date=date(2018, 4, 1),
-            end_date=date(2018, 6, 30)))
-    session.add(
-        SeriesItem(
-            name='Q2 2018/19',
-            series=1,
-            start_date=date(2018, 7, 1),
-            end_date=date(2018, 9, 30)))
-    session.add(
-        SeriesItem(
-            name='Q3 2018/19',
-            series=1,
-            start_date=date(2018, 10, 1),
-            end_date=date(2018, 12, 31)))
-    session.add(
-        SeriesItem(
-            name='Q4 2018/19',
-            series=1,
-            start_date=date(2019, 1, 1),
-            end_date=date(2019, 3, 31)))
-
-    #  8
-    session.add(
-        SeriesItem(
-            name='Q1 2019/20',
-            series=1,
-            start_date=date(2019, 4, 1),
-            end_date=date(2019, 6, 30)))
-    session.add(
-        SeriesItem(
-            name='Q2 2019/20',
-            series=1,
-            start_date=date(2019, 7, 1),
-            end_date=date(2019, 9, 30)))
-    session.add(
-        SeriesItem(
-            name='Q3 2019/20',
-            series=1,
-            start_date=date(2019, 10, 1),
-            end_date=date(2019, 12, 31)))
-    session.add(
-        SeriesItem(
-            name='Q4 2019/20',
-            series=1,
-            start_date=date(2020, 1, 1),
-            end_date=date(2020, 3, 31)))
+    for series_item in series_items:
+        session.add(
+            SeriesItem(
+                name=series_item,
+                series=1,
+                start_date=date(2012, 4, 1),
+                end_date=date(2012, 6, 30)))
     session.commit()
 
 
-def populate_portfolio_table() -> None:
+def populate_portfolio_table(portfolio_name) -> None:
     """
     Populate the Portfolio table.
     """
-    session.add(Portfolio(name="DfT Tier 1 Projects Portfolio"))
+    session.add(Portfolio(name=portfolio_name))
     session.commit()
 
 
@@ -326,6 +127,13 @@ def populate_projects_table(portfolio_id: int) -> None:
         for p in project_list:
             p = Project(name=p, portfolio=1)
             session.add(p)
+    session.commit()
+
+
+def populate_projects_table_from_gui(portfolio_id: int, projects_list: list) -> None:
+    for p in projects_list:
+        p = Project(name=p, portfolio=portfolio_id)
+        session.add(p)
     session.commit()
 
 
@@ -419,10 +227,11 @@ def main():
                            'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
         merge_gmpp_datamap('/home/lemon/Documents/xldigest/source/'
                            'datamap-master-to-gmpp')
-        populate_portfolio_table()
-        populate_series_table()
+        populate_portfolio_table("DfT Tier 1 Projects")
+        populate_series_table("Financial Quarters")
         populate_projects_table(1)
-        populate_quarters_table()
+        populate_series_item_table(['Q1 2017/18', 'Q2 2017/18', 'Q3 2017/18'
+                                    'Q4 2017/18'])
     elif args.secondary:
         CURRENT_QUARTER = args.secondary[0]
         import_all_returns_to_database(CURRENT_QUARTER)

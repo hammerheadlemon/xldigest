@@ -5,6 +5,7 @@
 # Created by: PyQt5 UI code generator 5.7.1
 #
 # WARNING! All changes made in this file will be lost!
+import os
 import sys
 
 from pathlib import Path
@@ -20,17 +21,8 @@ from xldigest.widgets.overview import OverviewWidget
 from xldigest.widgets.returnswindow import ReturnsWindow
 from xldigest.widgets.template_manager_window import TemplateManagerWindow
 from xldigest.widgets.importreturns import ImportReturns
-from xldigest.database.setup import USER_DATA_DIR
-
-
-def test_db():
-    if Path(USER_DATA_DIR + '/db.sqlite').is_file():
-        return True
-    else:
-        return False
-
-
-DATABASE_PRESENT = test_db()
+from xldigest.database.setup import USER_DATA_DIR, set_up_session, DATABASE_PRESENT
+from xldigest.startup import main_startup
 
 
 class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
@@ -93,14 +85,34 @@ class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
 
 
 def main():
-    application = QtWidgets.QApplication(sys.argv)
-    window = XldigestMainWindow()
-    desktop = QtWidgets.QDesktopWidget().availableGeometry()
-    width = (desktop.width() - window.width()) / 2
-    height = (desktop.height() - window.height()) / 3
-    window.show()
-    window.move(width, height)
-    sys.exit(application.exec_())
+    if not DATABASE_PRESENT:
+        application = QtWidgets.QApplication(sys.argv)
+        wiz = BaseImportWizard()
+        if wiz.exec_():
+            main_startup(
+                wiz.selected_csv_file,
+                wiz.selected_gmpp_csv_file,
+                wiz.portfolio,
+                wiz.series,
+                wiz.projects,
+                wiz.series_items
+            )
+            window = XldigestMainWindow()
+            desktop = QtWidgets.QDesktopWidget().availableGeometry()
+            width = (desktop.width() - window.width()) / 2
+            height = (desktop.height() - window.height()) / 3
+            window.show()
+            window.move(width, height)
+            sys.exit(application.exec_())
+    else:
+        application = QtWidgets.QApplication(sys.argv)
+        window = XldigestMainWindow()
+        desktop = QtWidgets.QDesktopWidget().availableGeometry()
+        width = (desktop.width() - window.width()) / 2
+        height = (desktop.height() - window.height()) / 3
+        window.show()
+        window.move(width, height)
+        sys.exit(application.exec_())
 
 
 if __name__ == "__main__":

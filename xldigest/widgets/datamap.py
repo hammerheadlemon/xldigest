@@ -1,16 +1,13 @@
-import os
 import sys
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
 from xldigest.database.models import DatamapItem
-from xldigest.database.setup import set_up_session, USER_DATA_DIR
+from xldigest.database.setup import SESSION as session
+from xldigest.database.setup import DATABASE_PRESENT
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
-
-db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
-session = set_up_session(db_pth)
 
 
 class DatamapTableModel(QtCore.QAbstractTableModel):
@@ -145,10 +142,13 @@ def pull_all_data_from_db():
 
 
 class DatamapWindow(QtWidgets.QWidget):
-    def __init__(self, *args):
-        super(DatamapWindow, self).__init__(*args)
+    def __init__(self, parent=None):
+        super().__init__(parent)
         # convert from tuples to list
-        table_data = pull_all_data_from_db()
+        if DATABASE_PRESENT:
+            table_data = pull_all_data_from_db()
+        else:
+            table_data = []
 
         self.tv = QtWidgets.QTableView()
 
@@ -249,13 +249,3 @@ class DatamapWindow(QtWidgets.QWidget):
     def sortChanged(self):
         self.proxyModel.setSortCaseSensitivity(
             self.sortCaseSensitivityCheckBox.isChecked())
-
-
-def main():
-    app = QtWidgets.QApplication(sys.argv)
-    w = DatamapWindow()
-    w.show()
-    sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()
