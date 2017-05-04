@@ -1,11 +1,8 @@
-import sys
-
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
 from xldigest.database.models import DatamapItem
 from xldigest.database.setup import SESSION as session
-from xldigest.database.setup import DATABASE_PRESENT
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
 
@@ -144,11 +141,12 @@ def pull_all_data_from_db():
 class DatamapWindow(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        # convert from tuples to list
-        if DATABASE_PRESENT:
-            table_data = pull_all_data_from_db()
-        else:
-            table_data = []
+#        if DATABASE_PRESENT:
+#            table_data = pull_all_data_from_db()
+#        else:
+#            table_data = []
+
+        table_data = pull_all_data_from_db()
 
         self.tv = QtWidgets.QTableView()
 
