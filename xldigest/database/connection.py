@@ -1,19 +1,23 @@
+import xldigest.database.paths
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-class _CreateSession:
-    def __init__(self, db_file):
-        self._db_file = db_file
+class CreateSession:
+    def __init__(self):
+        self._db_file = xldigest.database.paths.DB_PATH
 
     def call(self):
         engine_string = "sqlite:///" + self._db_file
         engine = create_engine(engine_string)
-        return sessionmaker(bind=engine)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        return session
 
 
 class Connection:
 
     @classmethod
-    def session(cls, db_file):
-        return _CreateSession(db_file)
+    def session(cls):
+        return CreateSession().call()

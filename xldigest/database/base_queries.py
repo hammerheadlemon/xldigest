@@ -1,17 +1,9 @@
-import os
-
+from xldigest.database.connection import Connection
 from .models import (DatamapItem, Project, ReturnItem, SeriesItem, Portfolio,
                      Series)
 
-import xldigest.database.paths
-
-from xldigest.database.setup import set_up_session
-
-db_pth = os.path.join(xldigest.database.paths.USER_DATA_DIR, 'db.sqlite')
-session = set_up_session(db_pth)
-
-
 def quarter_data(quarter_id):
+    session = Connection.session()
     d = session.query(DatamapItem.key, ReturnItem.value, Project.id,
                       Project.name, SeriesItem.id).\
         filter(ReturnItem.project_id == Project.id).\
@@ -34,21 +26,25 @@ def single_project_data(quarter_id, project_id):
 
 
 def project_names_in_portfolio(portfolio_id: int) -> list:
+    session = Connection.session()
     ps = session.query(Project.name).filter(Portfolio.id == portfolio_id).all()
     return [item[0] for item in ps]
 
 
 def portfolio_names() -> list:
+    session = Connection.session()
     pns = session.query(Portfolio.name).all()
     return [item[0] for item in pns]
 
 
 def series_names() -> list:
+    session = Connection.session()
     sns = session.query(Series.name).all()
     return [item[0] for item in sns]
 
 
 def series_items(series: int) -> list:
+    session = Connection.session()
     """
     Takes a Series id, and returns all SeriesItem objects belonging to it.
     """

@@ -6,7 +6,7 @@ from datetime import date
 
 import xldigest.database.paths
 
-from xldigest.database.setup import set_up_session
+from xldigest.database.connection import Connection
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.template import BICCTemplate
@@ -14,10 +14,7 @@ from xldigest.process.template import BICCTemplate
 from xldigest.database.models import (DatamapItem, Project, Portfolio,
                                       ReturnItem, Series, SeriesItem)
 
-
-db_pth = os.path.join(xldigest.database.paths.USER_DATA_DIR, 'db.sqlite')
-print(db_pth)
-session = set_up_session(db_pth)
+session = Connection.session()
 
 # Hard-coded for now - this matches the current quarter with the same
 # value in the database so we're not relying on how it's written in

@@ -4,20 +4,23 @@ import uuid
 
 from openpyxl import load_workbook
 
+import xldigest.database.paths
+
 from xldigest.database.models import RetainedSourceFile, ReturnItem, DatamapItem
-from xldigest.database.setup import set_up_session, APPNAME, APPAUTHOR, USER_DATA_DIR
+from xldigest.database.setup import APPNAME, APPAUTHOR, USER_DATA_DIR
 from xldigest.process.exceptions import NoFilesInDirectoryError
 from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
+from xldigest.database.connection import Connection
 
 
 try:
-    os.listdir(USER_DATA_DIR)
+    os.listdir(xldigest.database.paths.USER_DATA_DIR)
 except FileNotFoundError:
-    print("No data directory found at: {}".format(USER_DATA_DIR))
+    print("No data directory found at: {}".format(xldigest.database.paths.USER_DATA_DIR))
     print("Creating the directory now.")
-    os.makedirs(USER_DATA_DIR)
+    os.makedirs(xldigest.database.paths.USER_DATA_DIR)
 
 
 # TODO
@@ -52,7 +55,7 @@ class Ingestor:
         Returns True or False based on whether this combination of portfolio,
         project and series_item is already in the database.
         """
-        session = set_up_session(self.db_file)
+        session = Connection.session()
         data = session.query(RetainedSourceFile.portfolio_id,
                              RetainedSourceFile.project_id,
                              RetainedSourceFile.series_item_id).all()
@@ -68,7 +71,7 @@ class Ingestor:
         Import a single return in the form of a populated template and save it
         as ReturnItem values in the database.
         """
-        session = set_up_session(self.db_file)
+        session = Connection.session()
         datamap = Datamap(self.source_file, self.db_file)
         datamap.cell_map_from_database()
         digest = Digest(datamap, self.series_item, self.project)
@@ -102,12 +105,12 @@ class Ingestor:
                 str(self.series_item),  # series_item second field
                 str(self.project),  # project_third field
                 fuuid, '.xlsx'])
-            w_path = os.path.join(USER_DATA_DIR, target_file_name)
+            w_path = os.path.join(xldigest.database.paths.USER_DATA_DIR, target_file_name)
             self.import_single_return()
             # Here we write the file to our store
             shutil.copy(self.source_file.source_file, w_path)
             # Here we write the details to the db
-            session = set_up_session(self.db_file)
+            session = Connection.session()
             retained_f = RetainedSourceFile(
                 project_id=self.project,
                 portfolio_id=self.portfolio,

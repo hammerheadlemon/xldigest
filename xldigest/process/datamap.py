@@ -4,15 +4,7 @@ from xldigest.process.cell import Cell
 from xldigest.process.template import FormTemplate
 
 from xldigest.database.models import DatamapItem
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-def set_up_session(db_file):
-    engine_string = "sqlite:///" + db_file
-    engine = create_engine(engine_string)
-    Session = sessionmaker(bind=engine)
-    return Session()
+from xldigest.database.connection import Connection
 
 
 class Datamap:
@@ -27,10 +19,10 @@ class Datamap:
     template, call Datamap.cell_map_from_csv().
     """
     def __init__(self, template: FormTemplate, db_file: str) -> None:
+        self.session = Connection.session()
         self.cell_map = []  # type: List[Cell]
         self.template = template
         self.db_file = db_file
-        self.session = set_up_session(db_file)
 
     def add_cell(self, cell: Cell) -> Cell:
         self.cell_map.append(cell)

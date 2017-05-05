@@ -11,13 +11,10 @@ import xldigest.database.paths
 
 from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
 from xldigest.widgets.base_import_wizard import BaseImportWizard
-from xldigest.database.setup import set_up_session
 from xldigest.database.models import Series
+from xldigest.database.connection import Connection
 from xldigest.database.base_queries import (
     project_names_in_portfolio, portfolio_names, series_names, series_items)
-
-db_pth = os.path.join(xldigest.database.paths.USER_DATA_DIR, 'db.sqlite')
-session = set_up_session(db_pth)
 
 verification_template = """
 <h1>Confirmation required</h1>
@@ -196,6 +193,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         This is doing the work of populating the series_model, but also
         adjusting the series_item_model depending on what is selected.
         """
+        session = Connection.session()
         idx = self.series_model.index(0, index)
         try:
             self._selected_series_id = session.query(Series.id).filter(

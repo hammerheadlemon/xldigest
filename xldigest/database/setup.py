@@ -1,6 +1,7 @@
 import os
 
 from xldigest.database.models import Portfolio
+from xldigest.database.connection import Connection
 import xldigest.database.paths
 
 from sqlalchemy import create_engine
@@ -22,14 +23,15 @@ def set_up_session(db_file):
 
 
 try:
-    SESSION = set_up_session(xldigest.database.paths.DB_PATH)
+    SESSION = Connection.session()
 except:
     SESSON = None
 
 
 def test_db():
-    session = set_up_session(xldigest.database.paths.DB_PATH)
+    session = Connection.session()
     try:
         session.query(Portfolio.id).first()[0] == 1
     except TypeError:
         return False
+    return True
