@@ -88,14 +88,14 @@ class Digest:
         return Session()
 
     def _set_up_session(self):
-        return Connection.session_with_file()
+        return Connection.session_with_file(self.datamap.db_file)
 
     def _get_existing_project_and_series_item_ids(self) -> Tuple[Any, Any]:
         """
         Returns a tuple of lists of series_item_ids and project_ids
         in the database.
         """
-        session = Connection.session()
+        session = Connection.session_with_file(self.datamap.db_file)
         project_ids = session.query(Project.id).first()[0]
         series_item_ids = session.query(SeriesItem.id).first()[0]
         session.close()
@@ -106,7 +106,7 @@ class Digest:
         Generate a set containing project_ids in returns, and a set containing
         series_item_ids in returns.
         """
-        session = Connection.session()
+        session = Connection.session_with_file(self.datamap.db_file)
         project_ids_in_returns = session.query(ReturnItem.project_id).all()
         series_item_ids_in_returns = session.query(
             ReturnItem.series_item_id).all()
@@ -125,7 +125,7 @@ class Digest:
         Raise SeriesItemNotFoundError if there is no corresponding series_item_id in
         Digest object.
         """
-        session = Connection.session()
+        session = Connection.session_with_file(self.datamap.db_file)
         series_item_ids = session.query(SeriesItem.id).all()
         series_item_ids = [item[0] for item in series_item_ids]
         if self.series_item_id not in series_item_ids:
@@ -138,7 +138,7 @@ class Digest:
         Raise ProjectNotFoundError if there is no corresponding project_id in
         Digest object.
         """
-        session = Connection.session()
+        session = Connection.session_with_file(self.datamap.db_file)
         project_ids = session.query(Project.id).all()
         project_ids = [item[0] for item in project_ids]
         if self.project_id not in project_ids:
@@ -151,7 +151,7 @@ class Digest:
         """
         Get name of project.
         """
-        session = Connection.session()
+        session = Connection.session_with_file(self.datamap.db_file)
         return session.query(Project.name).filter(Project.id == self.project_id).first()[0]
 
     def read_project_data(self) -> None:
@@ -177,7 +177,7 @@ class Digest:
     def _generate_file_name_from_return_data(self,
                                              series_item_id: int,
                                              project_id: int) -> str:
-        session = Connection.session()
+        session = Connection.session_with_file(self.datamap.db_file)
         q_str = session.query(SeriesItem.name).filter(
             SeriesItem.id == series_item_id).first()[0]
         proj_str = self.project_name
@@ -244,7 +244,7 @@ class Digest:
         self._check_series_item_exists_in_db()
         self._check_project_exists_in_db()
         if not self._check_for_existing_return():
-            session = Connection.session()
+            session = Connection.session_with_file(self.datamap.db_file)
             for cell in self._data:
                 return_item = ReturnItem(
                     project_id=self.project_id,
