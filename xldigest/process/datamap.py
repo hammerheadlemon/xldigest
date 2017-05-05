@@ -19,7 +19,7 @@ class Datamap:
     template, call Datamap.cell_map_from_csv().
     """
     def __init__(self, template: FormTemplate, db_file: str) -> None:
-        self.session = Connection.session()
+        self.session = Connection.session_with_file(db_file)
         self.cell_map = []  # type: List[Cell]
         self.template = template
         self.db_file = db_file

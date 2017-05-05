@@ -1,7 +1,9 @@
 import getpass
 import platform
 
-from xldigest.process.ingestor import Ingestor, USER_DATA_DIR, APPNAME, APPAUTHOR
+import xldigest.database.paths
+
+from xldigest.process.ingestor import Ingestor
 from xldigest.process.exceptions import NoFilesInDirectoryError
 
 from xldigest.process.template import BICCTemplate
@@ -75,10 +77,10 @@ def test_series_item_object(INMEMORY_SQLITE3):
 def test_application_data_path():
     usr = getpass.getuser()
     if platform.system() == 'Linux':
-        assert USER_DATA_DIR == '/home/{}/.local/share/{}'.format(usr, APPNAME)
+        assert xldigest.database.paths.USER_DATA_DIR == '/home/{}/.local/share/{}'.format(usr, xldigest.database.paths.APPNAME)
     elif platform.system() == 'Windows':
-        assert USER_DATA_DIR == 'C:\\Users\\{}\\AppData\\Local\\{}\\{}'.format(
-            usr, APPAUTHOR, APPNAME)
+        assert xldigest.database.paths.USER_DATA_DIR == 'C:\\Users\\{}\\AppData\\Local\\{}\\{}'.format(
+            usr, xldigest.database.paths.APPAUTHOR, xldigest.database.paths.APPNAME)
 
 
 def test_import_save_and_uuid_alloc(INMEMORY_SQLITE3, BICC_RETURN_MOCK):

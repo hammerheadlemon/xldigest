@@ -88,7 +88,7 @@ class Digest:
         return Session()
 
     def _set_up_session(self):
-        return Connection.session()
+        return Connection.session_with_file()
 
     def _get_existing_project_and_series_item_ids(self) -> Tuple[Any, Any]:
         """
@@ -112,7 +112,7 @@ class Digest:
             ReturnItem.series_item_id).all()
         self._existing_project_ids_in_returns = {
             id[0]
-            for id in project_ids_in_returns
+            for id in project_ids_in_returns
         }
         self._existing_series_item_ids_in_returns = {
             id[0]

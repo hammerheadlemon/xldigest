@@ -7,7 +7,6 @@ from openpyxl import load_workbook
 import xldigest.database.paths
 
 from xldigest.database.models import RetainedSourceFile, ReturnItem, DatamapItem
-from xldigest.database.setup import APPNAME, APPAUTHOR, USER_DATA_DIR
 from xldigest.process.exceptions import NoFilesInDirectoryError
 from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
@@ -55,7 +54,7 @@ class Ingestor:
         Returns True or False based on whether this combination of portfolio,
         project and series_item is already in the database.
         """
-        session = Connection.session()
+        session = Connection.session_with_file(self.db_file)
         data = session.query(RetainedSourceFile.portfolio_id,
                              RetainedSourceFile.project_id,
                              RetainedSourceFile.series_item_id).all()
@@ -71,7 +70,7 @@ class Ingestor:
         Import a single return in the form of a populated template and save it
         as ReturnItem values in the database.
         """
-        session = Connection.session()
+        session = Connection.session_with_file(self.db_file)
         datamap = Datamap(self.source_file, self.db_file)
         datamap.cell_map_from_database()
         digest = Digest(datamap, self.series_item, self.project)
@@ -110,7 +109,7 @@ class Ingestor:
             # Here we write the file to our store
             shutil.copy(self.source_file.source_file, w_path)
             # Here we write the details to the db
-            session = Connection.session()
+            session = Connection.session_with_file(self.db_file)
             retained_f = RetainedSourceFile(
                 project_id=self.project,
                 portfolio_id=self.portfolio,
