@@ -3,9 +3,11 @@ import os
 from .models import (DatamapItem, Project, ReturnItem, SeriesItem, Portfolio,
                      Series)
 
-from xldigest.database.setup import set_up_session, USER_DATA_DIR
+import xldigest.database.paths
 
-db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
+from xldigest.database.setup import set_up_session
+
+db_pth = os.path.join(xldigest.database.paths.USER_DATA_DIR, 'db.sqlite')
 session = set_up_session(db_pth)
 
 

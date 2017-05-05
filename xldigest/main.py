@@ -1,14 +1,4 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'main_test.ui'
-#
-# Created by: PyQt5 UI code generator 5.7.1
-#
-# WARNING! All changes made in this file will be lost!
-import os
 import sys
-
-from pathlib import Path
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 
@@ -21,7 +11,7 @@ from xldigest.widgets.overview import OverviewWidget
 from xldigest.widgets.returnswindow import ReturnsWindow
 from xldigest.widgets.template_manager_window import TemplateManagerWindow
 from xldigest.widgets.importreturns import ImportReturns
-from xldigest.database.setup import USER_DATA_DIR, test_db
+from xldigest.database.setup import test_db
 from xldigest.startup import main_startup
 
 
@@ -49,11 +39,6 @@ class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
 
         self.importIcon = QtGui.QPixmap(':/arrow-down.png')
         self.toolBar.addAction(QtGui.QIcon(self.importIcon), "Imports", self.set_import_central)
-
-        if not DATABASE_PRESENT:
-            self.overviewWidget.databasePresentLabel.setEnabled(True)
-            self.overviewWidget.baseSetupButton.setEnabled(True)
-            self.overviewWidget.baseSetupButton.clicked.connect(self._launch_wizard)
 
     def set_import_central(self):
         self.i_widget = ImportReturns(self)

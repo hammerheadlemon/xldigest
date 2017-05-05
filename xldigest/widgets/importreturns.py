@@ -7,14 +7,16 @@ from mako.runtime import Context
 
 from io import StringIO
 
+import xldigest.database.paths
+
 from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
 from xldigest.widgets.base_import_wizard import BaseImportWizard
-from xldigest.database.setup import USER_DATA_DIR, set_up_session, USER_HOME
-from xldigest.database.models import Portfolio, Series, SeriesItem
+from xldigest.database.setup import set_up_session
+from xldigest.database.models import Series
 from xldigest.database.base_queries import (
     project_names_in_portfolio, portfolio_names, series_names, series_items)
 
-db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
+db_pth = os.path.join(xldigest.database.paths.USER_DATA_DIR, 'db.sqlite')
 session = set_up_session(db_pth)
 
 verification_template = """
@@ -156,7 +158,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.import_returns_dir_dialog = QtWidgets.QFileDialog()
         self.import_returns_dir_dialog.setFileMode(
             QtWidgets.QFileDialog.ExistingFiles)
-        self.import_returns_dir_dialog.setDirectory(USER_HOME)
+        self.import_returns_dir_dialog.setDirectory(xldigest.database.paths.USER_HOME)
         self.import_returns_dir_dialog.setNameFilter("Excel files (*.xlsx)")
         self.import_returns_dir_dialog.show()
         if self.import_returns_dir_dialog.exec():

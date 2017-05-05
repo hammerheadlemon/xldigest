@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 
-from xldigest.database.setup import USER_HOME
+import xldigest.database.paths
 
 
 class AddPortfolioDialog(QtWidgets.QDialog):
@@ -127,18 +127,18 @@ class AddDatamapFromCSVDialog(QtWidgets.QFileDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFileMode(QtWidgets.QFileDialog.ExistingFile)
-        self.setDirectory(USER_HOME)
+        self.setDirectory(xldigest.database.paths.USER_HOME)
 
 
 class AddGMPPDatamapFromCSVDialog(QtWidgets.QFileDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFileMode(QtWidgets.QFileDialog.ExistingFile)
-        self.setDirectory(USER_HOME)
+        self.setDirectory(xldigest.database.paths.USER_HOME)
 
 
 class AddTransposedMasterDialog(QtWidgets.QFileDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFileMode(QtWidgets.QFileDialog.ExistingFile)
-        self.setDirectory(USER_HOME)
+        self.setDirectory(xldigest.database.paths.USER_HOME)

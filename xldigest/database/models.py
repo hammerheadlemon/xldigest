@@ -1,6 +1,6 @@
 import os
 
-from xldigest.database.setup import USER_DATA_DIR
+import xldigest.database.paths
 
 from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, Date
 from sqlalchemy.ext.declarative import declarative_base
@@ -12,7 +12,7 @@ Base = declarative_base()
 #                       'db.sqlite')
 
 
-engine = create_engine(os.path.join('sqlite:////', USER_DATA_DIR[1:], 'db.sqlite'))
+engine = create_engine(os.path.join('sqlite:////', xldigest.database.paths.USER_DATA_DIR[1:], 'db.sqlite'))
 
 
 class SeriesItem(Base):

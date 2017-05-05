@@ -4,7 +4,9 @@ import os
 
 from datetime import date
 
-from xldigest.database.setup import set_up_session, USER_DATA_DIR
+import xldigest.database.paths
+
+from xldigest.database.setup import set_up_session
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.template import BICCTemplate
@@ -13,7 +15,7 @@ from xldigest.database.models import (DatamapItem, Project, Portfolio,
                                       ReturnItem, Series, SeriesItem)
 
 
-db_pth = os.path.join(USER_DATA_DIR, 'db.sqlite')
+db_pth = os.path.join(xldigest.database.paths.USER_DATA_DIR, 'db.sqlite')
 print(db_pth)
 session = set_up_session(db_pth)
 
@@ -157,7 +159,7 @@ def import_single_bicc_return_using_database(source_file: str,
     template = BICCTemplate(source_file)
 
     datamap = Datamap(template,
-                      '{}{}'.format(USER_DATA_DIR, '/db.sqlite'))
+                      '{}{}'.format(xldigest.database.paths.USER_DATA_DIR, '/db.sqlite'))
     datamap.cell_map_from_database()
     digest = Digest(datamap, series_item_id, project_id)
     digest.read_template()
