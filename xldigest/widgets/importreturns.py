@@ -84,21 +84,22 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.comboSeriesItem.activated.connect(self._series_item_select)
         self.selectedCountLabel.setText("")
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
-        self.importButton.clicked.connect(self._import_slot)
+        self.importButton.clicked.connect(self.import_slot)
 
-    def _import_slot(self):
+    def import_slot(self):
         model = self.model_selected_returns
         i = 0
         for p in range(model.rowCount()):
             f_idx = self.model_selected_returns.index(i, 0)
             p_idx = self.model_selected_returns.index(i, 2)
+            selected_series_item_id = self.selected_series_item
             project_file_name = model.data(f_idx, QtCore.Qt.DisplayRole)
             project_name = model.data(p_idx, QtCore.Qt.DisplayRole)
             print(
                 (
                     project_file_name,
                     project_name,
-                    self._selected_series_item,
+                    selected_series_item_id
                 ))
             i += 1
 
@@ -231,7 +232,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.comboSeriesItem.setModel(self.series_item_model)
 
     def _series_item_select(self, index):
-        print("got that series item sig: {}".format(index))
+        self.selected_series_item = index
 
     def _pop_portfolio_dropdown(self):
         self.portfolio_model = QtGui.QStandardItemModel()
