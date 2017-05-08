@@ -29,7 +29,8 @@ setup(
     py_modules=['icons_rc'],
     entry_points={
         'console_scripts':
-        ['xldigest-populate = xldigest.database.populate:main']
+        ['xldigest-populate = xldigest.database.populate:main',
+         'xldigest = xldigest.main: main']
     },
     install_requires=requirements,
     zip_safe=False,
