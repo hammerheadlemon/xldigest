@@ -88,6 +88,12 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
         self.importButton.clicked.connect(self._gather)
 
+    def _projects_id_dict(self):
+        model = self.model_selected_returns
+        d = {model.data(model.index(i, 0), QtCore.Qt.DisplayRole): "test" for i in
+             range(model.rowCount())}
+        return d
+
     def import_files(self, t_data: tuple) -> None:
         """
         Import the selected files into the database and associate with the
@@ -98,13 +104,11 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             i = Ingestor(
                 db_file='/home/lemon/.local/share/xldigest/db.sqlite',
                 portfolio_id=t_data[0],
-                project_id=t_data[2],
+                project_id=1,
                 series_item_id=t_data[3],
                 source_file=template
             )
-            i.write_source_file()
-            print("Importing {}".format(i.project))
-            i.import_single_return()
+        print(self._projects_id_dict())
 
     def _gather(self) -> tuple:
         """
