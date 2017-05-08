@@ -15,9 +15,9 @@ test_requirements = [
 
 setup(
     name='xldigest',
-    version='0.2dev',
+    version='0.2',
     description="Digest Excel files",
-    long_description=open('README'),
+    long_description="Digest Excel files",
     author="Matthew Lemon",
     author_email='matt@matthewlemon.com',
     url='https://github.com/hammerheadlemon/xldigest',
@@ -26,7 +26,7 @@ setup(
         'xldigest.database', 'xldigest.widgets', 'xldigest.analysis',
         'xldigest.tests'
     ],
-    py_modules=['icons_rc.py'],
+    py_modules=['icons_rc'],
     entry_points={
         'console_scripts':
         ['xldigest-populate = xldigest.database.populate:main']
