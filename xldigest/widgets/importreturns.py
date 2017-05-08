@@ -11,6 +11,8 @@ import xldigest.database.paths
 
 from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
 from xldigest.widgets.base_import_wizard import BaseImportWizard
+from xldigest.process.ingestor import Ingestor
+from xldigest.process.template import BICCTemplate
 from xldigest.database.models import Series
 from xldigest.database.connection import Connection
 from xldigest.database.base_queries import (
@@ -84,24 +86,55 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.comboSeriesItem.activated.connect(self._series_item_select)
         self.selectedCountLabel.setText("")
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
-        self.importButton.clicked.connect(self.import_slot)
+        self.importButton.clicked.connect(self._gather)
 
-    def import_slot(self):
+    def import_files(self, t_data: tuple) -> None:
+        """
+        Import the selected files into the database and associate with the
+        correct portfolio and series item. Uses the Ingestor functionality.
+        """
+        template = BICCTemplate('/home/lemon/Documents/xldigest/source/bicc_template.xlsx')
+        for x in t_data:
+            i = Ingestor(
+                db_file='/home/lemon/.local/share/xldigest/db.sqlite',
+                portfolio_id=t_data[0],
+                project_id=t_data[2],
+                series_item_id=t_data[3],
+                source_file=template
+            )
+            i.write_source_file()
+            print("Importing {}".format(i.project))
+            i.import_single_return()
+
+    def _gather(self) -> tuple:
+        """
+        Gather data from the returns file table and the dropdowns.
+        """
         model = self.model_selected_returns
         i = 0
         for p in range(model.rowCount()):
             f_idx = self.model_selected_returns.index(i, 0)
             p_idx = self.model_selected_returns.index(i, 2)
             selected_series_item_id = self.selected_series_item
+            selected_portfolio_id = self.selected_portfolio
             project_file_name = model.data(f_idx, QtCore.Qt.DisplayRole)
             project_name = model.data(p_idx, QtCore.Qt.DisplayRole)
             print(
                 (
+                    selected_portfolio_id,
                     project_file_name,
                     project_name,
                     selected_series_item_id
                 ))
             i += 1
+        tup = (
+            selected_series_item_id + 1,  # to meet db id
+            project_file_name,
+            project_name,
+            selected_series_item_id + 1  # to meet db ide
+        )
+        self.import_files(tup)
+        return tup
 
     def _launch_wizard_slot(self):
         warning_dialog = QtWidgets.QDialog(parent=self)
@@ -206,6 +239,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             print("No files selected")
 
     def _portfolio_select(self, index):
+        self.selected_portfolio = index
         print("got that portfolio sig: {}".format(index))
 
     def _series_select(self, index):
