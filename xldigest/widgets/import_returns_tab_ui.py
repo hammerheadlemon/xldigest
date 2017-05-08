@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'qt_designer_ui/import_returns.ui'
+# Form implementation generated from reading ui file 'import_returns.ui'
 #
-# Created by: PyQt5 UI code generator 5.7.1
+# Created by: PyQt5 UI code generator 5.8
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ImportManager(object):
     def setupUi(self, ImportManager):
         ImportManager.setObjectName("ImportManager")
-        ImportManager.resize(683, 618)
+        ImportManager.resize(699, 627)
         self.gridLayout_3 = QtWidgets.QGridLayout(ImportManager)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.gridLayout_2 = QtWidgets.QGridLayout()
@@ -57,9 +57,6 @@ class Ui_ImportManager(object):
         self.gridLayout_2.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
-        self.label = QtWidgets.QLabel(ImportManager)
-        self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
         self.selectedFilesWidget = QtWidgets.QTableView(ImportManager)
         self.selectedFilesWidget.setObjectName("selectedFilesWidget")
         self.gridLayout.addWidget(self.selectedFilesWidget, 1, 0, 1, 1)
@@ -69,7 +66,13 @@ class Ui_ImportManager(object):
         self.gridLayout.addWidget(self.selectedCountLabel, 2, 0, 1, 1)
         self.base_setup_launch_wizard = QtWidgets.QPushButton(ImportManager)
         self.base_setup_launch_wizard.setObjectName("base_setup_launch_wizard")
-        self.gridLayout.addWidget(self.base_setup_launch_wizard, 3, 0, 1, 1)
+        self.gridLayout.addWidget(self.base_setup_launch_wizard, 4, 0, 1, 1)
+        self.label = QtWidgets.QLabel(ImportManager)
+        self.label.setObjectName("label")
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        self.importButton = QtWidgets.QPushButton(ImportManager)
+        self.importButton.setObjectName("importButton")
+        self.gridLayout.addWidget(self.importButton, 3, 0, 1, 1)
         self.gridLayout_2.addLayout(self.gridLayout, 1, 0, 1, 1)
         self.gridLayout_3.addLayout(self.gridLayout_2, 0, 0, 1, 1)
 
@@ -84,7 +87,8 @@ class Ui_ImportManager(object):
         self.label_4.setText(_translate("ImportManager", "2. Select Portfolio"))
         self.label_5.setText(_translate("ImportManager", "3. Select Series"))
         self.label_6.setText(_translate("ImportManager", "4. Select Series Item"))
-        self.label.setText(_translate("ImportManager", "Files selected for import:"))
         self.selectedCountLabel.setText(_translate("ImportManager", "TextLabel"))
         self.base_setup_launch_wizard.setText(_translate("ImportManager", "Basic Setup Wizard"))
+        self.label.setText(_translate("ImportManager", "Files selected for import:"))
+        self.importButton.setText(_translate("ImportManager", "IMPORT"))
 

@@ -79,9 +79,28 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self._selected_series_id = 0
         self.series_item_model = self._pop_series_item_dropdown()
         self.comboSeriesItem.setModel(self.series_item_model)
+
+        # signals
         self.comboSeriesItem.activated.connect(self._series_item_select)
         self.selectedCountLabel.setText("")
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
+        self.importButton.clicked.connect(self._import_slot)
+
+    def _import_slot(self):
+        model = self.model_selected_returns
+        i = 0
+        for p in range(model.rowCount()):
+            f_idx = self.model_selected_returns.index(i, 0)
+            p_idx = self.model_selected_returns.index(i, 2)
+            project_file_name = model.data(f_idx, QtCore.Qt.DisplayRole)
+            project_name = model.data(p_idx, QtCore.Qt.DisplayRole)
+            print(
+                (
+                    project_file_name,
+                    project_name,
+                    self._selected_series_item,
+                ))
+            i += 1
 
     def _launch_wizard_slot(self):
         warning_dialog = QtWidgets.QDialog(parent=self)
