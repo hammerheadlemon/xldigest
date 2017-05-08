@@ -17,7 +17,7 @@ setup(
     name='xldigest',
     version='0.2dev',
     description="Digest Excel files",
-    long_description=open('README')
+    long_description=open('README'),
     author="Matthew Lemon",
     author_email='matt@matthewlemon.com',
     url='https://github.com/hammerheadlemon/xldigest',
@@ -26,7 +26,7 @@ setup(
         'xldigest.database', 'xldigest.widgets', 'xldigest.analysis',
         'xldigest.tests'
     ],
-    py_modules=['icons_rc.py']
+    py_modules=['icons_rc.py'],
     entry_points={
         'console_scripts':
         ['xldigest-populate = xldigest.database.populate:main']
@@ -39,6 +39,6 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     test_suite='tests',
-    tests_require=test_requirements
+    tests_require=test_requirements,
     license='MIT'
 )
