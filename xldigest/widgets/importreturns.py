@@ -16,7 +16,8 @@ from xldigest.process.template import BICCTemplate
 from xldigest.database.models import Series
 from xldigest.database.connection import Connection
 from xldigest.database.base_queries import (
-    project_names_in_portfolio, portfolio_names, series_names, series_items)
+    project_names_in_portfolio, portfolio_names, series_names, series_items,
+    projects_with_id)
 
 verification_template = """
 <h1>Confirmation required</h1>
@@ -88,27 +89,26 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
         self.importButton.clicked.connect(self._gather)
 
-    def _projects_id_dict(self):
-        model = self.model_selected_returns
-        d = {model.data(model.index(i, 0), QtCore.Qt.DisplayRole): "test" for i in
-             range(model.rowCount())}
-        return d
-
     def import_files(self, t_data: tuple) -> None:
         """
         Import the selected files into the database and associate with the
         correct portfolio and series item. Uses the Ingestor functionality.
         """
+        # TODO fix this function, too tired to deal with PM 8 May...
+        # I need to capture the selected project index in the table
+        # dropdown. That should then cross reference a project id in the
+        # database, then that id should be used in the Ingestor initiator
+        # here
+        p_mapping = projects_with_id()
         template = BICCTemplate('/home/lemon/Documents/xldigest/source/bicc_template.xlsx')
         for x in t_data:
             i = Ingestor(
                 db_file='/home/lemon/.local/share/xldigest/db.sqlite',
                 portfolio_id=t_data[0],
-                project_id=1,
+                project_id=p_mapping[t_data[1]], # yeah, this is not right
                 series_item_id=t_data[3],
                 source_file=template
             )
-        print(self._projects_id_dict())
 
     def _gather(self) -> tuple:
         """

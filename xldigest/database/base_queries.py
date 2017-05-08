@@ -2,6 +2,7 @@ from xldigest.database.connection import Connection
 from .models import (DatamapItem, Project, ReturnItem, SeriesItem, Portfolio,
                      Series)
 
+
 def quarter_data(quarter_id):
     session = Connection.session()
     d = session.query(DatamapItem.key, ReturnItem.value, Project.id,
@@ -35,6 +36,12 @@ def portfolio_names() -> list:
     session = Connection.session()
     pns = session.query(Portfolio.name).all()
     return [item[0] for item in pns]
+
+
+def projects_with_id() -> dict:
+    session = Connection.session()
+    tups = session.query(Project.name, Project.id).all()
+    return {tupe[0]: tupe[1] for tupe in tups}
 
 
 def series_names() -> list:
