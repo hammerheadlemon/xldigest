@@ -1,5 +1,7 @@
 import os
 
+from types import SimpleNamespace
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 
 from mako.template import Template
@@ -17,7 +19,7 @@ from xldigest.database.models import Series
 from xldigest.database.connection import Connection
 from xldigest.database.base_queries import (
     project_names_in_portfolio, portfolio_names, series_names, series_items,
-    projects_with_id)
+    projects_with_id, get_project_id)
 
 verification_template = """
 <h1>Confirmation required</h1>
@@ -110,10 +112,11 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 source_file=template
             )
 
-    def _gather(self) -> tuple:
+    def _gather(self):
         """
         Gather data from the returns file table and the dropdowns.
         """
+        collected_data = SimpleNamespace()
         model = self.model_selected_returns
         i = 0
         for p in range(model.rowCount()):
@@ -123,22 +126,14 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             selected_portfolio_id = self.selected_portfolio
             project_file_name = model.data(f_idx, QtCore.Qt.DisplayRole)
             project_name = model.data(p_idx, QtCore.Qt.DisplayRole)
-            print(
-                (
-                    selected_portfolio_id,
-                    project_file_name,
-                    project_name,
-                    selected_series_item_id
-                ))
             i += 1
-        tup = (
-            selected_series_item_id + 1,  # to meet db id
-            project_file_name,
-            project_name,
-            selected_series_item_id + 1  # to meet db ide
-        )
-        self.import_files(tup)
-        return tup
+        collected_data.portfolio_id = selected_portfolio_id + 1
+        collected_data.series_item_id = selected_series_item_id + 1
+        collected_data.project_file_name = project_file_name
+        collected_data.project_id = get_project_id(project_name)
+#        self.import_files(tup)
+        print(collected_data)
+        return collected_data
 
     def _launch_wizard_slot(self):
         warning_dialog = QtWidgets.QDialog(parent=self)
@@ -169,12 +164,10 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         """
         Takes a dict and parses it into an HTML table.
         """
-        print(data)
         template = Template(verification_template)
         buf = StringIO()
         ctx = Context(buf, data=data)
         template.render_context(ctx)
-        print(buf.getvalue())
         return (buf.getvalue())
 
     def verify_wizard_data(self, data):
@@ -217,7 +210,6 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.import_returns_dir_dialog.show()
         if self.import_returns_dir_dialog.exec():
             self.selected_files = self.import_returns_dir_dialog.selectedFiles()
-            print(self.selected_files)
             l = []
             for sfile in self.selected_files:
                 # we want to replace with section of code with a deployment of
@@ -235,7 +227,6 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 QtWidgets.QAbstractItemView.CurrentChanged)
             self.selectedFilesWidget.horizontalHeader().setStretchLastSection(
                 True)
-            print(l)
         try:
             self.selectedCountLabel.setText(
                 "{} files selected".format(len(self.selected_files)))

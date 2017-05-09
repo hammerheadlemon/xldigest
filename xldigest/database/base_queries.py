@@ -50,6 +50,13 @@ def series_names() -> list:
     return [item[0] for item in sns]
 
 
+def get_project_id(project_name) -> int:
+    session = Connection.session()
+    id = session.query(Project.id).filter(
+        Project.name == project_name).first()[0]
+    return id
+
+
 def series_items(series: int) -> list:
     session = Connection.session()
     """
