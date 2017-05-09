@@ -8,6 +8,7 @@ from xldigest.widgets.main_ui import Ui_MainXldigestWindow
 from xldigest.widgets.base_import_wizard import BaseImportWizard
 from xldigest.widgets.datamap import DatamapWindow
 from xldigest.widgets.overview import OverviewWidget
+from xldigest.widgets.master import MasterWidget
 from xldigest.widgets.returnswindow import ReturnsWindow
 from xldigest.widgets.template_manager_window import TemplateManagerWindow
 from xldigest.widgets.importreturns import ImportReturns
@@ -39,6 +40,14 @@ class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
 
         self.importIcon = QtGui.QPixmap(':/arrow-down.png')
         self.toolBar.addAction(QtGui.QIcon(self.importIcon), "Imports", self.set_import_central)
+
+        self.masterIcon = QtGui.QPixmap(':/barchart.png')
+        self.toolBar.addAction(QtGui.QIcon(self.masterIcon), "Master", self.set_master_central)
+
+
+    def set_master_central(self):
+        self.m_widget = MasterWidget(self)
+        self.setCentralWidget(self.m_widget)
 
     def set_import_central(self):
         self.i_widget = ImportReturns(self)
