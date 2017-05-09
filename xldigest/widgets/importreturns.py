@@ -21,6 +21,7 @@ from xldigest.database.base_queries import (
     project_names_in_portfolio, portfolio_names, series_names, series_items,
     projects_with_id, get_project_id)
 
+
 verification_template = """
 <h1>Confirmation required</h1>
 
@@ -89,34 +90,36 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.comboSeriesItem.activated.connect(self._series_item_select)
         self.selectedCountLabel.setText("")
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
-        self.importButton.clicked.connect(self._gather)
+        self.importButton.clicked.connect(self.import_slot)
 
-    def import_files(self, t_data: tuple) -> None:
+    def import_slot(self):
+        """Handler to trigger _gather() and _import_files()"""
+        print("Gathering....")
+        d = self._gather()
+        print("Importing...")
+        self._import_files(d)
+
+    def _import_files(self, t_data: dict) -> None:
         """
         Import the selected files into the database and associate with the
         correct portfolio and series item. Uses the Ingestor functionality.
         """
-        # TODO fix this function, too tired to deal with PM 8 May...
-        # I need to capture the selected project index in the table
-        # dropdown. That should then cross reference a project id in the
-        # database, then that id should be used in the Ingestor initiator
-        # here
-        p_mapping = projects_with_id()
-        template = BICCTemplate('/home/lemon/Documents/xldigest/source/bicc_template.xlsx')
+        template = BICCTemplate('/home/lemon/Documents/bcompiler/source/bicc_template.xlsx')
         for x in t_data:
             i = Ingestor(
                 db_file='/home/lemon/.local/share/xldigest/db.sqlite',
-                portfolio_id=t_data[0],
-                project_id=p_mapping[t_data[1]], # yeah, this is not right
-                series_item_id=t_data[3],
+                portfolio_id=t_data['portfolio_id'],
+                project_id=t_data['project_id'],
+                series_item_id=t_data['series_item_id'],
                 source_file=template
             )
+            i.import_single_return()
 
-    def _gather(self):
+    def _gather(self) -> dict:
         """
         Gather data from the returns file table and the dropdowns.
         """
-        collected_data = SimpleNamespace()
+        collected_data = {}
         model = self.model_selected_returns
         i = 0
         for p in range(model.rowCount()):
@@ -127,12 +130,11 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             project_file_name = model.data(f_idx, QtCore.Qt.DisplayRole)
             project_name = model.data(p_idx, QtCore.Qt.DisplayRole)
             i += 1
-        collected_data.portfolio_id = selected_portfolio_id + 1
-        collected_data.series_item_id = selected_series_item_id + 1
-        collected_data.project_file_name = project_file_name
-        collected_data.project_id = get_project_id(project_name)
+        collected_data['portfolio_id'] = selected_portfolio_id + 1
+        collected_data['series_item_id'] = selected_series_item_id + 1
+        collected_data[project_file_name] = project_file_name
+        collected_data['project_id'] = get_project_id(project_name)
 #        self.import_files(tup)
-        print(collected_data)
         return collected_data
 
     def _launch_wizard_slot(self):
