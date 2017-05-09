@@ -15,7 +15,7 @@ def forumulate_data_for_model(series_item_id: int, project_ids: list) -> list:
     collect = []
     for i in list(project_ids):
         db_items = session.query(ReturnItem.value).filter(
-            ReturnItem.series_item_id == series_item_id and
+            ReturnItem.series_item_id == series_item_id,
             ReturnItem.project_id == i).all()
         db_items_lst = [item[0] for item in db_items]
         collect.append(db_items_lst)
