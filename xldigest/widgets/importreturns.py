@@ -1,7 +1,3 @@
-import os
-
-from types import SimpleNamespace
-
 from PyQt5 import QtWidgets, QtGui, QtCore
 
 from mako.template import Template
@@ -19,7 +15,7 @@ from xldigest.database.models import Series
 from xldigest.database.connection import Connection
 from xldigest.database.base_queries import (
     project_names_in_portfolio, portfolio_names, series_names, series_items,
-    projects_with_id, get_project_id)
+    get_project_id)
 
 
 verification_template = """
