@@ -5,25 +5,30 @@ age...
 from PyQt5 import QtWidgets, QtCore
 
 from xldigest.database.connection import Connection
-from xldigest.database.base_queries import project_ids_for_series
+from xldigest.database.base_queries import (
+    project_ids_in_returns_with_series_item_of)
 from xldigest.database.models import ReturnItem
 
 
-def _project_ids_per_series():
-    s = set()
-    for l in range(3):
-        projs = project_ids_for_series(l)
-        s.update(projs)
-    print(s)
-
-
-def pull_return_data_from_db(series_item_id):
+def forumulate_data_for_model(series_item_id: int, project_ids: list) -> list:
     session = Connection.session()
-    db_items = session.query(ReturnItem).filter(
-        ReturnItem.series_item_id == series_item_id).all()
-    db_items_lst = [[item.value] for item in db_items]
-    _project_ids_per_series()
-    return db_items_lst
+    collect = []
+    for i in list(project_ids):
+        db_items = session.query(ReturnItem.value).filter(
+            ReturnItem.series_item_id == series_item_id and
+            ReturnItem.project_id == i).all()
+        db_items_lst = [item[0] for item in db_items]
+        collect.append(db_items_lst)
+    return collect
+
+
+#def pull_return_data_from_db(series_item_id):
+#    session = Connection.session()
+#    db_items = session.query(ReturnItem).filter(
+#        ReturnItem.series_item_id == series_item_id).all()
+#    db_items_lst = [[item.value] for item in db_items]
+#    _project_ids_per_series()
+#    return db_items_lst
 
 
 class MasterTableModel(QtCore.QAbstractTableModel):
@@ -70,15 +75,19 @@ class MasterWidget(QtWidgets.QWidget):
         self.proxyModel.setSourceModel(self.tableModel)
         self.tv.setSortingEnabled(True)
         self.tv.horizontalHeader().setStretchLastSection(True)
-        self.sortCaseSensitivityCheckBox = QtWidgets.QCheckBox("Case sensitive sorting")
-        self.filterCaseSensitivityCheckBox = QtWidgets.QCheckBox("Case sensitive filter")
+        self.sortCaseSensitivityCheckBox = QtWidgets.QCheckBox(
+            "Case sensitive sorting")
+        self.filterCaseSensitivityCheckBox = QtWidgets.QCheckBox(
+            "Case sensitive filter")
         self.filterPatternLineEdit = QtWidgets.QLineEdit()
         self.filterPatternLabel = QtWidgets.QLabel("Filter pattern")
         self.filterPatternLabel.setBuddy(self.filterPatternLineEdit)
         self.filterSyntaxCombo = QtWidgets.QComboBox()
-        self.filterSyntaxCombo.addItem("Regular Expression", QtCore.QRegExp.RegExp)
+        self.filterSyntaxCombo.addItem("Regular Expression",
+                                       QtCore.QRegExp.RegExp)
         self.filterSyntaxCombo.addItem("Wildcard", QtCore.QRegExp.Wildcard)
-        self.filterSyntaxCombo.addItem("Fixed string", QtCore.QRegExp.FixedString)
+        self.filterSyntaxCombo.addItem("Fixed string",
+                                       QtCore.QRegExp.FixedString)
         self.filterSyntaxLabel = QtWidgets.QLabel("Filter syntax:")
         self.filterSyntaxLabel.setBuddy(self.filterSyntaxCombo)
         self.filterColumnCombo = QtWidgets.QComboBox()
@@ -87,8 +96,10 @@ class MasterWidget(QtWidgets.QWidget):
         self.filterColumnLabel.setBuddy(self.filterColumnCombo)
 
         self.filterPatternLineEdit.textChanged.connect(self.filterRegExChanged)
-        self.filterSyntaxCombo.currentIndexChanged.connect(self.filterRegExChanged)
-        self.filterColumnCombo.currentIndexChanged.connect(self.filterColumnChanged)
+        self.filterSyntaxCombo.currentIndexChanged.connect(
+            self.filterRegExChanged)
+        self.filterColumnCombo.currentIndexChanged.connect(
+            self.filterColumnChanged)
         self.filterCaseSensitivityCheckBox.toggled.connect(self.sortChanged)
 
         proxyGroupBox = QtWidgets.QGroupBox("Master Data")
@@ -120,11 +131,12 @@ class MasterWidget(QtWidgets.QWidget):
         self.sortCaseSensitivityCheckBox.setChecked(False)
 
     def filterRegExChanged(self):
-        syntax = QtCore.QRegExp.PatternSyntax(self.filterSyntaxCombo.itemData(
-            self.filterSyntaxCombo.currentIndex()))
+        syntax = QtCore.QRegExp.PatternSyntax(
+            self.filterSyntaxCombo.itemData(
+                self.filterSyntaxCombo.currentIndex()))
         caseSensitivity = self.filterCaseSensitivityCheckBox.isChecked()
-        regex = QtCore.QRegExp(
-            self.filterPatternLineEdit.text(), caseSensitivity, syntax)
+        regex = QtCore.QRegExp(self.filterPatternLineEdit.text(),
+                               caseSensitivity, syntax)
         self.proxyModel.setFilterRegExp(regex)
 
     def filterColumnChanged(self):

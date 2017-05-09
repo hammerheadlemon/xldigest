@@ -38,10 +38,11 @@ def portfolio_names() -> list:
     return [item[0] for item in pns]
 
 
-def project_ids_for_series(series_id) -> list:
+def project_ids_in_returns_with_series_item_of(series_item_id: int) -> list:
     session = Connection.session()
-    ids = session.query(ReturnItem.series_item_id).filter(ReturnItem.series_item_id == series_id).all()
-    return [item[0] for item in ids]
+    return list(set([x[0] for x in session.query(
+        ReturnItem.project_id).filter(
+            ReturnItem.series_item_id == series_item_id).all()]))
 
 
 def projects_with_id() -> dict:
