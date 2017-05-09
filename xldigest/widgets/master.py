@@ -11,6 +11,11 @@ from xldigest.database.models import ReturnItem
 
 
 def forumulate_data_for_model(series_item_id: int, project_ids: list) -> list:
+    """
+    Returns a list of (v1, v2, v3, ..) tuples where vn is the corresponding
+    value in each return that matches all the project_ids for a particular
+    series_item.
+    """
     session = Connection.session()
     collect = []
     for i in list(project_ids):
@@ -19,7 +24,9 @@ def forumulate_data_for_model(series_item_id: int, project_ids: list) -> list:
             ReturnItem.project_id == i).all()
         db_items_lst = [item[0] for item in db_items]
         collect.append(db_items_lst)
-    return collect
+    # time to flip into tuples of related values ("A13", "Bound Materials",..)
+    flipped = list(zip(*collect))
+    return flipped
 
 
 #def pull_return_data_from_db(series_item_id):
@@ -51,7 +58,7 @@ class MasterTableModel(QtCore.QAbstractTableModel):
             return value
 
     def headerData(self, section, orientation, role):
-        headers = ['Project Name']
+        headers = ['Project Name'] * len(forumulate_data_for_model(1, [1, 2]))
         if role == QtCore.Qt.DisplayRole:
             if orientation == QtCore.Qt.Horizontal:
                 return headers[section]
@@ -66,7 +73,7 @@ class MasterWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        table_data = pull_return_data_from_db(1)
+        table_data = forumulate_data_for_model(1, [1, 2])
 
         self.tv = QtWidgets.QTableView()
         self.proxyModel = QtCore.QSortFilterProxyModel()
