@@ -45,6 +45,13 @@ def project_ids_in_returns_with_series_item_of(series_item_id: int) -> list:
             ReturnItem.series_item_id == series_item_id).all()]))
 
 
+def datamap_items_in_return(series_item_id: int, project_id: int) -> list:
+    session = Connection.session()
+    return [item[0] for item in session.query(DatamapItem.key).join(
+        ReturnItem).filter(ReturnItem.series_item_id == series_item_id,
+                           ReturnItem.project_id == project_id).all()]
+
+
 def projects_with_id() -> dict:
     session = Connection.session()
     tups = session.query(Project.name, Project.id).all()

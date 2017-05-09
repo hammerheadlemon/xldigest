@@ -6,11 +6,15 @@ from PyQt5 import QtWidgets, QtCore
 
 from xldigest.database.connection import Connection
 from xldigest.database.base_queries import (
-    project_ids_in_returns_with_series_item_of)
+    project_ids_in_returns_with_series_item_of, datamap_items_in_return)
 from xldigest.database.models import ReturnItem
 
 
-def forumulate_data_for_model(series_item_id: int, project_ids: list) -> list:
+def forumulate_data_for_model(
+    series_item_id: int,
+    project_ids: list,
+    dm_keys: list,
+) -> list:
     """
     Returns a list of (v1, v2, v3, ..) tuples where vn is the corresponding
     value in each return that matches all the project_ids for a particular
@@ -25,17 +29,8 @@ def forumulate_data_for_model(series_item_id: int, project_ids: list) -> list:
         db_items_lst = [item[0] for item in db_items]
         collect.append(db_items_lst)
     # time to flip into tuples of related values ("A13", "Bound Materials",..)
-    flipped = list(zip(*collect))
+    flipped = list(zip(dm_keys, *collect))
     return flipped
-
-
-#def pull_return_data_from_db(series_item_id):
-#    session = Connection.session()
-#    db_items = session.query(ReturnItem).filter(
-#        ReturnItem.series_item_id == series_item_id).all()
-#    db_items_lst = [[item.value] for item in db_items]
-#    _project_ids_per_series()
-#    return db_items_lst
 
 
 class MasterTableModel(QtCore.QAbstractTableModel):
@@ -43,6 +38,7 @@ class MasterTableModel(QtCore.QAbstractTableModel):
         super().__init__(parent)
         self.data_in = data_in
         self.header = None  # this needs to be generated dynamically Project titles
+        self.p_names = list(self.data_in[0])
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.data_in)
@@ -58,7 +54,7 @@ class MasterTableModel(QtCore.QAbstractTableModel):
             return value
 
     def headerData(self, section, orientation, role):
-        headers = ['Project Name'] * 2
+        headers = self.p_names
         if role == QtCore.Qt.DisplayRole:
             if orientation == QtCore.Qt.Horizontal:
                 return headers[section]
@@ -73,11 +69,12 @@ class MasterWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        table_data = forumulate_data_for_model(1, [1, 2])
+        self.datamap_keys = datamap_items_in_return(1, 1)
+        self.table_data = forumulate_data_for_model(1, [1, 2], self.datamap_keys)
 
         self.tv = QtWidgets.QTableView()
         self.proxyModel = QtCore.QSortFilterProxyModel()
-        self.tableModel = MasterTableModel(table_data, self)
+        self.tableModel = MasterTableModel(self.table_data, self)
         self.tv.setModel(self.proxyModel)
         self.proxyModel.setSourceModel(self.tableModel)
         self.tv.setSortingEnabled(True)
