@@ -72,21 +72,28 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.launchFileDialog.clicked.connect(self.get_return_source_files_slot)
+
         self.portfolio_model = self._pop_portfolio_dropdown()
         self.comboPortfolio.setModel(self.portfolio_model)
-        self.comboPortfolio.activated.connect(self._portfolio_select)
+        self.comboPortfolio.currentIndexChanged.connect(self._portfolio_select)
+
         self.series_model = self._pop_series_dropdown()
         self.comboSeries.setModel(self.series_model)
-        self.comboSeries.activated.connect(self._series_select)
+        self.comboSeries.currentIndexChanged.connect(self._series_select)
+
         self._selected_series_id = 0
+
         self.series_item_model = self._pop_series_item_dropdown()
         self.comboSeriesItem.setModel(self.series_item_model)
+        self.comboSeriesItem.currentIndexChanged.connect(self._series_item_select)
 
-        # signals
-        self.comboSeriesItem.activated.connect(self._series_item_select)
+        self.comboSeries.activated.connect(self._series_select)
+
+        self.launchFileDialog.clicked.connect(self.get_return_source_files_slot)
         self.selectedCountLabel.setText("")
+
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
+
         self.importButton.clicked.connect(self._gather)
 
     def import_files(self, t_data: tuple) -> None:
@@ -269,11 +276,20 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.series_item_model = self._pop_series_item_dropdown()
         self.comboSeriesItem.setModel(self.series_item_model)
 
+    def _inject_initial(self, text, model):
+        """
+        Inject a friendly first item in the dropdown.
+        """
+        t = QtGui.QStandardItem(text)
+        model.appendRow(t)
+
     def _series_item_select(self, index):
         self.selected_series_item = index
 
     def _pop_portfolio_dropdown(self):
         self.portfolio_model = QtGui.QStandardItemModel()
+
+        self._inject_initial("SELECT PORTFOLIO", self.portfolio_model)
 
         # this lot will come from the database
         items = portfolio_names()
@@ -286,6 +302,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
     def _pop_series_dropdown(self):
         self.series_model = QtGui.QStandardItemModel()
 
+        self._inject_initial("SELECT SERIES", self.series_model)
+
         # this lot will come from the database
         items = series_names()
 
@@ -296,6 +314,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
 
     def _pop_series_item_dropdown(self):
         self.series_item_model = QtGui.QStandardItemModel()
+
+        self._inject_initial("SELECT SERIES ITEM", self.series_item_model)
 
         # this lot will come from the database
         items = series_items(self._selected_series_id)
