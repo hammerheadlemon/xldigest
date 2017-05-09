@@ -33,6 +33,15 @@ except FileNotFoundError:
 # alternative init method.
 
 class Ingestor:
+    """
+    The key class when importing a populated template containing data bound for
+    the database.
+
+    A path to the db file is required upon instantiation. The other arguments
+    are optional. This allows it to operate on all files in a source directory
+    by inclusion of Ingestor(source_dir=PATH), or for ingesting a single
+    populated template file.
+    """
     def __init__(self,
                  db_file: str,
                  source_dir: str=None,
@@ -89,8 +98,8 @@ class Ingestor:
 
     def write_source_file(self) -> str:
         """
-        Writes the self.source_file (which should be a populated tempalte file)
-        to the database.
+        Writes the details of the self.source_file (which should be a populated
+        tempalte file) to the database.
 
         Returns the path of where the source file is saved in the system after
         import.
@@ -116,6 +125,8 @@ class Ingestor:
                 series_item_id=self.series_item,
                 uuid=fuuid)
             session.add(retained_f)
+
+
             session.commit()
             session.close()
             return w_path
@@ -123,6 +134,9 @@ class Ingestor:
             return ""
 
     def source_xls_only(self) -> bool:
+        """
+        Tests whether there are only xlsx files in a Ingestor.source_dir.
+        """
         fls = os.listdir(self.source_dir)
         if len(fls) > 0:
             for f in fls:
