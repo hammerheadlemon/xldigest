@@ -93,6 +93,7 @@ class Ingestor:
                 series_item_id=self.series_item,
                 datamap_item_id=cell_val_id,
                 value=cell.cell_value)
+            print("Adding {}".format(return_item))
             session.add(return_item)
         session.commit()
 

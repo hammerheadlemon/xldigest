@@ -104,7 +104,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         Import the selected files into the database and associate with the
         correct portfolio and series item. Uses the Ingestor functionality.
         """
-        template = BICCTemplate('/home/lemon/Documents/bcompiler/source/bicc_template.xlsx')
+        template = BICCTemplate(
+            '/home/lemon/Documents/bcompiler/source/returns/' + t_data['project_file_name'])
         for x in t_data:
             i = Ingestor(
                 db_file='/home/lemon/.local/share/xldigest/db.sqlite',
@@ -113,7 +114,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 series_item_id=t_data['series_item_id'],
                 source_file=template
             )
-            i.import_single_return()
+        i.import_single_return()
 
     def _gather(self) -> dict:
         """
@@ -132,7 +133,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             i += 1
         collected_data['portfolio_id'] = selected_portfolio_id + 1
         collected_data['series_item_id'] = selected_series_item_id + 1
-        collected_data[project_file_name] = project_file_name
+        collected_data['project_file_name'] = project_file_name
         collected_data['project_id'] = get_project_id(project_name)
 #        self.import_files(tup)
         return collected_data
