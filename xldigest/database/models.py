@@ -12,7 +12,8 @@ Base = declarative_base()
 #                       'db.sqlite')
 
 
-engine = create_engine(os.path.join('sqlite:////', xldigest.database.paths.USER_DATA_DIR[1:], 'db.sqlite'))
+engine = create_engine(os.path.join('sqlite:///' + xldigest.database.paths.DB_PATH))
+#engine = create_engine(os.path.join('sqlite:////', xldigest.database.paths.USER_DATA_DIR[1:], 'db.sqlite'))
 
 
 class SeriesItem(Base):
