@@ -38,6 +38,12 @@ def portfolio_names() -> list:
     return [item[0] for item in pns]
 
 
+def project_ids_for_series(series_id) -> list:
+    session = Connection.session()
+    ids = session.query(ReturnItem.series_item_id).filter(ReturnItem.series_item_id == series_id).all()
+    return [item[0] for item in ids]
+
+
 def projects_with_id() -> dict:
     session = Connection.session()
     tups = session.query(Project.name, Project.id).all()

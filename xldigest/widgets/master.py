@@ -5,15 +5,24 @@ age...
 from PyQt5 import QtWidgets, QtCore
 
 from xldigest.database.connection import Connection
+from xldigest.database.base_queries import project_ids_for_series
 from xldigest.database.models import ReturnItem
 
 
-def pull_return_data_from_db(project_id, series_item_id):
+def _project_ids_per_series():
+    s = set()
+    for l in range(3):
+        projs = project_ids_for_series(l)
+        s.update(projs)
+    print(s)
+
+
+def pull_return_data_from_db(series_item_id):
     session = Connection.session()
     db_items = session.query(ReturnItem).filter(
-        ReturnItem.project_id == project_id and ReturnItem.series_item_id == series_item_id).all()
+        ReturnItem.series_item_id == series_item_id).all()
     db_items_lst = [[item.value] for item in db_items]
-    print(db_items_lst)
+    _project_ids_per_series()
     return db_items_lst
 
 
@@ -52,7 +61,7 @@ class MasterWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        table_data = pull_return_data_from_db(1, 1)
+        table_data = pull_return_data_from_db(1)
 
         self.tv = QtWidgets.QTableView()
         self.proxyModel = QtCore.QSortFilterProxyModel()
