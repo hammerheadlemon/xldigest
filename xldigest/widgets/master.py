@@ -58,7 +58,7 @@ class MasterTableModel(QtCore.QAbstractTableModel):
             return value
 
     def headerData(self, section, orientation, role):
-        headers = ['Project Name'] * len(forumulate_data_for_model(1, [1, 2]))
+        headers = ['Project Name'] * 2
         if role == QtCore.Qt.DisplayRole:
             if orientation == QtCore.Qt.Horizontal:
                 return headers[section]
