@@ -8,15 +8,12 @@ from xldigest.database.connection import Connection
 from xldigest.database.models import ReturnItem
 
 
-def pull_return_data_from_db():
+def pull_return_data_from_db(project_id, series_item_id):
     session = Connection.session()
-    db_items = session.query(ReturnItem).all()
-    db_items_lst = [[
-        item.id,
-        item.project_id,
-        item.series_item_id,
-        item.datamap_item_id,
-        item.value] for item in db_items]
+    db_items = session.query(ReturnItem).filter(
+        ReturnItem.project_id == project_id and ReturnItem.series_item_id == series_item_id).all()
+    db_items_lst = [[item.value] for item in db_items]
+    print(db_items_lst)
     return db_items_lst
 
 
@@ -40,7 +37,7 @@ class MasterTableModel(QtCore.QAbstractTableModel):
             return value
 
     def headerData(self, section, orientation, role):
-        headers = ['TestItem'] * 5
+        headers = ['Project Name']
         if role == QtCore.Qt.DisplayRole:
             if orientation == QtCore.Qt.Horizontal:
                 return headers[section]
@@ -55,7 +52,7 @@ class MasterWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        table_data = pull_return_data_from_db()
+        table_data = pull_return_data_from_db(1, 1)
 
         self.tv = QtWidgets.QTableView()
         self.proxyModel = QtCore.QSortFilterProxyModel()
