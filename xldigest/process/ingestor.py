@@ -84,14 +84,18 @@ class Ingestor:
         datamap.cell_map_from_database()
         digest = Digest(datamap, self.series_item, self.project)
         digest.read_template()
+        # TODO BUG HERE - this results in duplicate returnlines in the database
+        # because the SQLalchemy query here is matching on the cell.key, which
+        # is the name value from the datamap, which is not guaranteed to be
+        # unique FIXME
         for cell in digest.data:
-            cell_val_id = session.query(DatamapItem.id).filter(
-                DatamapItem.key == cell.cell_key).all()[0][0]
+#            cell_val_id = session.query(DatamapItem.id).filter(
+#                DatamapItem.key == cell.cell_key).all()[0][0]
 
             return_item = ReturnItem(
                 project_id=self.project,
                 series_item_id=self.series_item,
-                datamap_item_id=cell_val_id,
+                datamap_item_id=cell.datamap_id[0],
                 value=cell.cell_value)
             print("Adding {}".format(return_item))
             session.add(return_item)
