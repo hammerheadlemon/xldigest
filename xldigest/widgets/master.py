@@ -28,8 +28,8 @@ class ReturnSequence:
             'project_id',
             'series_item_name',
             'series_item_id',
-            'key_id',
             'key_name',
+            'key_id',
             'value'
         ])
         try:
