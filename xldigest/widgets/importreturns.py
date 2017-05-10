@@ -100,10 +100,9 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         Import the selected files into the database and associate with the
         correct portfolio and series item. Uses the Ingestor functionality.
         """
-        # TODO fix this hard-coded path
-        template = BICCTemplate(
-            '/home/lemon/Documents/bcompiler/source/returns/' + t_data['project_file_name'])
-        for x in t_data:
+        target_files = list(zip(t_data['selected_files'], t_data['selected_project_names']))
+        for x, _ in target_files:
+            template = BICCTemplate(x)
             i = Ingestor(
                 db_file='/home/lemon/.local/share/xldigest/db.sqlite',
                 portfolio_id=t_data['portfolio_id'],
@@ -111,7 +110,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 series_item_id=t_data['series_item_id'],
                 source_file=template
             )
-        i.import_single_return()
+            i.import_single_return()
 
     def _gather(self) -> dict:
         """
@@ -119,6 +118,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         """
         collected_data = {}
         model = self.model_selected_returns
+        selected_files = []
+        selected_project_names = []
         i = 0
         for p in range(model.rowCount()):
             f_idx = self.model_selected_returns.index(i, 0)
@@ -127,12 +128,14 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             selected_portfolio_id = self.selected_portfolio
             project_file_name = model.data(f_idx, QtCore.Qt.DisplayRole)
             project_name = model.data(p_idx, QtCore.Qt.DisplayRole)
+            selected_project_names.append(project_name)
             i += 1
         collected_data['portfolio_id'] = selected_portfolio_id + 1
         collected_data['series_item_id'] = selected_series_item_id + 1
         collected_data['project_file_name'] = project_file_name
         collected_data['project_id'] = get_project_id(project_name)
-#        self.import_files(tup)
+        collected_data['selected_files'] = self.selected_files
+        collected_data['selected_project_names'] = selected_project_names
         return collected_data
 
     def _launch_wizard_slot(self):
