@@ -135,10 +135,3 @@ class AddGMPPDatamapFromCSVDialog(QtWidgets.QFileDialog):
         super().__init__(parent)
         self.setFileMode(QtWidgets.QFileDialog.ExistingFile)
         self.setDirectory(xldigest.database.paths.USER_HOME)
-
-
-class AddTransposedMasterDialog(QtWidgets.QFileDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setFileMode(QtWidgets.QFileDialog.ExistingFile)
-        self.setDirectory(xldigest.database.paths.USER_HOME)

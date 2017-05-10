@@ -131,7 +131,7 @@ class Ui_base_import_wizard(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
         self.imported_datamap_table = QtWidgets.QTableWidget(self.wizardPage)
-        self.imported_datamap_table.setRowCount(3)
+        self.imported_datamap_table.setRowCount(2)
         self.imported_datamap_table.setColumnCount(2)
         self.imported_datamap_table.setObjectName("imported_datamap_table")
         self.imported_datamap_table.horizontalHeader().setStretchLastSection(True)

@@ -1,11 +1,13 @@
 from PyQt5 import QtWidgets, QtGui
 
 from xldigest.widgets.base_import_wizard_ui import Ui_base_import_wizard
-from xldigest.widgets.dialogs import (AddPortfolioDialog, AddProjectDialog,
-                                      AddSeriesDialog, AddSeriesItemDialog,
-                                      AddDatamapFromCSVDialog,
-                                      AddGMPPDatamapFromCSVDialog,
-                                      AddTransposedMasterDialog)
+from xldigest.widgets.dialogs import (
+    AddPortfolioDialog,
+    AddProjectDialog,
+    AddSeriesDialog,
+    AddSeriesItemDialog,
+    AddDatamapFromCSVDialog,
+    AddGMPPDatamapFromCSVDialog)
 
 
 class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
@@ -34,12 +36,13 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         self.create_series_item_button.setEnabled(False)
 
         self.select_datamap_button.clicked.connect(self._add_datamap_csv_diag)
-        self.select_gmpp_datamap_button.clicked.connect(self._add_gmpp_datamap_csv_diag)
-        self.select_transposed_master_button.clicked.connect(self._add_transposed_master_diag)
+        self.select_gmpp_datamap_button.clicked.connect(
+            self._add_gmpp_datamap_csv_diag)
 
         # table cells
 
-        self.imported_datamap_table.cellClicked.connect(self._clicked_cell_dispathcher)
+        self.imported_datamap_table.cellClicked.connect(
+            self._clicked_cell_dispathcher)
 
         self.portfolio_added_label.setEnabled(False)
         self.series_added_label.setEnabled(False)
@@ -56,22 +59,18 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         self.setWindowTitle("Set up xldigest application")
 
         # datamap page table
-        self.imported_datamap_table.setItem(0, 0, QtWidgets.QTableWidgetItem(
-            "Datamap File:"))
-        self.imported_datamap_table.setItem(1, 0, QtWidgets.QTableWidgetItem(
-            "GMPP Datamap File:"))
-        self.imported_datamap_table.setItem(2, 0, QtWidgets.QTableWidgetItem(
-            "Transposed Master File:"))
+        self.imported_datamap_table.setItem(
+            0, 0, QtWidgets.QTableWidgetItem("Datamap File:"))
+        self.imported_datamap_table.setItem(
+            1, 0, QtWidgets.QTableWidgetItem("GMPP Datamap File:"))
 
         clk_to_select = QtWidgets.QTableWidgetItem("--Click to select file--")
         clk_to_select.setForeground(QtGui.QColor(135, 135, 135))
 
-        self.imported_datamap_table.setItem(0, 1, QtWidgets.QTableWidgetItem(
-            clk_to_select))
-        self.imported_datamap_table.setItem(1, 1, QtWidgets.QTableWidgetItem(
-            clk_to_select))
-        self.imported_datamap_table.setItem(2, 1, QtWidgets.QTableWidgetItem(
-            clk_to_select))
+        self.imported_datamap_table.setItem(
+            0, 1, QtWidgets.QTableWidgetItem(clk_to_select))
+        self.imported_datamap_table.setItem(
+            1, 1, QtWidgets.QTableWidgetItem(clk_to_select))
 
         self.imported_datamap_table.setHorizontalHeaderItem(
             0, QtWidgets.QTableWidgetItem("Description"))
@@ -107,10 +106,6 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
             assert self.selected_gmpp_csv_file
         except AttributeError:
             return False
-        try:
-            assert self.selected_transposed_master_file
-        except AttributeError:
-            return False
         return True
 
     def populate_data(self):
@@ -121,7 +116,6 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
             'series_items': self.series_items,
             'datamap_csv': self.selected_csv_file[0].split('/')[-1],
             'gmpp_datamap_csv': self.selected_gmpp_csv_file[0].split('/')[-1],
-            'transposed_master': self.selected_transposed_master_file
         }
 
     def _clicked_cell_dispathcher(self, row, col):
@@ -129,8 +123,6 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
             self._add_datamap_csv_diag()
         if row == 1 and col == 1:
             self._add_gmpp_datamap_csv_diag()
-        if row == 2 and col == 1:
-            self._add_transposed_master_diag()
 
     def _create_portfolio_diag(self):
         diag = AddPortfolioDialog()
@@ -174,7 +166,8 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         if diag.exec_():
             self.selected_csv_file = diag.selectedFiles()
             self.imported_datamap_table.setItem(
-                0, 1, QtWidgets.QTableWidgetItem(
+                0, 1,
+                QtWidgets.QTableWidgetItem(
                     self.selected_csv_file[0].split('/')[-1]))
 
     def _add_gmpp_datamap_csv_diag(self):
@@ -183,14 +176,6 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
         if diag.exec_():
             self.selected_gmpp_csv_file = diag.selectedFiles()
             self.imported_datamap_table.setItem(
-                1, 1, QtWidgets.QTableWidgetItem(
+                1, 1,
+                QtWidgets.QTableWidgetItem(
                     self.selected_gmpp_csv_file[0].split('/')[-1]))
-
-    def _add_transposed_master_diag(self):
-        diag = AddTransposedMasterDialog(self)
-        diag.show()
-        if diag.exec_():
-            self.selected_transposed_master_file = diag.selectedFiles()
-            self.imported_datamap_table.setItem(
-                2, 1, QtWidgets.QTableWidgetItem(
-                    self.selected_transposed_master_file[0].split('/')[-1]))

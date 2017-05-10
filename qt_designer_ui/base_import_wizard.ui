@@ -315,7 +315,7 @@
       <item>
        <widget class="QTableWidget" name="imported_datamap_table">
         <property name="rowCount">
-         <number>3</number>
+         <number>2</number>
         </property>
         <property name="columnCount">
          <number>2</number>
@@ -323,7 +323,6 @@
         <attribute name="horizontalHeaderStretchLastSection">
          <bool>true</bool>
         </attribute>
-        <row/>
         <row/>
         <row/>
         <column/>
