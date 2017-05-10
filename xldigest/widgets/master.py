@@ -2,12 +2,53 @@
 A Qt version of the old bcompiler master spreadsheet. Re-written for the new
 age...
 """
+from collections import namedtuple
+
 from PyQt5 import QtWidgets, QtCore
 
 from xldigest.database.connection import Connection
 from xldigest.database.base_queries import (
     project_ids_in_returns_with_series_item_of, datamap_items_in_return)
-from xldigest.database.models import ReturnItem
+from xldigest.database.models import ReturnItem, Project, SeriesItem, DatamapItem
+
+
+class ReturnSequence:
+    """
+    Sequence of return values given a project_id and series_item_id.
+    """
+    def __init__(self, project_id, dm_key_id):
+        self.project_id = project_id
+        self.dm_key_id = dm_key_id
+        self.data = self._collect()
+
+    def _collect(self):
+        session = Connection.session()
+        ReturnLine = namedtuple('ReturnLine', [
+            'project_name',
+            'project_id',
+            'series_item_name',
+            'series_item_id',
+            'key_id',
+            'key_name',
+            'value'
+        ])
+        try:
+            rows = session.query(
+                Project.name,
+                Project.id,
+                SeriesItem.name,
+                SeriesItem.id,
+                DatamapItem.key,
+                DatamapItem.id,
+                ReturnItem.value
+            ).join(ReturnItem, DatamapItem, SeriesItem).filter(
+                Project.id == self.project_id,
+                DatamapItem.id == self.dm_key_id
+            )
+            return [ReturnLine._make(row) for row in rows]
+        except:
+            print("Something went wrong")
+            raise
 
 
 def forumulate_data_for_model(
