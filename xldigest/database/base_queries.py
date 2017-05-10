@@ -1,6 +1,96 @@
+from collections import namedtuple, Counter
+
 from xldigest.database.connection import Connection
 from .models import (DatamapItem, Project, ReturnItem, SeriesItem, Portfolio,
                      Series)
+
+
+class ReturnSequence:
+    """
+    Sequence of return values given a project_id and series_item_id.
+
+    >> r = ReturnSequence(1, 1) # project_id 1, datamap_item_id 1
+    >> list(r) # ['200', '300'] (there are two returns for that project in db)
+
+    """
+    def __init__(self, project_id, dm_key_id):
+        self.project_id = project_id
+        self.dm_key_id = dm_key_id
+        self._data = self._collect()
+
+    def _collect(self):
+        session = Connection.session()
+        ReturnLine = namedtuple('ReturnLine', [
+            'project_name',
+            'project_id',
+            'series_item_name',
+            'series_item_id',
+            'key_name',
+            'key_id',
+            'value'
+        ])
+        try:
+            rows = session.query(
+                Project.name,
+                Project.id,
+                SeriesItem.name,
+                SeriesItem.id,
+                DatamapItem.key,
+                DatamapItem.id,
+                ReturnItem.value
+            ).join(ReturnItem, DatamapItem, SeriesItem).filter(
+                Project.id == self.project_id,
+                DatamapItem.id == self.dm_key_id
+            )
+            return [ReturnLine._make(row) for row in rows]
+        except:
+            raise
+
+    def __getitem__(self, index):
+        return self.data[index].value
+
+    def __iter__(self):
+        for item in self._data:
+            yield item.value
+        return
+
+    @property
+    def data(self):
+        return self._data
+
+
+def check_db_table_duplicates(model_instance):
+    """
+    Function which counts the ids of model objects and returns the list
+    of any duplicates.
+    """
+    session = Connection.session()
+    c = [item for item, count in Counter(session.query(DatamapItem.id)).items() if
+         count > 1]
+    return c
+
+
+def forumulate_data_for_master_model(
+    series_item_id: int,
+    project_ids: list,
+    dm_keys: list,
+) -> list:
+    """
+    Returns a list of (v1, v2, v3, ..) tuples where vn is the corresponding
+    value in each return that matches all the project_ids for a particular
+    series_item.
+    """
+    session = Connection.session()
+    collect = []
+    for i in list(project_ids):
+        db_items = session.query(ReturnItem.value).filter(
+            ReturnItem.series_item_id == series_item_id,
+            ReturnItem.project_id == i).all()
+        db_items_lst = [item[0] for item in db_items]
+        collect.append(db_items_lst)
+    # time to flip into tuples of related values ("A13", "Bound Materials",..)
+    flipped = list(zip(dm_keys, *collect))
+    return flipped
 
 
 def quarter_data(quarter_id):

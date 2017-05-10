@@ -100,6 +100,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         Import the selected files into the database and associate with the
         correct portfolio and series item. Uses the Ingestor functionality.
         """
+        # TODO fix this hard-coded path
         template = BICCTemplate(
             '/home/lemon/Documents/bcompiler/source/returns/' + t_data['project_file_name'])
         for x in t_data:
