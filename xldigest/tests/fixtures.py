@@ -250,7 +250,7 @@ return_data = [
 ]
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def sqlite3_db_file():
     db_file = os.path.join(TMP_DIR, "test.db")
     conn = sqlite3.connect(db_file)
@@ -345,8 +345,8 @@ def sqlite3_db_file():
     conn.commit()
     c.close()
     conn.close()
-    return db_file
-    # os.unlink(os.path.join(TMP_DIR, 'test.db')
+    yield db_file
+    os.unlink(os.path.join(TMP_DIR, 'test.db'))
 
 
 @pytest.fixture

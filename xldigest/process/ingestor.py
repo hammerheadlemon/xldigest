@@ -2,15 +2,19 @@ import os
 import shutil
 import uuid
 
+from collections import Counter
+
 from openpyxl import load_workbook
 
 import xldigest.database.paths
 
-from xldigest.database.models import RetainedSourceFile, ReturnItem, DatamapItem
+from xldigest.database.models import (RetainedSourceFile, ReturnItem, DatamapItem,
+                                      Project, SeriesItem)
 from xldigest.process.exceptions import NoFilesInDirectoryError
 from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
+from xldigest.process.exceptions import DuplicateReturnError
 from xldigest.database.connection import Connection
 
 
@@ -74,11 +78,29 @@ class Ingestor:
             session.close()
             return True
 
+    def _test_for_duplicate_return(self) -> bool:
+        """
+        Given a project_id and series_item_id, do we already have entries in
+        return_items table?
+        """
+        session = Connection.session_with_file(self.db_file)
+        c = Counter(session.query(ReturnItem.project_id, ReturnItem.series_item_id).all())
+        if True in [i[0] == (self.project, self.series_item) for i in c.items()]:
+            raise DuplicateReturnError
+        else:
+            return False
+
+
+
     def import_single_return(self) -> None:
         """
         Import a single return in the form of a populated template and save it
         as ReturnItem values in the database.
         """
+        try:
+            self._test_for_duplicate_return()
+        except DuplicateReturnError:
+            raise
         session = Connection.session_with_file(self.db_file)
         datamap = Datamap(self.source_file, self.db_file)
         datamap.cell_map_from_database()
@@ -115,7 +137,10 @@ class Ingestor:
                 str(self.project),  # project_third field
                 fuuid, '.xlsx'])
             w_path = os.path.join(xldigest.database.paths.USER_DATA_DIR, target_file_name)
-            self.import_single_return()
+            try:
+                self.import_single_return()
+            except DuplicateReturnError:
+                raise
             # Here we write the file to our store
             shutil.copy(self.source_file.source_file, w_path)
             # Here we write the details to the db

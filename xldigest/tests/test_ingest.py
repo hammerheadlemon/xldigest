@@ -4,7 +4,8 @@ import platform
 import xldigest.database.paths
 
 from xldigest.process.ingestor import Ingestor
-from xldigest.process.exceptions import NoFilesInDirectoryError
+from xldigest.process.exceptions import (NoFilesInDirectoryError,
+                                         DuplicateReturnError)
 
 from xldigest.process.template import BICCTemplate
 
@@ -105,16 +106,8 @@ def test_import_duplicate_return(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
         portfolio_id=1,
         series_item_id=1,
         source_file=source_template)
-    saved_file = ingestor.write_source_file()
-    ingestor2 = Ingestor(
-        INMEMORY_SQLITE3,
-        project_id=1,
-        portfolio_id=1,
-        series_item_id=1,
-        source_file=source_template)
-    saved_file2 = ingestor2.write_source_file()
-    assert "1_1_1" in saved_file
-    assert saved_file2 == ""
+    with pytest.raises(DuplicateReturnError):
+        saved_file = ingestor.write_source_file()
 
 
 def test_import_single_return_using_ingestor(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
