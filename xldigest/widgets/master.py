@@ -6,7 +6,8 @@ from PyQt5 import QtWidgets, QtCore
 
 from xldigest.database.base_queries import (
     datamap_items_in_return,
-    forumulate_data_for_master_model)
+    forumulate_data_for_master_model,
+    project_ids_in_returns_with_series_item_of)
 
 
 class MasterTableModel(QtCore.QAbstractTableModel):
@@ -44,9 +45,10 @@ class MasterTableModel(QtCore.QAbstractTableModel):
 class MasterWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-
-        self.datamap_keys = datamap_items_in_return(1, 1)
-        self.table_data = forumulate_data_for_master_model(1, [1, 2], self.datamap_keys)
+        project_ids = project_ids_in_returns_with_series_item_of(1)  # TODO to get which series_item
+        # FIXME - this shit is hard-coded
+        self.datamap_keys = datamap_items_in_return(1, 1)  # TODO likewise - fix hard-cde
+        self.table_data = forumulate_data_for_master_model(1, project_ids, self.datamap_keys)
 
         self.tv = QtWidgets.QTableView()
         self.proxyModel = QtCore.QSortFilterProxyModel()
