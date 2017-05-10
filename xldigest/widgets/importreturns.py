@@ -100,13 +100,13 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         Import the selected files into the database and associate with the
         correct portfolio and series item. Uses the Ingestor functionality.
         """
-        target_files = list(zip(t_data['selected_files'], t_data['selected_project_names']))
-        for x, _ in target_files:
-            template = BICCTemplate(x)
+        target_files = list(zip(t_data['selected_files'], t_data['selected_project_ids']))
+        for filename, p_id in target_files:
+            template = BICCTemplate(filename)
             i = Ingestor(
                 db_file='/home/lemon/.local/share/xldigest/db.sqlite',
                 portfolio_id=t_data['portfolio_id'],
-                project_id=t_data['project_id'],
+                project_id=p_id,
                 series_item_id=t_data['series_item_id'],
                 source_file=template
             )
@@ -118,8 +118,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         """
         collected_data = {}
         model = self.model_selected_returns
-        selected_files = []
         selected_project_names = []
+        selected_project_ids = []
         i = 0
         for p in range(model.rowCount()):
             f_idx = self.model_selected_returns.index(i, 0)
@@ -129,6 +129,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             project_file_name = model.data(f_idx, QtCore.Qt.DisplayRole)
             project_name = model.data(p_idx, QtCore.Qt.DisplayRole)
             selected_project_names.append(project_name)
+            selected_project_ids.append(get_project_id(project_name))
             i += 1
         collected_data['portfolio_id'] = selected_portfolio_id + 1
         collected_data['series_item_id'] = selected_series_item_id + 1
@@ -136,6 +137,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         collected_data['project_id'] = get_project_id(project_name)
         collected_data['selected_files'] = self.selected_files
         collected_data['selected_project_names'] = selected_project_names
+        collected_data['selected_project_ids'] = selected_project_ids
         return collected_data
 
     def _launch_wizard_slot(self):
