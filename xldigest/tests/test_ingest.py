@@ -108,7 +108,7 @@ def test_import_duplicate_return(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
         series_item_id=1,
         source_file=source_template)
     with pytest.raises(DuplicateReturnError):
-        saved_file = ingestor.write_source_file()
+        ingestor.write_source_file()
 
 
 @pytest.mark.xfail  # because we're writing a duplicate return to fixture and not catching that

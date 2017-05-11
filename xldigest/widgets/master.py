@@ -56,7 +56,12 @@ class MasterWidget(QtWidgets.QWidget):
         self.tv.setModel(self.proxyModel)
         self.proxyModel.setSourceModel(self.tableModel)
         self.tv.setSortingEnabled(True)
-        self.tv.horizontalHeader().setStretchLastSection(True)
+        self.tv.horizontalHeader().setStretchLastSection(False)
+        col_count = self.tableModel.columnCount()
+        self.tv.setColumnWidth(0, 300)
+        for c in range(1, col_count):
+            self.tv.setColumnWidth(c, 200)
+        print(col_count)
         self.sortCaseSensitivityCheckBox = QtWidgets.QCheckBox(
             "Case sensitive sorting")
         self.filterCaseSensitivityCheckBox = QtWidgets.QCheckBox(
