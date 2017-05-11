@@ -22,8 +22,8 @@ class MasterTableModel(QtCore.QAbstractTableModel):
         self.p_names_on_pop_form = list(self.data_in[0])
         self.headers = create_master_friendly_header(
             self.p_names_on_pop_form, 1)
-        self.headers.insert(0, "Key")
-        self.headers.insert(0, "Key")
+        self.headers.insert(0, "DMI")
+        self.headers.insert(1, "Key")
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.data_in)
@@ -68,7 +68,7 @@ class MasterWidget(QtWidgets.QWidget):
             self.selected_series_item, project_ids, self.datamap_keys)
 
         self.tv = QtWidgets.QTableView()
-        self.tv.verticalHeader(False)
+        self.tv.verticalHeader().hide()
         self.proxyModel = QtCore.QSortFilterProxyModel()
         self.tableModel = MasterTableModel(self.table_data, self)
         self.tv.setModel(self.proxyModel)
@@ -76,8 +76,9 @@ class MasterWidget(QtWidgets.QWidget):
         self.tv.setSortingEnabled(True)
         self.tv.horizontalHeader().setStretchLastSection(False)
         col_count = self.tableModel.columnCount()
-        self.tv.setColumnWidth(0, 300)
-        for c in range(1, col_count):
+        self.tv.setColumnWidth(0, 50)
+        self.tv.setColumnWidth(1, 300)
+        for c in range(2, col_count):
             self.tv.setColumnWidth(c, 200)
         self.sortCaseSensitivityCheckBox = QtWidgets.QCheckBox(
             "Case sensitive sorting")
