@@ -96,7 +96,7 @@ class MasterWidget(QtWidgets.QWidget):
         self.filterSyntaxLabel = QtWidgets.QLabel("Filter syntax:")
         self.filterSyntaxLabel.setBuddy(self.filterSyntaxCombo)
         self.filterColumnCombo = QtWidgets.QComboBox()
-        self.filterColumnCombo.addItem("Project 1")
+        self.filterColumnCombo.addItem("Key")
         self.filterColumnLabel = QtWidgets.QLabel("Filter column:")
         self.filterColumnLabel.setBuddy(self.filterColumnCombo)
 
@@ -162,7 +162,7 @@ class MasterWidget(QtWidgets.QWidget):
 
     def filterColumnChanged(self):
         self.proxyModel.setFilterKeyColumn(
-            self.filterColumnCombo.currentIndex())
+            self.filterColumnCombo.currentIndex() + 1)
 
     def sortChanged(self):
         self.proxyModel.setSortCaseSensitivity(
