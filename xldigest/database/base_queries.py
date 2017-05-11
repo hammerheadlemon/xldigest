@@ -14,6 +14,7 @@ class ReturnSequence:
     >> list(r) # ['200', '300'] (there are two returns for that project in db)
 
     """
+
     def __init__(self, project_id, dm_key_id):
         self.project_id = project_id
         self.dm_key_id = dm_key_id
@@ -22,27 +23,16 @@ class ReturnSequence:
     def _collect(self):
         session = Connection.session()
         ReturnLine = namedtuple('ReturnLine', [
-            'project_name',
-            'project_id',
-            'series_item_name',
-            'series_item_id',
-            'key_name',
-            'key_id',
-            'value'
+            'project_name', 'project_id', 'series_item_name', 'series_item_id',
+            'key_name', 'key_id', 'value'
         ])
         try:
             rows = session.query(
-                Project.name,
-                Project.id,
-                SeriesItem.name,
-                SeriesItem.id,
-                DatamapItem.key,
-                DatamapItem.id,
-                ReturnItem.value
-            ).join(ReturnItem, DatamapItem, SeriesItem).filter(
-                Project.id == self.project_id,
-                DatamapItem.id == self.dm_key_id
-            )
+                Project.name, Project.id, SeriesItem.name, SeriesItem.id,
+                DatamapItem.key, DatamapItem.id, ReturnItem.value).join(
+                    ReturnItem, DatamapItem, SeriesItem).filter(
+                        Project.id == self.project_id,
+                        DatamapItem.id == self.dm_key_id)
             return [ReturnLine._make(row) for row in rows]
         except:
             raise
@@ -66,8 +56,10 @@ def check_db_table_duplicates(model_instance):
     of any duplicates.
     """
     session = Connection.session()
-    c = [item for item, count in Counter(session.query(DatamapItem.id)).items() if
-         count > 1]
+    c = [
+        item for item, count in Counter(session.query(DatamapItem.id)).items()
+        if count > 1
+    ]
     return c
 
 
@@ -76,30 +68,35 @@ def link_declared_p_name_with_project(series_item_id: int,
                                       dm_key: str) -> tuple:
     session = Connection.session()
     return session.query(Project.name, ReturnItem.value).join(
-        ReturnItem, DatamapItem).filter(
-            ReturnItem.series_item_id == series_item_id,
-            ReturnItem.project_id == project_id,
-            DatamapItem.key == dm_key).first()
+        ReturnItem,
+        DatamapItem).filter(ReturnItem.series_item_id == series_item_id,
+                            ReturnItem.project_id == project_id,
+                            DatamapItem.key == dm_key).first()
 
 
 def link_projects_all_in_return(series_item_id: int) -> tuple:
     ps = project_ids_in_returns_with_series_item_of(series_item_id)
     t = []
     for p in ps:
-        t.append(link_declared_p_name_with_project(series_item_id, p, "Project/Programme Name"))
+        t.append(
+            link_declared_p_name_with_project(series_item_id, p,
+                                              "Project/Programme Name"))
     return t
 
 
-def create_master_friendly_header(submitted_titles: list, series_item_id: int) -> list:
-    return [i[0] for i in link_projects_all_in_return(series_item_id) for
-            t in submitted_titles if t == i[1]]
+def create_master_friendly_header(submitted_titles: list,
+                                  series_item_id: int) -> list:
+    return sorted([
+        i[0]
+        for i in link_projects_all_in_return(series_item_id)
+        for t in submitted_titles if t == i[1]
+    ])
 
 
 def forumulate_data_for_master_model(
-    series_item_id: int,
-    project_ids: list,
-    dm_keys: list,
-) -> list:
+        series_item_id: int,
+        project_ids: list,
+        dm_keys: list, ) -> list:
     """
     Returns a list of (v1, v2, v3, ..) tuples where vn is the corresponding
     value in each return that matches all the project_ids for a particular
@@ -157,16 +154,22 @@ def portfolio_names() -> list:
 
 def project_ids_in_returns_with_series_item_of(series_item_id: int) -> list:
     session = Connection.session()
-    return list(set([x[0] for x in session.query(
-        ReturnItem.project_id).filter(
-            ReturnItem.series_item_id == series_item_id).all()]))
+    return list(
+        set([
+            x[0]
+            for x in session.query(ReturnItem.project_id).filter(
+                ReturnItem.series_item_id == series_item_id).all()
+        ]))
 
 
 def datamap_items_in_return(series_item_id: int, project_id: int) -> list:
     session = Connection.session()
-    return [item[0] for item in session.query(DatamapItem.key).join(
-        ReturnItem).filter(ReturnItem.series_item_id == series_item_id,
-                           ReturnItem.project_id == project_id).all()]
+    return [
+        item[0]
+        for item in session.query(DatamapItem.key).join(ReturnItem).filter(
+            ReturnItem.series_item_id == series_item_id, ReturnItem.project_id
+            == project_id).all()
+    ]
 
 
 def projects_with_id() -> dict:
@@ -193,5 +196,6 @@ def series_items(series: int) -> list:
     """
     Takes a Series id, and returns all SeriesItem objects belonging to it.
     """
-    sis = session.query(SeriesItem.name).filter(SeriesItem.series == series).all()
+    sis = session.query(SeriesItem.name).filter(
+        SeriesItem.series == series).all()
     return [item[0] for item in sis]
