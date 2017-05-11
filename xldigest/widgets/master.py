@@ -23,6 +23,7 @@ class MasterTableModel(QtCore.QAbstractTableModel):
         self.headers = create_master_friendly_header(
             self.p_names_on_pop_form, 1)
         self.headers.insert(0, "Key")
+        self.headers.insert(0, "Key")
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.data_in)

@@ -103,6 +103,8 @@ def forumulate_data_for_master_model(
     series_item.
     """
     session = Connection.session()
+    dm_ids = session.query(DatamapItem.id).all()
+    dm_ids = [i[0] for i in dm_ids]
     collect = []
     for i in list(project_ids):
         db_items = session.query(ReturnItem.value).filter(
@@ -113,7 +115,7 @@ def forumulate_data_for_master_model(
     # sort the raw data into alphabetical order based on declared Project name
     collect = sorted(collect, key=itemgetter(0))
     # time to flip into tuples of related values ("A13", "Bound Materials",..)
-    flipped = list(zip(dm_keys, *collect))
+    flipped = list(zip(dm_ids, dm_keys, *collect))
     return flipped
 
 
