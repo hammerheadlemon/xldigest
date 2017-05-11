@@ -68,6 +68,7 @@ class MasterWidget(QtWidgets.QWidget):
             self.selected_series_item, project_ids, self.datamap_keys)
 
         self.tv = QtWidgets.QTableView()
+        self.tv.verticalHeader(False)
         self.proxyModel = QtCore.QSortFilterProxyModel()
         self.tableModel = MasterTableModel(self.table_data, self)
         self.tv.setModel(self.proxyModel)
