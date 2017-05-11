@@ -122,12 +122,12 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         selected_project_ids = []
         i = 0
         for p in range(model.rowCount()):
-            f_idx = self.model_selected_returns.index(i, 0)
-            p_idx = self.model_selected_returns.index(i, 2)
+            selected_f_idx = self.model_selected_returns.index(i, 0)
+            selected_p_idx = self.model_selected_returns.index(i, 2)
             selected_series_item_id = self.selected_series_item
             selected_portfolio_id = self.selected_portfolio
-            project_file_name = model.data(f_idx, QtCore.Qt.DisplayRole)
-            project_name = model.data(p_idx, QtCore.Qt.DisplayRole)
+            project_file_name = model.data(selected_f_idx, QtCore.Qt.DisplayRole)
+            project_name = model.data(selected_p_idx, QtCore.Qt.DisplayRole)
             selected_project_names.append(project_name)
             selected_project_ids.append(get_project_id(project_name))
             i += 1
@@ -138,6 +138,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         collected_data['selected_files'] = self.selected_files
         collected_data['selected_project_names'] = selected_project_names
         collected_data['selected_project_ids'] = selected_project_ids
+        collected_data['project_name_id_pairs'] = tuple(zip(
+            selected_project_ids, selected_project_names))
         return collected_data
 
     def _launch_wizard_slot(self):

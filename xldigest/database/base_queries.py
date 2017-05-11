@@ -1,4 +1,5 @@
 from collections import namedtuple, Counter
+from operator import itemgetter
 
 from xldigest.database.connection import Connection
 from .models import (DatamapItem, Project, ReturnItem, SeriesItem, Portfolio,
@@ -88,6 +89,8 @@ def forumulate_data_for_master_model(
             ReturnItem.project_id == i).all()
         db_items_lst = [item[0] for item in db_items]
         collect.append(db_items_lst)
+    # sort the raw data into alphabetical order based on declared Project name
+    collect = sorted(collect, key=itemgetter(0))
     # time to flip into tuples of related values ("A13", "Bound Materials",..)
     flipped = list(zip(dm_keys, *collect))
     return flipped
