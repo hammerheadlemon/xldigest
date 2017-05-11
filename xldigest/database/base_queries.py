@@ -71,6 +71,30 @@ def check_db_table_duplicates(model_instance):
     return c
 
 
+def link_declared_p_name_with_project(series_item_id: int,
+                                      project_id: int,
+                                      dm_key: str) -> tuple:
+    session = Connection.session()
+    return session.query(Project.name, ReturnItem.value).join(
+        ReturnItem, DatamapItem).filter(
+            ReturnItem.series_item_id == series_item_id,
+            ReturnItem.project_id == project_id,
+            DatamapItem.key == dm_key).first()
+
+
+def link_projects_all_in_return(series_item_id: int) -> tuple:
+    ps = project_ids_in_returns_with_series_item_of(series_item_id)
+    t = []
+    for p in ps:
+        t.append(link_declared_p_name_with_project(series_item_id, p, "Project/Programme Name"))
+    return t
+
+
+def create_master_friendly_header(submitted_titles: list, series_item_id: int) -> list:
+    return [i[0] for i in link_projects_all_in_return(series_item_id) for
+            t in submitted_titles if t == i[1]]
+
+
 def forumulate_data_for_master_model(
     series_item_id: int,
     project_ids: list,

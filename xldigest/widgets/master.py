@@ -8,7 +8,8 @@ from xldigest.database.base_queries import (
     datamap_items_in_return,
     forumulate_data_for_master_model,
     project_ids_in_returns_with_series_item_of,
-    project_names_per_quarter
+    project_names_per_quarter,
+    create_master_friendly_header
 )
 
 
@@ -16,8 +17,10 @@ class MasterTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data_in, parent=None):
         super().__init__(parent)
         self.data_in = data_in
-        self.header = None  # this needs to be generated dynamically Project titles
         self.p_names_on_pop_form = list(self.data_in[0])
+        self.headers = create_master_friendly_header(
+            self.p_names_on_pop_form, 1)
+        self.headers.insert(0, "Key")
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.data_in)
@@ -33,7 +36,7 @@ class MasterTableModel(QtCore.QAbstractTableModel):
             return value
 
     def headerData(self, section, orientation, role):
-        headers = self.p_names_on_pop_form
+        headers = self.headers
         if role == QtCore.Qt.DisplayRole:
             if orientation == QtCore.Qt.Horizontal:
                 return headers[section]
@@ -63,7 +66,6 @@ class MasterWidget(QtWidgets.QWidget):
         self.tv.setColumnWidth(0, 300)
         for c in range(1, col_count):
             self.tv.setColumnWidth(c, 200)
-        print(col_count)
         self.sortCaseSensitivityCheckBox = QtWidgets.QCheckBox(
             "Case sensitive sorting")
         self.filterCaseSensitivityCheckBox = QtWidgets.QCheckBox(
