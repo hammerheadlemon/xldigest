@@ -191,6 +191,12 @@ def get_project_id(project_name) -> int:
     return id
 
 
+def series_item_ids_in_returns() -> list:
+    """Returns list of tuple of series_item names and ids in all returns"""
+    session = Connection.session()
+    return list(set(session.query(SeriesItem.id, SeriesItem.name).join(ReturnItem).all()))
+
+
 def series_items(series: int) -> list:
     session = Connection.session()
     """

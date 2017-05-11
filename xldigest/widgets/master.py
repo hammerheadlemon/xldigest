@@ -9,7 +9,9 @@ from xldigest.database.base_queries import (
     forumulate_data_for_master_model,
     project_ids_in_returns_with_series_item_of,
     project_names_per_quarter,
-    create_master_friendly_header
+    create_master_friendly_header,
+    series_items,
+    series_item_ids_in_returns
 )
 
 
@@ -50,10 +52,19 @@ class MasterTableModel(QtCore.QAbstractTableModel):
 class MasterWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        project_ids = project_ids_in_returns_with_series_item_of(1)  # TODO to get which series_item
+
+        self.series_label = QtWidgets.QLabel("Select Series Item")
+        self.series_combo = QtWidgets.QComboBox(self)
+        self.set_series_item_combo()
+        self.selected_series_item = self.series_combo.itemData(0, QtCore.Qt.UserRole)
+        self.series_combo.currentIndexChanged.connect(self._swap_table_slot)
+
+        project_ids = project_ids_in_returns_with_series_item_of(
+            self.selected_series_item)  # TODO to get which series_item
         # FIXME - this shit is hard-coded
         self.datamap_keys = datamap_items_in_return(1, 1)  # TODO likewise - fix hard-cde
-        self.table_data = forumulate_data_for_master_model(1, project_ids, self.datamap_keys)
+        self.table_data = forumulate_data_for_master_model(
+            self.selected_series_item, project_ids, self.datamap_keys)
 
         self.tv = QtWidgets.QTableView()
         self.proxyModel = QtCore.QSortFilterProxyModel()
@@ -86,6 +97,7 @@ class MasterWidget(QtWidgets.QWidget):
         self.filterColumnLabel = QtWidgets.QLabel("Filter column:")
         self.filterColumnLabel.setBuddy(self.filterColumnCombo)
 
+
         self.filterPatternLineEdit.textChanged.connect(self.filterRegExChanged)
         self.filterSyntaxCombo.currentIndexChanged.connect(
             self.filterRegExChanged)
@@ -94,17 +106,18 @@ class MasterWidget(QtWidgets.QWidget):
         self.filterCaseSensitivityCheckBox.toggled.connect(self.sortChanged)
 
         proxyGroupBox = QtWidgets.QGroupBox("Master Data")
-
         proxyLayout = QtWidgets.QGridLayout()
-        proxyLayout.addWidget(self.tv, 0, 0, 1, 3)
-        proxyLayout.addWidget(self.filterPatternLabel, 1, 0)
-        proxyLayout.addWidget(self.filterPatternLineEdit, 1, 1, 1, 2)
-        proxyLayout.addWidget(self.filterSyntaxLabel, 2, 0)
-        proxyLayout.addWidget(self.filterSyntaxCombo, 2, 1, 1, 2)
-        proxyLayout.addWidget(self.filterColumnLabel, 3, 0)
-        proxyLayout.addWidget(self.filterColumnCombo, 3, 1, 1, 2)
-        proxyLayout.addWidget(self.filterCaseSensitivityCheckBox, 4, 0, 1, 2)
-        proxyLayout.addWidget(self.sortCaseSensitivityCheckBox, 4, 2)
+        proxyLayout.addWidget(self.series_label, 0, 1, 1, 2)
+        proxyLayout.addWidget(self.series_combo, 0, 0, 1, 1)
+        proxyLayout.addWidget(self.tv, 1, 0, 1, 3)
+        proxyLayout.addWidget(self.filterPatternLabel, 2, 0)
+        proxyLayout.addWidget(self.filterPatternLineEdit, 2, 1, 1, 2)
+        proxyLayout.addWidget(self.filterSyntaxLabel, 3, 0)
+        proxyLayout.addWidget(self.filterSyntaxCombo, 3, 1, 1, 2)
+        proxyLayout.addWidget(self.filterColumnLabel, 4, 0)
+        proxyLayout.addWidget(self.filterColumnCombo, 4, 1, 1, 2)
+        proxyLayout.addWidget(self.filterCaseSensitivityCheckBox, 5, 0, 1, 2)
+        proxyLayout.addWidget(self.sortCaseSensitivityCheckBox, 5, 2)
         proxyGroupBox.setLayout(proxyLayout)
 
         mainLayout = QtWidgets.QVBoxLayout()
@@ -120,6 +133,20 @@ class MasterWidget(QtWidgets.QWidget):
         self.filterPatternLineEdit.setText("")
         self.filterCaseSensitivityCheckBox.setChecked(False)
         self.sortCaseSensitivityCheckBox.setChecked(False)
+
+    def _swap_table_slot(self, index):
+        si = self.series_combo.itemData(index, QtCore.Qt.UserRole)
+        project_ids = project_ids_in_returns_with_series_item_of(
+            si)
+        self.table_data = forumulate_data_for_master_model(
+            si, project_ids, self.datamap_keys)
+        self.tableModel = MasterTableModel(self.table_data, self)
+        self.proxyModel.setSourceModel(self.tableModel)
+        self.tv.setModel(self.proxyModel)
+
+    def set_series_item_combo(self):
+        for item in series_item_ids_in_returns():
+            self.series_combo.addItem(item[1], item[0])
 
     def filterRegExChanged(self):
         syntax = QtCore.QRegExp.PatternSyntax(
