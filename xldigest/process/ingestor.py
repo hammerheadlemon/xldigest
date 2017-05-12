@@ -86,7 +86,7 @@ class Ingestor:
         session = Connection.session_with_file(self.db_file)
         c = Counter(session.query(ReturnItem.project_id, ReturnItem.series_item_id).all())
         if True in [i[0] == (self.project, self.series_item) for i in c.items()]:
-            raise DuplicateReturnError
+            raise DuplicateReturnError("{} is already in the database for {}.".format(self.project, self.series_item))
         else:
             return False
 
