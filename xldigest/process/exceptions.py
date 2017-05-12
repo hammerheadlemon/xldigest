@@ -16,3 +16,7 @@ class NonExistantReturnError(Exception):
 
 class NoFilesInDirectoryError(Exception):
     pass
+
+
+class NoDataToCreateMasterError(Exception):
+    pass

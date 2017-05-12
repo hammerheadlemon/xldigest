@@ -2,6 +2,7 @@ from collections import namedtuple, Counter
 from operator import itemgetter
 
 from xldigest.database.connection import Connection
+from xldigest.process.exceptions import NoDataToCreateMasterError
 from .models import (DatamapItem, Project, ReturnItem, SeriesItem, Portfolio,
                      Series)
 
@@ -167,12 +168,18 @@ def project_ids_in_returns_with_series_item_of(series_item_id: int) -> list:
 
 def datamap_items_in_return(series_item_id: int, project_id: int) -> list:
     session = Connection.session()
-    return [
+    x = [
         item[0]
         for item in session.query(DatamapItem.key).join(ReturnItem).filter(
             ReturnItem.series_item_id == series_item_id, ReturnItem.project_id
             == project_id).all()
     ]
+    if len(x) == 0:
+        raise NoDataToCreateMasterError(
+            "Check there is data for {} and {}".format(
+                series_item_id, project_id))
+    else:
+        return x
 
 
 def projects_with_id() -> dict:
@@ -201,11 +208,11 @@ def series_item_ids_in_returns() -> list:
     return list(set(session.query(SeriesItem.id, SeriesItem.name).join(ReturnItem).all()))
 
 
-def series_items(series: int) -> list:
+def series_items(series: int) -> tuple:
     session = Connection.session()
     """
     Takes a Series id, and returns all SeriesItem objects belonging to it.
     """
-    sis = session.query(SeriesItem.name).filter(
+    sis = session.query(SeriesItem.id, SeriesItem.name).filter(
         SeriesItem.series == series).all()
-    return [item[0] for item in sis]
+    return [item for item in sis]

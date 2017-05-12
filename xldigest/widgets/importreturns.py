@@ -75,20 +75,19 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.comboPortfolio.setModel(self.portfolio_model)
         self.comboPortfolio.insertItem(0, "Choose a Portfolio")
         self.comboPortfolio.setCurrentIndex(0)
-        self.comboPortfolio.activated.connect(self._portfolio_select)
+        self.comboPortfolio.currentIndexChanged.connect(self._portfolio_select)
 
         self.series_model = self._pop_series_dropdown()
         self.comboSeries.setModel(self.series_model)
         self.comboSeries.insertItem(0, "Choose a Series")
         self.comboSeries.setCurrentIndex(0)
-        self.comboSeries.activated.connect(self._series_select)
+        self.comboSeries.currentIndexChanged.connect(self._series_select)
 
         self._selected_series_id = 0
         self.series_item_model = self._pop_series_item_dropdown()
         self.comboSeriesItem.setModel(self.series_item_model)
-
-        # signals
         self.comboSeriesItem.activated.connect(self._series_item_select)
+
         self.selectedCountLabel.setText("")
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
         self.importButton.clicked.connect(self.import_slot)
@@ -136,8 +135,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             selected_project_names.append(project_name)
             selected_project_ids.append(get_project_id(project_name))
             i += 1
-        collected_data['portfolio_id'] = selected_portfolio_id + 1
-        collected_data['series_item_id'] = selected_series_item_id + 1
+        collected_data['portfolio_id'] = selected_portfolio_id
+        collected_data['series_item_id'] = selected_series_item_id
         collected_data['project_file_name'] = project_file_name
         collected_data['project_id'] = get_project_id(project_name)
         collected_data['selected_files'] = self.selected_files
@@ -273,7 +272,15 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
 #        self.comboSeriesItem.setModel(self.series_item_model)
 
     def _series_item_select(self, index):
-        self.selected_series_item = index
+        try:
+            self.selected_series_item = self.comboSeriesItem.model().item(
+                index, 1).data(QtCore.Qt.UserRole)
+            print("Selected SeriesItem at Index: {} with data {}".format(
+                index, self.selected_series_item))
+        except AttributeError:
+            print("This selection has no data, but")
+            # call a quit function here as we don't want to proceed
+            pass
 
     def _pop_portfolio_dropdown(self):
         self.portfolio_model = QtGui.QStandardItemModel()

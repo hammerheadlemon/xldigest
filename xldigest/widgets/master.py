@@ -4,13 +4,13 @@ age...
 """
 from PyQt5 import QtWidgets, QtCore
 
+from xldigest.process.exceptions import NoDataToCreateMasterError
+
 from xldigest.database.base_queries import (
     datamap_items_in_return,
     forumulate_data_for_master_model,
     project_ids_in_returns_with_series_item_of,
-    project_names_per_quarter,
     create_master_friendly_header,
-    series_items,
     series_item_ids_in_returns
 )
 
@@ -62,7 +62,13 @@ class MasterWidget(QtWidgets.QWidget):
         project_ids = project_ids_in_returns_with_series_item_of(
             self.selected_series_item)  # TODO to get which series_item
         # FIXME - this shit is hard-coded
-        self.datamap_keys = datamap_items_in_return(1, 1)  # TODO likewise - fix hard-cde
+        import pudb; pudb.set_trace()  # XXX BREAKPOINT
+        try:
+            self.datamap_keys = datamap_items_in_return(1, 1)  # TODO likewise - fix hard-cde
+        except NoDataToCreateMasterError:
+            no_master_diag = QtWidgets.QDialog()
+            if no_master_diag.exec_():
+                print("Done")
         self.table_data = forumulate_data_for_master_model(
             self.selected_series_item, project_ids, self.datamap_keys)
 
