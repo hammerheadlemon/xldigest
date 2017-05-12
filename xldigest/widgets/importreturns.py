@@ -75,6 +75,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
 
         self.portfolio_model = self._pop_portfolio_dropdown()
         self.comboPortfolio.setModel(self.portfolio_model)
+        self.comboPortfolio.insertItem(0, "Choose a portfolio")
+        self.comboPortfolio.setCurrentIndex(0)
         self.comboPortfolio.activated.connect(self._portfolio_select)
 
         self.series_model = self._pop_series_dropdown()
@@ -244,10 +246,14 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             print("No files selected")
 
     def _portfolio_select(self, index):
-        self.selected_portfolio = index
-        print("Selected Portfolio at Index: {} with data {}".format(
-            index,
-            self.comboPortfolio.model().item(index, 1).data(QtCore.Qt.UserRole)))
+        try:
+            self.selected_portfolio = self.comboPortfolio.model().item(
+                index, 1).data(QtCore.Qt.UserRole)
+            print("Selected Portfolio at Index: {} with data {}".format(
+                index, self.selected_portfolio))
+        except AttributeError:
+            print("This selection has no data, but")
+            pass
 
     def _series_select(self, index):
         """
