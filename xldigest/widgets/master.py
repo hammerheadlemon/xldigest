@@ -54,7 +54,6 @@ class MasterWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.series_label = QtWidgets.QLabel("Select Series Item")
         self.series_combo = QtWidgets.QComboBox(self)
         self.set_series_item_combo()
         self.selected_series_item = self.series_combo.itemData(0, QtCore.Qt.UserRole)
@@ -100,7 +99,6 @@ class MasterWidget(QtWidgets.QWidget):
         self.filterColumnLabel = QtWidgets.QLabel("Filter column:")
         self.filterColumnLabel.setBuddy(self.filterColumnCombo)
 
-
         self.filterPatternLineEdit.textChanged.connect(self.filterRegExChanged)
         self.filterSyntaxCombo.currentIndexChanged.connect(
             self.filterRegExChanged)
@@ -110,7 +108,6 @@ class MasterWidget(QtWidgets.QWidget):
 
         proxyGroupBox = QtWidgets.QGroupBox("Master Data")
         proxyLayout = QtWidgets.QGridLayout()
-        proxyLayout.addWidget(self.series_label, 0, 1, 1, 2)
         proxyLayout.addWidget(self.series_combo, 0, 0, 1, 1)
         proxyLayout.addWidget(self.tv, 1, 0, 1, 3)
         proxyLayout.addWidget(self.filterPatternLabel, 2, 0)

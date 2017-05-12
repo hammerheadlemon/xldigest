@@ -72,12 +72,15 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         super().__init__(parent)
         self.setupUi(self)
         self.launchFileDialog.clicked.connect(self.get_return_source_files_slot)
+
         self.portfolio_model = self._pop_portfolio_dropdown()
         self.comboPortfolio.setModel(self.portfolio_model)
         self.comboPortfolio.activated.connect(self._portfolio_select)
+
         self.series_model = self._pop_series_dropdown()
         self.comboSeries.setModel(self.series_model)
         self.comboSeries.activated.connect(self._series_select)
+
         self._selected_series_id = 0
         self.series_item_model = self._pop_series_item_dropdown()
         self.comboSeriesItem.setModel(self.series_item_model)
@@ -242,7 +245,9 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
 
     def _portfolio_select(self, index):
         self.selected_portfolio = index
-        print("got that portfolio sig: {}".format(index))
+        print("Selected Portfolio at Index: {} with data {}".format(
+            index,
+            self.comboPortfolio.model().item(index, 1).data(QtCore.Qt.UserRole)))
 
     def _series_select(self, index):
         """
@@ -276,9 +281,11 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         # this lot will come from the database
         items = portfolio_names()
 
-        for item in items:
-            item_text = QtGui.QStandardItem(item)
-            self.portfolio_model.appendRow(item_text)
+        for id, name in items:
+            item_text = QtGui.QStandardItem(name)
+            port_id = QtGui.QStandardItem()
+            port_id.setData(id, QtCore.Qt.UserRole)
+            self.portfolio_model.appendRow([item_text, port_id])
         return self.portfolio_model
 
     def _pop_series_dropdown(self):

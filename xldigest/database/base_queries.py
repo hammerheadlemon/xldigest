@@ -148,10 +148,11 @@ def project_names_in_portfolio(portfolio_id: int) -> list:
     return [item[0] for item in ps]
 
 
-def portfolio_names() -> list:
+def portfolio_names() -> tuple:
+    """You get the id as the first value in the tuple for free..."""
     session = Connection.session()
-    pns = session.query(Portfolio.name).all()
-    return [item[0] for item in pns]
+    pns = session.query(Portfolio.id, Portfolio.name).all()
+    return [item for item in pns]
 
 
 def project_ids_in_returns_with_series_item_of(series_item_id: int) -> list:
