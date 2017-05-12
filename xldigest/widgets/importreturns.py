@@ -86,7 +86,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self._selected_series_id = 0
         self.series_item_model = self._pop_series_item_dropdown()
         self.comboSeriesItem.setModel(self.series_item_model)
-        self.comboSeriesItem.activated.connect(self._series_item_select)
+        self.comboSeriesItem.currentIndexChanged.connect(self._series_item_select)
 
         self.selectedCountLabel.setText("")
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
@@ -250,6 +250,8 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 index, 1).data(QtCore.Qt.UserRole)
             print("Selected Portfolio at Index: {} with data {}".format(
                 index, self.selected_portfolio))
+            self._pop_series_dropdown()
+            self.comboSeries.setModel(self.series_model)
         except AttributeError:
             print("This selection has no data, but")
             # call a quit function here as we don't want to proceed
