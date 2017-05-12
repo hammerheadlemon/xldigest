@@ -62,7 +62,6 @@ class MasterWidget(QtWidgets.QWidget):
         project_ids = project_ids_in_returns_with_series_item_of(
             self.selected_series_item)  # TODO to get which series_item
         # FIXME - this shit is hard-coded
-        import pudb; pudb.set_trace()  # XXX BREAKPOINT
         try:
             self.datamap_keys = datamap_items_in_return(1, 1)  # TODO likewise - fix hard-cde
         except NoDataToCreateMasterError:
