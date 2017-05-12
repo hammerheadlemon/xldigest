@@ -11,8 +11,6 @@ from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
 from xldigest.widgets.base_import_wizard import BaseImportWizard
 from xldigest.process.ingestor import Ingestor
 from xldigest.process.template import BICCTemplate
-from xldigest.database.models import Series
-from xldigest.database.connection import Connection
 from xldigest.database.base_queries import (
     project_names_in_portfolio, portfolio_names, series_names, series_items,
     get_project_id)
@@ -75,12 +73,14 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
 
         self.portfolio_model = self._pop_portfolio_dropdown()
         self.comboPortfolio.setModel(self.portfolio_model)
-        self.comboPortfolio.insertItem(0, "Choose a portfolio")
+        self.comboPortfolio.insertItem(0, "Choose a Portfolio")
         self.comboPortfolio.setCurrentIndex(0)
         self.comboPortfolio.activated.connect(self._portfolio_select)
 
         self.series_model = self._pop_series_dropdown()
         self.comboSeries.setModel(self.series_model)
+        self.comboSeries.insertItem(0, "Choose a Series")
+        self.comboSeries.setCurrentIndex(0)
         self.comboSeries.activated.connect(self._series_select)
 
         self._selected_series_id = 0
@@ -253,30 +253,24 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
                 index, self.selected_portfolio))
         except AttributeError:
             print("This selection has no data, but")
+            # call a quit function here as we don't want to proceed
             pass
 
     def _series_select(self, index):
-        """
-        This is doing the work of populating the series_model, but also
-        adjusting the series_item_model depending on what is selected.
-        """
-        session = Connection.session()
-        idx = self.series_model.index(0, index)
         try:
-            self._selected_series_id = session.query(Series.id).filter(
-                Series.name == self.series_model.data(
-                    idx, QtCore.Qt.DisplayRole)).all()[0][0]
-        except IndexError:
-            self._selected_series_id = index + 1
-            print("There are no SeriesItems that related to Series: {}".format(
-                self._selected_series_id))
-            self.comboSeriesItem.setModel(QtGui.QStandardItemModel())
-            self.comboSeriesItem.clear()
-        print("got that series sig: {} - index in db: {}".format(
-            self.series_model.data(idx, QtCore.Qt.DisplayRole),
-            self._selected_series_id))
-        self.series_item_model = self._pop_series_item_dropdown()
-        self.comboSeriesItem.setModel(self.series_item_model)
+            self._selected_series_id = self.comboSeries.model().item(
+                index, 1).data(QtCore.Qt.UserRole)
+            print("Selected Series at Index: {} with data {}".format(
+                index, self._selected_series_id))
+            # now we call this to populate the series_item dropdown
+            self._pop_series_item_dropdown()
+            self.comboSeriesItem.setModel(self.series_item_model)
+        except AttributeError:
+            print("Series selections has no data, but")
+            # call a quit function here as we don't want to proceed
+            pass
+#        self.series_item_model = self._pop_series_item_dropdown()
+#        self.comboSeriesItem.setModel(self.series_item_model)
 
     def _series_item_select(self, index):
         self.selected_series_item = index
@@ -300,9 +294,11 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         # this lot will come from the database
         items = series_names()
 
-        for item in items:
-            item_text = QtGui.QStandardItem(item)
-            self.series_model.appendRow(item_text)
+        for id, name in items:
+            item_text = QtGui.QStandardItem(name)
+            s_id = QtGui.QStandardItem()
+            s_id.setData(id, QtCore.Qt.UserRole)
+            self.series_model.appendRow([item_text, s_id])
         return self.series_model
 
     def _pop_series_item_dropdown(self):
@@ -311,9 +307,11 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         # this lot will come from the database
         items = series_items(self._selected_series_id)
 
-        for item in items:
-            item_text = QtGui.QStandardItem(item)
-            self.series_item_model.appendRow(item_text)
+        for id, name in items:
+            item_text = QtGui.QStandardItem(name)
+            si_id = QtGui.QStandardItem()
+            si_id.setData(id, QtCore.Qt.UserRole)
+            self.series_item_model.appendRow([item_text, si_id])
         return self.series_item_model
 
 

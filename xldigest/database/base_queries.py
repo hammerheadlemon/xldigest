@@ -181,10 +181,11 @@ def projects_with_id() -> dict:
     return {tupe[0]: tupe[1] for tupe in tups}
 
 
-def series_names() -> list:
+def series_names() -> tuple:
+    """You get the series_id for free as the first in the tuple"""
     session = Connection.session()
-    sns = session.query(Series.name).all()
-    return [item[0] for item in sns]
+    sns = session.query(Series.id, Series.name).all()
+    return [item for item in sns]
 
 
 def get_project_id(project_name) -> int:
