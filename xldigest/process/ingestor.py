@@ -90,8 +90,6 @@ class Ingestor:
         else:
             return False
 
-
-
     def import_single_return(self) -> None:
         """
         Import a single return in the form of a populated template and save it
