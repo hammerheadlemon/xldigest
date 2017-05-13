@@ -4,8 +4,6 @@ age...
 """
 from PyQt5 import QtWidgets, QtCore
 
-from xldigest.process.exceptions import NoDataToCreateMasterError
-
 from xldigest.database.base_queries import (
     datamap_items_in_return,
     forumulate_data_for_master_model,
@@ -13,6 +11,7 @@ from xldigest.database.base_queries import (
     create_master_friendly_header,
     series_item_ids_in_returns
 )
+from xldigest.process.exceptions import NoDataToCreateMasterError
 
 
 class MasterTableModel(QtCore.QAbstractTableModel):
@@ -139,7 +138,7 @@ class MasterWidget(QtWidgets.QWidget):
         self.filterCaseSensitivityCheckBox.setChecked(False)
         self.sortCaseSensitivityCheckBox.setChecked(False)
 
-    def _swap_table_slot(self, index):
+    def _swap_table_slot(self, index: QtCore.QModelIndex) -> None:
         si = self.series_combo.itemData(index, QtCore.Qt.UserRole)
         project_ids = project_ids_in_returns_with_series_item_of(
             si)

@@ -1,20 +1,16 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-
-from mako.template import Template
-from mako.runtime import Context
-
 from io import StringIO
+from mako.runtime import Context
+from mako.template import Template
 
 import xldigest.database.paths
-
-from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
-from xldigest.widgets.base_import_wizard import BaseImportWizard
-from xldigest.process.ingestor import Ingestor
-from xldigest.process.template import BICCTemplate
 from xldigest.database.base_queries import (
     project_names_in_portfolio, portfolio_names, series_names, series_items,
     get_project_id)
-
+from xldigest.process.ingestor import Ingestor
+from xldigest.process.template import BICCTemplate
+from xldigest.widgets.base_import_wizard import BaseImportWizard
+from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
 
 verification_template = """
 <h1>Confirmation required</h1>
@@ -92,7 +88,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.base_setup_launch_wizard.clicked.connect(self._launch_wizard_slot)
         self.importButton.clicked.connect(self.import_slot)
 
-    def import_slot(self):
+    def import_slot(self) -> None:
         """Handler to trigger _gather() and _import_files()"""
         print("Gathering....")
         d = self._gather()

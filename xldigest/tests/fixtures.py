@@ -1,12 +1,11 @@
 import csv
-import os
 import sqlite3
+
+import os
 import pytest
 import shutil
-
-from tempfile import gettempdir
-
 from openpyxl import Workbook
+from tempfile import gettempdir
 
 TMP_DIR = gettempdir()
 
@@ -359,7 +358,7 @@ def test_blank_xls():
     wb.create_sheet('Assurance planning')
     wb.create_sheet('GMPP info')
     wb.save(os.path.join(TMP_DIR, 'test.xlsx'))
-    return(os.path.join(TMP_DIR, 'test.xlsx'))
+    return os.path.join(TMP_DIR, 'test.xlsx')
 
 
 @pytest.fixture
@@ -432,7 +431,7 @@ def bicc_return():
 
 
 @pytest.fixture
-def mock_datamap_source_file():
+def mock_datamap_source_file() -> None:
     data = [
         [
             'Project/Programme Name', 'Summary', 'B5', 'red', 'white', '',
@@ -501,7 +500,10 @@ def mock_datamap_source_file():
     os.unlink(os.path.join(TMP_DIR, 'mock_datamap.csv'))
 
 
-def mock_blank_xlsx_file(source_dir: str, empty: bool=False, mix: bool=False) -> None:
+def mock_blank_xlsx_file(
+        source_dir: str,
+        empty: bool=False,
+        mix: bool=False) -> None:
     wb = Workbook()
     wb.create_sheet('Test')
 
