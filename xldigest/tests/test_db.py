@@ -1,12 +1,9 @@
-import os
+from . sqlalchemy_fixtures import session
+from ..database.models import Portfolio
 
-from ..database.connection import Connection
+SESSION = session
 
+def test_single_portfolio(SESSION):
+    assert SESSION.query(Portfolio.id).first()[0] == 1
+    assert SESSION.query(Portfolio.name).first()[0] == "Major Portfolio"
 
-def test_connection():
-    session = Connection.session_for_test('/tmp/db.sqlite')
-    from xldigest.database.models import Project
-    p = Project(name="Test Project 1", portfolio=1)
-    session.add(p)
-    session.commit()
-    assert os.path.exists('/tmp/db.sqlite')
