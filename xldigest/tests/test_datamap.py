@@ -52,8 +52,7 @@ def mock_datamap_source_file():
 @pytest.mark.skip("Not testing until we use mock db.")
 def test_for_datamap_class():
     template = BICCTemplate(os.path.join(TMP_DIR, 'bicc_template.xlsx'))
-    datamap = Datamap(template,
-                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     assert datamap
 
 
@@ -61,8 +60,7 @@ def test_for_datamap_class():
 def test_expect_datamap_cell():
     template = BICCTemplate(os.path.join(TMP_DIR, 'bicc_template.xlsx'))
     sheet = template.add_sheet('Summary')
-    datamap = Datamap(template,
-                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     cell = Cell(
         datamap_id=None,
         cell_key='Project/Programme Name',
@@ -79,8 +77,7 @@ def test_expect_datamap_cell():
 @pytest.mark.skip("Not testing until we use mock db.")
 def test_datamap_source_file(mock_datamap_source_file):
     template = BICCTemplate(os.path.join(TMP_DIR, 'bicc_template.xlsx'))
-    datamap = Datamap(template,
-                      '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
+    datamap = Datamap(template, '/home/lemon/code/python/xldigest/xldigest/db.sqlite')
     datamap.cell_map_from_csv(mock_datamap_source_file)
     assert isinstance(datamap.cell_map[0], Cell)
     assert datamap.cell_map[0].cell_key == 'Project/Programme Name'

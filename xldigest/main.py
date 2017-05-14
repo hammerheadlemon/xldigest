@@ -2,6 +2,8 @@ import sys
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 
+import icons_rc
+
 from xldigest.widgets.base_import_wizard import BaseImportWizard
 from xldigest.widgets.datamap import DatamapWindow
 from xldigest.widgets.importreturns import ImportReturns
