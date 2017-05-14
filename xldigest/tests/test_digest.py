@@ -32,7 +32,7 @@ def test_in_tmp_sqlite3(INMEMORY_SQLITE3):
 def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
     """Uses cell_map_from_csv() function to process the datamap text file."""
     template = BICCTemplate(BICC_RETURN_MOCK)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template)
     datamap.cell_map_from_csv(DATAMAP_MOCK)
     digest = Digest(datamap, None, None)
     assert digest.datamap.cell_map[0].cell_key == 'Project/Programme Name'
@@ -116,7 +116,7 @@ def test_digest_gets_project_from_database(INMEMORY_SQLITE3):
 
 def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
     template = BICCTemplate(BICC_RETURN_MOCK)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template)
     datamap.cell_map_from_csv(DATAMAP_MOCK)
     digest = Digest(datamap, None, None)
     # here we need to go through the datamap, use the cell_key and
@@ -143,7 +143,7 @@ def test_missing_series_item(INMEMORY_SQLITE3):
     qtr_id = 10
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template)
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id)
     with pytest.raises(SeriesItemNotFoundError):

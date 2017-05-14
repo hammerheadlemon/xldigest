@@ -31,27 +31,3 @@ def session_scope():
         raise
     finally:
         session.close()
-
-
-# REFACTORING SESSION-HANDLING = this belongs to 9da82e5, where
-# I started to the refactor
-
-#from xldigest.database.models import Portfolio
-#from xldigest.database.connection import Connection
-#import xldigest.database.paths
-#
-#from .startup import main_startup
-#
-#try:
-#    SESSION = Connection.session()
-#except:
-#    SESSON = None
-#
-#
-#def test_db():
-#    session = Connection.session()
-#    try:
-#        session.query(Portfolio.id).first()[0] == 1
-#    except TypeError:
-#        return False
-#    return True

@@ -7,10 +7,13 @@ import xldigest.database.paths
 from xldigest.database.base_queries import (
     project_names_in_portfolio, portfolio_names, series_names, series_items,
     get_project_id)
+from xldigest.database.populate import import_datamap_csv, merge_gmpp_datamap, populate_portfolio_table, \
+    populate_series_table, populate_projects_table_from_gui, populate_series_item_table
 from xldigest.process.ingestor import Ingestor
 from xldigest.process.template import BICCTemplate
 from xldigest.widgets.base_import_wizard import BaseImportWizard
 from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
+from xldigest import Session
 
 verification_template = """
 <h1>Confirmation required</h1>
@@ -104,7 +107,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         for filename, p_id in target_files:
             template = BICCTemplate(filename)
             i = Ingestor(
-                db_file='/home/lemon/.local/share/xldigest/db.sqlite',
+                session=Session,
                 portfolio_id=t_data['portfolio_id'],
                 project_id=p_id,
                 series_item_id=t_data['series_item_id'],
@@ -163,9 +166,16 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         if warning_dialog.exec_():
             self.base_wizard = BaseImportWizard()
             if self.base_wizard.exec_():
+                session = Session()
                 self.base_wizard.populate_data()
                 data = self.base_wizard.wizard_data
                 self.verify_wizard_data(data)
+                import_datamap_csv(self.base_wizard.selected_csv_file[0], session)
+                merge_gmpp_datamap(self.base_wizard.selected_gmpp_csv_file[0], session)
+                populate_portfolio_table(self.base_wizard.portfolio, session)
+                populate_series_table(self.base_wizard.series, session)
+                populate_projects_table_from_gui(1, self.base_wizard.projects, session)
+                populate_series_item_table(self.base_wizard.series_items, session)
 
     def _parse_data(self, data):
         """

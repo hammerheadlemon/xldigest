@@ -51,6 +51,7 @@ def import_datamap_csv(source_file, session: Session):
                 bicc_cellref=row['bicc_cellref'],
                 bicc_ver_form=row['bicc_verification_formula'])
             session.add(dmi)
+        session.commit()
 
 
 def merge_gmpp_datamap(source_file, session: Session):
@@ -79,6 +80,7 @@ def populate_series_table(series_name, session: Session) -> None:
     A single series: Financial Quarters
     """
     session.add(Series(name=series_name))
+    session.commit()
 
 
 def populate_series_item_table(session: Session, series_items: list):
@@ -101,6 +103,7 @@ def populate_portfolio_table(portfolio_name, session: Session) -> None:
     Populate the Portfolio table.
     """
     session.add(Portfolio(name=portfolio_name))
+    session.commit()
 
 
 def populate_projects_table(portfolio_id: int, session: Session) -> None:
@@ -117,12 +120,14 @@ def populate_projects_table(portfolio_id: int, session: Session) -> None:
         for p in project_list:
             p = Project(name=p, portfolio=portfolio_id)
             session.add(p)
+        session.commit()
 
 
 def populate_projects_table_from_gui(portfolio_id: int, projects_list: list, session: Session) -> None:
     for p in projects_list:
         p = Project(name=p, portfolio=portfolio_id)
         session.add(p)
+    session.commit()
 
 
 def _query_for_single_project_id(prj_str: str, session: Session) -> int:
@@ -174,6 +179,7 @@ def import_single_bicc_return_using_database(source_file: str,
             datamap_item_id=cell_val_id,
             value=cell.cell_value)
         session.add(return_item)
+    session.commit()
 
 
 def import_all_returns_to_database(series_item: str, session: Session) -> None:
