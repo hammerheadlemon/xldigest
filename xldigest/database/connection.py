@@ -1,7 +1,10 @@
-import xldigest.database.paths
+import sys
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+import xldigest.database
+import xldigest.database.paths
 
 
 class CreateSession:
@@ -28,8 +31,27 @@ class CreateSessionWithFile:
         return session
 
 
-class Connection:
+class CreateTestSession:
+    def __init__(self, file_path: str = None) -> None:
+        """
+        Pass a string to the file required, or by default creates an in memory database. 
+        :param file_path: 
+        """
+        if file_path:
+            self.db_file = file_path
+        else:
+            self.db_file = "sqlite:///:memory:"
 
+    def call(self):
+        setattr(sys.modules['xldigest.database'], 'model_path', self.db_file)
+        engine = create_engine('sqlite:///' + self.db_file)
+        setattr(sys.modules['xldigest.database.models'], 'engine', engine)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        return session
+
+
+class Connection:
     @classmethod
     def session(cls):
         return CreateSession().call()
@@ -37,3 +59,7 @@ class Connection:
     @classmethod
     def session_with_file(cls, db_file):
         return CreateSessionWithFile(db_file).call()
+
+    @classmethod
+    def session_for_test(cls, db_file):
+        return CreateTestSession(db_file).call()
