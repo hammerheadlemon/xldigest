@@ -1,4 +1,4 @@
-from xldigest.database.base_queries import ReturnSequence
+from xldigest.database.base_queries import ReturnSequence, check_db_table_duplicates, link_declared_p_name_with_project
 from .sqlalchemy_fixtures import session
 from ..database.models import Portfolio, Project, Series, SeriesItem
 
@@ -32,3 +32,13 @@ def test_return_sequence(session):
     assert list(r2)[0] == "Return Value 2 Project 2 SeriesItem 1"
     assert list(r3)[1] == "Return Value 10 Project 1 SeriesItem 2"
     assert list(r4)[1] == "Return Value 68 Project 8 SeriesItem 2"
+
+
+def test_check_db_table_duplicates(session):
+    assert check_db_table_duplicates(session) == []
+
+
+def test_link_declared_p_name_with_project(session):
+    assert link_declared_p_name_with_project(
+        1, 1, "Datamap Key 1" , session
+    )[0] == 'Project 1'
