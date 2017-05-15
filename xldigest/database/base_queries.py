@@ -1,3 +1,4 @@
+import reprlib
 from collections import namedtuple, Counter, Set
 from operator import itemgetter
 
@@ -45,6 +46,9 @@ class ReturnSequence:
         for item in self._data:
             yield item.value
         return
+
+    def __repr__(self):
+        return reprlib.repr(self.data)
 
     @property
     def data(self) -> list:

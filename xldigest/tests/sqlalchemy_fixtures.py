@@ -50,7 +50,7 @@ def session() -> Session:
             project_id=p,
             series_item_id=y,
             datamap_item_id=x,
-            value=f"Return Value {x}")
+            value=f"Return Value {x} Project {p} SeriesItem {y}")
             for y in range(1, 21)
             for x in range(1, 101)])
 

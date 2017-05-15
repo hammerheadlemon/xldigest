@@ -20,6 +20,7 @@ class SeriesItem(Base):
     def __repr__(self):
         return reprlib.repr(self.name)
 
+
 class Series(Base):
     __tablename__ = 'series'
 
@@ -37,6 +38,9 @@ class Portfolio(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     projects = relationship("Project")
+
+    def __repr__(self):
+        return reprlib.repr(self.name)
 
 
 class Project(Base):
@@ -60,6 +64,9 @@ class RetainedSourceFile(Base):
     series_item_id = Column(Integer, ForeignKey('series_items.id'))
     uuid = Column(String)
 
+    def __repr__(self):
+        return reprlib.repr(self.project_id, self.portfolio_id, self.series_item_id)
+
 
 class DatamapItem(Base):
     __tablename__ = 'datamap_items'
@@ -74,7 +81,7 @@ class DatamapItem(Base):
     return_items = relationship("ReturnItem")
 
     def __repr__(self):
-        return "<DatamapItem('{}')>".format(self.key[0:15])
+        return reprlib.repr(self.key)
 
 
 class ReturnItem(Base):
@@ -87,9 +94,7 @@ class ReturnItem(Base):
     value = Column(String)
 
     def __repr__(self):
-        return ("<ReturnItem(Project: {0}, SeriesItem for {1}, "
-                "for DMI: {2}>").format(self.project_id, self.series_item_id,
-                                        self.datamap_item_id)
+        return reprlib.repr(self.id, self.value)
 
 
 def create_tables(engine):
