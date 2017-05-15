@@ -1,20 +1,12 @@
-import os
-
-import xldigest.database.paths
-
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, Date
+from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
+
 # engine = create_engine('sqlite:////home/lemon/code/python/xldigest/xldigest/'
 #                       'db.sqlite')
-
-
-engine = create_engine(os.path.join('sqlite:///' + xldigest.database.paths.DB_PATH))
-#engine = create_engine(os.path.join('sqlite:////', xldigest.database.paths.USER_DATA_DIR[1:], 'db.sqlite'))
-
 
 class SeriesItem(Base):
     __tablename__ = 'series_items'
@@ -94,4 +86,5 @@ class ReturnItem(Base):
                                         self.datamap_item_id)
 
 
-Base.metadata.create_all(engine)
+def create_tables(engine):
+    Base.metadata.create_all(engine)

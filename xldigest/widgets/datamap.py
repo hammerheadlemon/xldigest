@@ -1,8 +1,9 @@
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
+from xldigest import session_scope
 from xldigest.database.models import DatamapItem
-from xldigest.database.setup import SESSION as session
+
 
 # from https://www.youtube.com/watch?v=2sRoLN337cs
 
@@ -92,15 +93,15 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
             db_index = row + 1
             self.data_in[row][col] = value
             print("New val: {}".format(value))
-            db_item_to_change = session.query(DatamapItem).filter(
-                DatamapItem.id == db_index).first()
-            print("Item to change: {}".format(db_item_to_change))
-            print("index to change: {}".format(db_index))
-            col_field = [
-                item[1] for item in self.header_model_map if item[2] == col
-            ][0]
-            db_item_to_change.__setattr__(col_field, value)
-            session.commit()
+            with session_scope() as session:
+                db_item_to_change = session.query(DatamapItem).filter(
+                    DatamapItem.id == db_index).first()
+                print("Item to change: {}".format(db_item_to_change))
+                print("index to change: {}".format(db_index))
+                col_field = [
+                    item[1] for item in self.header_model_map if item[2] == col
+                ][0]
+                db_item_to_change.__setattr__(col_field, value)
             self.dataChanged.emit(index, index)
             return True
         return False
@@ -126,16 +127,17 @@ class DatamapTableModel(QtCore.QAbstractTableModel):
 
 def pull_all_data_from_db():
     """Using sqlalchemy this time."""
-    db_items = session.query(DatamapItem).all()
-    db_items_lst = [[
-        item.id,
-        item.key,
-        item.bicc_sheet,
-        item.bicc_cellref,
-        item.gmpp_sheet,
-        item.gmpp_cellref,
-        item.bicc_ver_form] for item in db_items]
-    return db_items_lst
+    with session_scope() as session:
+        db_items = session.query(DatamapItem).all()
+        db_items_lst = [[
+            item.id,
+            item.key,
+            item.bicc_sheet,
+            item.bicc_cellref,
+            item.gmpp_sheet,
+            item.gmpp_cellref,
+            item.bicc_ver_form] for item in db_items]
+        return db_items_lst
 
 
 class DatamapWindow(QtWidgets.QWidget):

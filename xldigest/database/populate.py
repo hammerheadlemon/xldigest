@@ -1,20 +1,15 @@
 import argparse
 import csv
-import os
-
 from datetime import date
 
-import xldigest.database.paths
+import os
 
-from xldigest.database.connection import Connection
+from xldigest import session
+from xldigest.database.models import (DatamapItem, Project, Portfolio,
+                                      ReturnItem, Series, SeriesItem)
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.template import BICCTemplate
-
-from xldigest.database.models import (DatamapItem, Project, Portfolio,
-                                      ReturnItem, Series, SeriesItem)
-
-session = Connection.session()
 
 # Hard-coded for now - this matches the current quarter with the same
 # value in the database so we're not relying on how it's written in
@@ -24,7 +19,7 @@ CURRENT_QUARTER = None
 
 
 def _change_dict_val(target, replacement, dictionary):
-    "Helper script to strip or change values in a dict."
+    """Helper script to strip or change values in a dict."""
     for k, v in dictionary.items():
         if v == target:
             dictionary[k] = replacement
@@ -32,7 +27,7 @@ def _change_dict_val(target, replacement, dictionary):
 
 
 def _strip_trailing_whitespace(dictionary):
-    "Helper script to strip trailing whitespace from string values in dict."
+    """Helper script to strip trailing whitespace from string values in dict."""
     for k, v in dictionary.items():
         # probably a string
         if isinstance(v, str):
@@ -40,7 +35,7 @@ def _strip_trailing_whitespace(dictionary):
     return dictionary
 
 
-def import_datamap_csv(source_file):
+def import_datamap_csv(source_file, session: session):
     """
     Import a csv-based datamap into a sqlite database.
     """
@@ -56,12 +51,10 @@ def import_datamap_csv(source_file):
                 bicc_cellref=row['bicc_cellref'],
                 bicc_ver_form=row['bicc_verification_formula'])
             session.add(dmi)
-
         session.commit()
-        session.close()
 
 
-def merge_gmpp_datamap(source_file):
+def merge_gmpp_datamap(source_file, session: session):
     """
     Merge-in relevant cell references from a GMPP-based datamap, based on
     values from the returns-to-master datamap.
@@ -80,10 +73,9 @@ def merge_gmpp_datamap(source_file):
                     'gmpp_template_sheet_reference']
                 target_instance.gmpp_cellref = row[
                     'gmpp_template_cell_reference']
-    session.commit()
 
 
-def populate_series_table(series_name) -> None:
+def populate_series_table(series_name, session: session) -> None:
     """
     A single series: Financial Quarters
     """
@@ -91,7 +83,7 @@ def populate_series_table(series_name) -> None:
     session.commit()
 
 
-def populate_series_item_table(series_items: list=None):
+def populate_series_item_table(series_items: list, session: session):
     """
     Populate basic Quarter information as SeriesItem objects.
     """
@@ -106,7 +98,7 @@ def populate_series_item_table(series_items: list=None):
     session.commit()
 
 
-def populate_portfolio_table(portfolio_name) -> None:
+def populate_portfolio_table(portfolio_name, session: session) -> None:
     """
     Populate the Portfolio table.
     """
@@ -114,29 +106,31 @@ def populate_portfolio_table(portfolio_name) -> None:
     session.commit()
 
 
-def populate_projects_table(portfolio_id: int) -> None:
+def populate_projects_table(portfolio_id: int, session: session) -> None:
     """
     Populate the project table in the database. The master_transposed.csv
     file is used as the source for this.
+    
+    WILL BE REDUNDANT WHEN GUI COMPLETE.
     """
     with open('/home/lemon/Documents/xldigest/source/master_transposed.csv'
               ) as f:
         reader = csv.DictReader(f)
         project_list = [row['Project/Programme Name'] for row in reader]
         for p in project_list:
-            p = Project(name=p, portfolio=1)
+            p = Project(name=p, portfolio=portfolio_id)
             session.add(p)
-    session.commit()
+        session.commit()
 
 
-def populate_projects_table_from_gui(portfolio_id: int, projects_list: list) -> None:
+def populate_projects_table_from_gui(portfolio_id: int, projects_list: list, session: session) -> None:
     for p in projects_list:
         p = Project(name=p, portfolio=portfolio_id)
         session.add(p)
     session.commit()
 
 
-def _query_for_single_project_id(prj_str: str) -> int:
+def _query_for_single_project_id(prj_str: str, session: session) -> int:
     project_id = session.query(Project.id).filter(
         Project.name == prj_str).first()[0]
     return project_id
@@ -144,7 +138,8 @@ def _query_for_single_project_id(prj_str: str) -> int:
 
 def import_single_bicc_return_using_database(source_file: str,
                                              series_item_id: int,
-                                             project_id: int) -> None:
+                                             project_id: int,
+                                             session: session) -> None:
     """
     Import a single BICC return based on a source template. Use the datamap
     from database, rather than the csv file.
@@ -155,10 +150,9 @@ def import_single_bicc_return_using_database(source_file: str,
 
     template = BICCTemplate(source_file)
 
-    datamap = Datamap(template,
-                      '{}{}'.format(xldigest.database.paths.USER_DATA_DIR, '/db.sqlite'))
+    datamap = Datamap(template)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, series_item_id, project_id)
+    digest = Digest(datamap, series_item_id, project_id, session)
     digest.read_template()
 
     project_name = [
@@ -176,7 +170,6 @@ def import_single_bicc_return_using_database(source_file: str,
 
     # go through the cell_map in the Digest object and drop into database
     for cell in digest.data:
-
         cell_val_id = session.query(DatamapItem.id).filter(
             DatamapItem.key == cell.cell_key).all()[0][0]
 
@@ -189,7 +182,7 @@ def import_single_bicc_return_using_database(source_file: str,
     session.commit()
 
 
-def import_all_returns_to_database(series_item: str) -> None:
+def import_all_returns_to_database(series_item: str, session: session) -> None:
     """
     Runs through a directory of files and calls
     import_single_bicc_return_using_database on each one. Does not distinguish
@@ -202,7 +195,7 @@ def import_all_returns_to_database(series_item: str) -> None:
     for f in os.listdir(returns_dir):
         print("Importing {}".format(f))
         import_single_bicc_return_using_database(
-            os.path.join(returns_dir, f), quarter_id, 1)
+            os.path.join(returns_dir, f), quarter_id, 1, session)
 
 
 def main():
@@ -223,17 +216,17 @@ def main():
     args = parser.parse_args()
     if args.initial:
         import_datamap_csv('/home/lemon/Documents/xldigest/source/'
-                           'datamap-returns-to-master-WITH_HEADER_FORSQLITE')
+                           'datamap-returns-to-master-WITH_HEADER_FORSQLITE', session)
         merge_gmpp_datamap('/home/lemon/Documents/xldigest/source/'
-                           'datamap-master-to-gmpp')
-        populate_portfolio_table("DfT Tier 1 Projects")
-        populate_series_table("Financial Quarters")
-        populate_projects_table(1)
+                           'datamap-master-to-gmpp', session)
+        populate_portfolio_table("DfT Tier 1 Projects", session)
+        populate_series_table("Financial Quarters", session)
+        populate_projects_table(1, session)
         populate_series_item_table(['Q1 2017/18', 'Q2 2017/18', 'Q3 2017/18'
-                                    'Q4 2017/18'])
+                                                                'Q4 2017/18'])
     elif args.secondary:
         CURRENT_QUARTER = args.secondary[0]
-        import_all_returns_to_database(CURRENT_QUARTER)
+        import_all_returns_to_database(CURRENT_QUARTER, session)
 
 
 if __name__ == "__main__":

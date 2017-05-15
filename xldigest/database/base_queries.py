@@ -1,10 +1,10 @@
-from collections import namedtuple, Counter
+from collections import namedtuple, Counter, Set
 from operator import itemgetter
 
-from xldigest.database.connection import Connection
-from xldigest.process.exceptions import NoDataToCreateMasterError
+from xldigest import session
 from .models import (DatamapItem, Project, ReturnItem, SeriesItem, Portfolio,
                      Series)
+from ..process.exceptions import NoDataToCreateMasterError
 
 
 class ReturnSequence:
@@ -16,24 +16,24 @@ class ReturnSequence:
 
     """
 
-    def __init__(self, project_id, dm_key_id):
+    def __init__(self, project_id: int, dm_key_id: int, session: session) -> None:
         self.project_id = project_id
         self.dm_key_id = dm_key_id
+        self.session = session
         self._data = self._collect()
 
-    def _collect(self):
-        session = Connection.session()
+    def _collect(self) -> list:
         ReturnLine = namedtuple('ReturnLine', [
             'project_name', 'project_id', 'series_item_name', 'series_item_id',
             'key_name', 'key_id', 'value'
         ])
         try:
-            rows = session.query(
+            rows = self.session.query(
                 Project.name, Project.id, SeriesItem.name, SeriesItem.id,
                 DatamapItem.key, DatamapItem.id, ReturnItem.value).join(
-                    ReturnItem, DatamapItem, SeriesItem).filter(
-                        Project.id == self.project_id,
-                        DatamapItem.id == self.dm_key_id)
+                ReturnItem, DatamapItem, SeriesItem).filter(
+                Project.id == self.project_id,
+                DatamapItem.id == self.dm_key_id)
             return [ReturnLine._make(row) for row in rows]
         except:
             raise
@@ -47,16 +47,15 @@ class ReturnSequence:
         return
 
     @property
-    def data(self):
+    def data(self) -> list:
         return self._data
 
 
-def check_db_table_duplicates(model_instance):
+def check_db_table_duplicates(session: session):
     """
     Function which counts the ids of model objects and returns the list
     of any duplicates.
     """
-    session = Connection.session()
     c = [
         item for item, count in Counter(session.query(DatamapItem.id)).items()
         if count > 1
@@ -66,8 +65,8 @@ def check_db_table_duplicates(model_instance):
 
 def link_declared_p_name_with_project(series_item_id: int,
                                       project_id: int,
-                                      dm_key: str) -> tuple:
-    session = Connection.session()
+                                      dm_key: str,
+                                      session: session) -> list:
     return session.query(Project.name, ReturnItem.value).join(
         ReturnItem,
         DatamapItem).filter(ReturnItem.series_item_id == series_item_id,
@@ -75,35 +74,35 @@ def link_declared_p_name_with_project(series_item_id: int,
                             DatamapItem.key == dm_key).first()
 
 
-def link_projects_all_in_return(series_item_id: int) -> tuple:
-    ps = project_ids_in_returns_with_series_item_of(series_item_id)
+def link_projects_all_in_return(series_item_id: int, session: session) -> list:
+    ps = project_ids_in_returns_with_series_item_of(series_item_id, session)
     t = []
     for p in ps:
         t.append(
             link_declared_p_name_with_project(series_item_id, p,
-                                              "Project/Programme Name"))
+                                              "Project/Programme Name", session))
     return t
 
 
 def create_master_friendly_header(submitted_titles: list,
-                                  series_item_id: int) -> list:
+                                  series_item_id: int, session) -> list:
     return sorted([
         i[0]
-        for i in link_projects_all_in_return(series_item_id)
+        for i in link_projects_all_in_return(series_item_id, session)
         for t in submitted_titles if t == i[1]
     ])
 
 
-def forumulate_data_for_master_model(
+def formulate_data_for_master_model(
         series_item_id: int,
         project_ids: list,
-        dm_keys: list, ) -> list:
+        dm_keys: list,
+        session: session) -> list:
     """
     Returns a list of (v1, v2, v3, ..) tuples where vn is the corresponding
     value in each return that matches all the project_ids for a particular
     series_item.
     """
-    session = Connection.session()
     dm_ids = session.query(DatamapItem.id).all()
     dm_ids = [i[0] for i in dm_ids]
     collect = []
@@ -120,44 +119,40 @@ def forumulate_data_for_master_model(
     return flipped
 
 
-def quarter_data(quarter_id):
-    session = Connection.session()
+def quarter_data(quarter_id, session: session) -> list:
     d = session.query(DatamapItem.key, ReturnItem.value, Project.id,
-                      Project.name, SeriesItem.id).\
-        filter(ReturnItem.project_id == Project.id).\
-        filter(ReturnItem.series_item_id == SeriesItem.id).\
+                      Project.name, SeriesItem.id). \
+        filter(ReturnItem.project_id == Project.id). \
+        filter(ReturnItem.series_item_id == quarter_id). \
         filter(ReturnItem.datamap_item_id == DatamapItem.id).all()
     return d
 
 
-def project_names_per_quarter(quarter_id):
-    d = quarter_data(quarter_id)
+def project_names_per_quarter(quarter_id: int, session: session) -> Set:
+    d = quarter_data(quarter_id, session)
     projects_in_all_returns = [(item[2], item[3]) for item in d]
     projects_in_all_returns = set(projects_in_all_returns)
     return projects_in_all_returns
 
 
-def single_project_data(quarter_id, project_id):
-    d = quarter_data(quarter_id)
+def single_project_data(quarter_id: int, project_id: int, session: session) -> list:
+    d = quarter_data(quarter_id, session)
     project_data = [[item[0], item[1]] for item in d if item[2] == project_id]
     return project_data
 
 
-def project_names_in_portfolio(portfolio_id: int) -> list:
-    session = Connection.session()
+def project_names_in_portfolio(portfolio_id: int, session: session) -> list:
     ps = session.query(Project.name).filter(Portfolio.id == portfolio_id).all()
     return [item[0] for item in ps]
 
 
-def portfolio_names() -> tuple:
+def portfolio_names(session: session) -> list:
     """You get the id as the first value in the tuple for free..."""
-    session = Connection.session()
     pns = session.query(Portfolio.id, Portfolio.name).all()
     return [item for item in pns]
 
 
-def project_ids_in_returns_with_series_item_of(series_item_id: int) -> list:
-    session = Connection.session()
+def project_ids_in_returns_with_series_item_of(series_item_id: int, session: session) -> list:
     return list(
         set([
             x[0]
@@ -166,8 +161,7 @@ def project_ids_in_returns_with_series_item_of(series_item_id: int) -> list:
         ]))
 
 
-def datamap_items_in_return(series_item_id: int, project_id: int) -> list:
-    session = Connection.session()
+def datamap_items_in_return(series_item_id: int, project_id: int, session: session) -> list:
     x = [
         item[0]
         for item in session.query(DatamapItem.key).join(ReturnItem).filter(
@@ -182,34 +176,29 @@ def datamap_items_in_return(series_item_id: int, project_id: int) -> list:
         return x
 
 
-def projects_with_id() -> dict:
-    session = Connection.session()
+def projects_with_id(session: session) -> dict:
     tups = session.query(Project.name, Project.id).all()
     return {tupe[0]: tupe[1] for tupe in tups}
 
 
-def series_names() -> tuple:
+def series_names(session: session) -> list:
     """You get the series_id for free as the first in the tuple"""
-    session = Connection.session()
     sns = session.query(Series.id, Series.name).all()
     return [item for item in sns]
 
 
-def get_project_id(project_name) -> int:
-    session = Connection.session()
-    id = session.query(Project.id).filter(
+def get_project_id(project_name: str, session: session) -> int:
+    i = session.query(Project.id).filter(
         Project.name == project_name).first()[0]
-    return id
+    return i
 
 
-def series_item_ids_in_returns() -> list:
+def series_item_ids_in_returns(session: session) -> list:
     """Returns list of tuple of series_item names and ids in all returns"""
-    session = Connection.session()
     return list(set(session.query(SeriesItem.id, SeriesItem.name).join(ReturnItem).all()))
 
 
-def series_items(series: int) -> tuple:
-    session = Connection.session()
+def series_items(series: int, session: session) -> list:
     """
     Takes a Series id, and returns all SeriesItem objects belonging to it.
     """

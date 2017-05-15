@@ -63,3 +63,4 @@ xldigest/db.sqlite
 db.sqlite*
 db.sqlite_true
 images/
+.idea/

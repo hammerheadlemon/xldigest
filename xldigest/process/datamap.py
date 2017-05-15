@@ -3,8 +3,9 @@ import csv
 from xldigest.process.cell import Cell
 from xldigest.process.template import FormTemplate
 
+from xldigest import session_scope
+
 from xldigest.database.models import DatamapItem
-from xldigest.database.connection import Connection
 
 
 class Datamap:
@@ -18,11 +19,9 @@ class Datamap:
     Datamap.cell_map_from_database(). To create a base cell map from the
     template, call Datamap.cell_map_from_csv().
     """
-    def __init__(self, template: FormTemplate, db_file: str) -> None:
-        self.session = Connection.session_with_file(db_file)
-        self.cell_map = []  # type: List[Cell]
+    def __init__(self, template: FormTemplate) -> None:
+        self.cell_map = []
         self.template = template
-        self.db_file = db_file
 
     def add_cell(self, cell: Cell) -> Cell:
         self.cell_map.append(cell)
@@ -64,15 +63,16 @@ class Datamap:
         """Creates a cellmap from a sqlite3 database. cell_map fields are
         empty until a function is called to populate the cellmap from
         a data source."""
-        for row in self.session.query(DatamapItem).all():
-            self.cell_map.append(
-                Cell(
-                    datamap_id=row.id,
-                    cell_key=row.key,
-                    cell_value=None,
-                    template_sheet=row.bicc_sheet,
-                    bg_colour=None,
-                    fg_colour=None,
-                    number_format=None,
-                    verification_list=None,
-                    cell_reference=row.bicc_cellref))
+        with session_scope() as session:
+            for row in session.query(DatamapItem).all():
+                self.cell_map.append(
+                    Cell(
+                        datamap_id=row.id,
+                        cell_key=row.key,
+                        cell_value=None,
+                        template_sheet=row.bicc_sheet,
+                        bg_colour=None,
+                        fg_colour=None,
+                        number_format=None,
+                        verification_list=None,
+                        cell_reference=row.bicc_cellref))

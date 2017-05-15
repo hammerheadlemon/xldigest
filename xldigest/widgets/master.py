@@ -6,21 +6,25 @@ from PyQt5 import QtWidgets, QtCore
 
 from xldigest.database.base_queries import (
     datamap_items_in_return,
-    forumulate_data_for_master_model,
+    formulate_data_for_master_model,
     project_ids_in_returns_with_series_item_of,
     create_master_friendly_header,
     series_item_ids_in_returns
 )
 from xldigest.process.exceptions import NoDataToCreateMasterError
 
+from xldigest import session
+
+from openpyxl import Workbook
 
 class MasterTableModel(QtCore.QAbstractTableModel):
-    def __init__(self, data_in, parent=None):
+    def __init__(self, data_in, session: session, parent=None):
         super().__init__(parent)
+        self.session = session
         self.data_in = data_in
         self.p_names_on_pop_form = list(self.data_in[0])
         self.headers = create_master_friendly_header(
-            self.p_names_on_pop_form, 1)
+            self.p_names_on_pop_form, 1, self.session)
         self.headers.insert(0, "DMI")
         self.headers.insert(1, "Key")
 
@@ -52,28 +56,28 @@ class MasterTableModel(QtCore.QAbstractTableModel):
 class MasterWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-
+        self.session = session
         self.series_combo = QtWidgets.QComboBox(self)
         self.set_series_item_combo()
         self.selected_series_item = self.series_combo.itemData(0, QtCore.Qt.UserRole)
         self.series_combo.currentIndexChanged.connect(self._swap_table_slot)
 
         project_ids = project_ids_in_returns_with_series_item_of(
-            self.selected_series_item)  # TODO to get which series_item
+            self.selected_series_item, self.session)  # TODO to get which series_item
         # FIXME - this shit is hard-coded
         try:
-            self.datamap_keys = datamap_items_in_return(1, 1)  # TODO likewise - fix hard-cde
+            self.datamap_keys = datamap_items_in_return(1, 1, self.session)  # TODO likewise - fix hard-cde
         except NoDataToCreateMasterError:
-            no_master_diag = QtWidgets.QDialog()
+            no_master_diag = QtWidgets.QDialog(self)
             if no_master_diag.exec_():
                 print("Done")
-        self.table_data = forumulate_data_for_master_model(
-            self.selected_series_item, project_ids, self.datamap_keys)
+        self.table_data = formulate_data_for_master_model(
+            self.selected_series_item, project_ids, self.datamap_keys, self.session)
 
         self.tv = QtWidgets.QTableView()
         self.tv.verticalHeader().hide()
         self.proxyModel = QtCore.QSortFilterProxyModel()
-        self.tableModel = MasterTableModel(self.table_data, self)
+        self.tableModel = MasterTableModel(self.table_data, session, self)
         self.tv.setModel(self.proxyModel)
         self.proxyModel.setSourceModel(self.tableModel)
         self.tv.setSortingEnabled(True)
@@ -110,6 +114,9 @@ class MasterWidget(QtWidgets.QWidget):
             self.filterColumnChanged)
         self.filterCaseSensitivityCheckBox.toggled.connect(self.sortChanged)
 
+        self.export_button = QtWidgets.QPushButton("Export to Excel")
+        self.export_button.clicked.connect(self.export_master_to_excel_slot)
+
         proxyGroupBox = QtWidgets.QGroupBox("Master Data")
         proxyLayout = QtWidgets.QGridLayout()
         proxyLayout.addWidget(self.series_combo, 0, 0, 1, 1)
@@ -122,6 +129,7 @@ class MasterWidget(QtWidgets.QWidget):
         proxyLayout.addWidget(self.filterColumnCombo, 4, 1, 1, 2)
         proxyLayout.addWidget(self.filterCaseSensitivityCheckBox, 5, 0, 1, 2)
         proxyLayout.addWidget(self.sortCaseSensitivityCheckBox, 5, 2)
+        proxyLayout.addWidget(self.export_button, 6, 1)
         proxyGroupBox.setLayout(proxyLayout)
 
         mainLayout = QtWidgets.QVBoxLayout()
@@ -138,18 +146,67 @@ class MasterWidget(QtWidgets.QWidget):
         self.filterCaseSensitivityCheckBox.setChecked(False)
         self.sortCaseSensitivityCheckBox.setChecked(False)
 
+    def export_master_to_excel_slot(self) -> None:
+        """
+        Exports the model in the MasterWidget to a new Excel file.
+        :return: 
+        """
+        wb = Workbook()
+        f_selected = QtWidgets.QFileDialog()
+        f_selected.setNameFilter("Excel (*.xlsx)")
+        f_selected.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
+        if f_selected.exec_():
+            dest_file = "".join([f_selected.selectedFiles()[0], ".xlsx"])
+        ws = wb.active
+        ws.title = "Master Output"
+        capture = []
+        # launch a file dialog to create a new file and location to save
+
+        # set that value as target_file
+
+        rows = self.proxyModel.rowCount()
+        cols = self.proxyModel.columnCount()
+
+        for row in range(0, rows):
+            line = []
+            for col in range(cols):
+                i = self.proxyModel.index(row, col)
+                line.append(self.proxyModel.data(i, QtCore.Qt.DisplayRole))
+            capture.append(tuple(line))
+
+        for h in range(1, cols + 1):
+            l = self.proxyModel.headerData(h - 1, QtCore.Qt.Horizontal, QtCore.Qt.DisplayRole)
+            ws.cell(column=h, row=1, value=l)
+
+        for line in list(enumerate(capture, 2)):
+            c = 1
+            for item in line[1]:
+                ws.cell(column=c, row=line[0], value=line[1][line[1].index(item)])
+                c += 1
+        wb.save(dest_file)
+        conf_diag = QtWidgets.QDialog(self)
+        message_label = QtWidgets.QLabel("File {} created.".format(dest_file))
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok)
+        grid = QtWidgets.QGridLayout()
+        grid.addWidget(message_label, 0, 0)
+        grid.addWidget(button_box, 1, 0)
+        conf_diag.setLayout(grid)
+        button_box.accepted.connect(conf_diag.accept)
+        conf_diag.show()
+
+
     def _swap_table_slot(self, index: QtCore.QModelIndex) -> None:
         si = self.series_combo.itemData(index, QtCore.Qt.UserRole)
         project_ids = project_ids_in_returns_with_series_item_of(
-            si)
-        self.table_data = forumulate_data_for_master_model(
-            si, project_ids, self.datamap_keys)
-        self.tableModel = MasterTableModel(self.table_data, self)
+            si, self.session)
+        self.table_data = formulate_data_for_master_model(
+            si, project_ids, self.datamap_keys, self.session)
+        self.tableModel = MasterTableModel(self.table_data, session, self)
         self.proxyModel.setSourceModel(self.tableModel)
         self.tv.setModel(self.proxyModel)
 
     def set_series_item_combo(self):
-        for item in series_item_ids_in_returns():
+        for item in series_item_ids_in_returns(self.session):
             self.series_combo.addItem(item[1], item[0])
 
     def filterRegExChanged(self):

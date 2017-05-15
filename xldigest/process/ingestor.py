@@ -5,6 +5,7 @@ import uuid
 from collections import Counter
 
 from openpyxl import load_workbook
+from xldigest import session
 
 import xldigest.database.paths
 
@@ -15,7 +16,6 @@ from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.exceptions import DuplicateReturnError
-from xldigest.database.connection import Connection
 
 
 try:
@@ -47,35 +47,32 @@ class Ingestor:
     populated template file.
     """
     def __init__(self,
-                 db_file: str,
+                 session: session,
                  source_dir: str=None,
                  portfolio_id: int=None,
                  series_item_id: int=None,
                  series_id: int=None,
                  project_id: int=None,
                  source_file: BICCTemplate=None) -> None:
+        self.session = session
         self.source_dir = source_dir
         self.project = project_id
         self.portfolio = portfolio_id
         self.series = series_id
         self.series_item = series_item_id
         self.source_file = source_file
-        self.db_file = db_file
 
     def _non_duplicated_return(self) -> bool:
         """
         Returns True or False based on whether this combination of portfolio,
         project and series_item is already in the database.
         """
-        session = Connection.session_with_file(self.db_file)
-        data = session.query(RetainedSourceFile.portfolio_id,
+        data = self.session.query(RetainedSourceFile.portfolio_id,
                              RetainedSourceFile.project_id,
                              RetainedSourceFile.series_item_id).all()
         if (self.portfolio, self.project, self.series_item) in data:
-            session.close()
             return False
         else:
-            session.close()
             return True
 
     def _test_for_duplicate_return(self) -> bool:
@@ -83,8 +80,7 @@ class Ingestor:
         Given a project_id and series_item_id, do we already have entries in
         return_items table?
         """
-        session = Connection.session_with_file(self.db_file)
-        c = Counter(session.query(ReturnItem.project_id, ReturnItem.series_item_id).all())
+        c = Counter(self.session.query(ReturnItem.project_id, ReturnItem.series_item_id).all())
         if True in [i[0] == (self.project, self.series_item) for i in c.items()]:
             raise DuplicateReturnError("{} is already in the database for {}.".format(self.project, self.series_item))
         else:
@@ -99,10 +95,9 @@ class Ingestor:
             self._test_for_duplicate_return()
         except DuplicateReturnError:
             raise
-        session = Connection.session_with_file(self.db_file)
-        datamap = Datamap(self.source_file, self.db_file)
+        datamap = Datamap(self.source_file)
         datamap.cell_map_from_database()
-        digest = Digest(datamap, self.series_item, self.project)
+        digest = Digest(datamap, self.series_item, self.project, self.session)
         digest.read_template()
         for cell in digest.data:
 #            cell_val_id = session.query(DatamapItem.id).filter(
@@ -114,8 +109,8 @@ class Ingestor:
                 datamap_item_id=cell.datamap_id[0],
                 value=cell.cell_value)
             print("Adding {}".format(return_item))
-            session.add(return_item)
-        session.commit()
+            self.session.add(return_item)
+        self.session.commit()
 
     def write_source_file(self) -> str:
         """
@@ -142,17 +137,13 @@ class Ingestor:
             # Here we write the file to our store
             shutil.copy(self.source_file.source_file, w_path)
             # Here we write the details to the db
-            session = Connection.session_with_file(self.db_file)
             retained_f = RetainedSourceFile(
                 project_id=self.project,
                 portfolio_id=self.portfolio,
                 series_item_id=self.series_item,
                 uuid=fuuid)
-            session.add(retained_f)
-
-
-            session.commit()
-            session.close()
+            self.session.add(retained_f)
+            self.session.commit()
             return w_path
         else:
             return ""

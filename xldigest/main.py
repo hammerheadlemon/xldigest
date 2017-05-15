@@ -4,16 +4,14 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 
 import icons_rc
 
-from xldigest.widgets.main_ui import Ui_MainXldigestWindow
 from xldigest.widgets.base_import_wizard import BaseImportWizard
 from xldigest.widgets.datamap import DatamapWindow
-from xldigest.widgets.overview import OverviewWidget
+from xldigest.widgets.importreturns import ImportReturns
+from xldigest.widgets.main_ui import Ui_MainXldigestWindow
 from xldigest.widgets.master import MasterWidget
+from xldigest.widgets.overview import OverviewWidget
 from xldigest.widgets.returnswindow import ReturnsWindow
 from xldigest.widgets.template_manager_window import TemplateManagerWindow
-from xldigest.widgets.importreturns import ImportReturns
-from xldigest import test_db
-from xldigest.startup import main_startup
 
 
 class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
@@ -79,34 +77,14 @@ class XldigestMainWindow(QtWidgets.QMainWindow, Ui_MainXldigestWindow):
 
 
 def main():
-    if not test_db():
-        application = QtWidgets.QApplication(sys.argv)
-        wiz = BaseImportWizard()
-        if wiz.exec_():
-            main_startup(
-                wiz.selected_csv_file,
-                wiz.selected_gmpp_csv_file,
-                wiz.portfolio,
-                wiz.series,
-                wiz.projects,
-                wiz.series_items
-            )
-            window = XldigestMainWindow()
-            desktop = QtWidgets.QDesktopWidget().availableGeometry()
-            width = (desktop.width() - window.width()) / 2
-            height = (desktop.height() - window.height()) / 3
-            window.show()
-            window.move(width, height)
-            sys.exit(application.exec_())
-    else:
-        application = QtWidgets.QApplication(sys.argv)
-        window = XldigestMainWindow()
-        desktop = QtWidgets.QDesktopWidget().availableGeometry()
-        width = (desktop.width() - window.width()) / 2
-        height = (desktop.height() - window.height()) / 3
-        window.show()
-        window.move(width, height)
-        sys.exit(application.exec_())
+    application = QtWidgets.QApplication(sys.argv)
+    window = XldigestMainWindow()
+    desktop = QtWidgets.QDesktopWidget().availableGeometry()
+    width = (desktop.width() - window.width()) / 2
+    height = (desktop.height() - window.height()) / 3
+    window.show()
+    window.move(width, height)
+    sys.exit(application.exec_())
 
 
 if __name__ == "__main__":
