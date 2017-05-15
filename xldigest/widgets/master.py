@@ -2,7 +2,7 @@
 A Qt version of the old bcompiler master spreadsheet. Re-written for the new
 age...
 """
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 
 from xldigest.database.base_queries import (
     datamap_items_in_return,
@@ -40,6 +40,30 @@ class MasterTableModel(QtCore.QAbstractTableModel):
             col = index.column()
             value = self.data_in[row][col]
             return value
+
+        if index.isValid() and role == QtCore.Qt.BackgroundRole:
+            row = index.row()
+            col = index.column()
+            value = self.data_in[row][col]
+            if isinstance(value, (int, float)) and col > 0:
+                if value > 10:
+                    return QtGui.QColor(23, 243, 24)
+            if isinstance(value, str) and col > 0:
+                try:
+                    value = int(value)
+                    if value > 10:
+                        return QtGui.QColor(32, 231, 100)
+                except:
+                    try:
+                        value = float(value)
+                        if value > 10:
+                            return QtGui.QColor(32, 231, 100)
+                    except:
+                        pass
+            else:
+                return None
+
+
 
     def headerData(self, section, orientation, role):
         headers = self.headers
