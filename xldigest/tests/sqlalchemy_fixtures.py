@@ -4,8 +4,8 @@ from sqlalchemy.orm import sessionmaker
 
 import xldigest.database.models as models
 
-engine = create_engine("sqlite:///" + ':memory:')
-#engine = create_engine("sqlite:///" + '/tmp/new-test.sqlite')
+#engine = create_engine("sqlite:///" + ':memory:')
+engine = create_engine("sqlite:///" + '/tmp/new-test.sqlite')
 Session = sessionmaker(bind=engine)
 
 models.create_tables(engine)
@@ -31,7 +31,7 @@ def session() -> Session:
     session.add_all(series_items)
 
     projects = [models.Project(name=f"Project {x}")
-                for x in range(1, 34)]
+                for x in range(1, 10)]
     session.add_all(projects)
 
     datamap_items = [models.DatamapItem(
@@ -44,13 +44,15 @@ def session() -> Session:
         for x in range(1, 101)]
     session.add_all(datamap_items)
 
-    return_items = [[models.ReturnItem(
-        project_id=p,
-        series_item_id=1,
-        datamap_item_id=x,
-        value=f"Return Value {x}")
-        for x in range(1, 101)]
-        for p in range(1, 34)]
+    return_items = []
+    for p in range(1, 10):
+        return_items.append([models.ReturnItem(
+            project_id=p,
+            series_item_id=y,
+            datamap_item_id=x,
+            value=f"Return Value {x}")
+            for y in range(1, 21)
+            for x in range(1, 101)])
 
     for r in return_items:
         session.add_all(r)
