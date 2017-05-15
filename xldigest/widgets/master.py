@@ -147,8 +147,16 @@ class MasterWidget(QtWidgets.QWidget):
         self.sortCaseSensitivityCheckBox.setChecked(False)
 
     def export_master_to_excel_slot(self) -> None:
+        """
+        Exports the model in the MasterWidget to a new Excel file.
+        :return: 
+        """
         wb = Workbook()
-        dest_file = '/tmp/xldigest-export-master.xlsx'
+        f_selected = QtWidgets.QFileDialog()
+        f_selected.setNameFilter("Excel (*.xlsx)")
+        f_selected.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
+        if f_selected.exec_():
+            dest_file = "".join([f_selected.selectedFiles()[0], ".xlsx"])
         ws = wb.active
         ws.title = "Master Output"
         capture = []
@@ -176,6 +184,16 @@ class MasterWidget(QtWidgets.QWidget):
                 ws.cell(column=c, row=line[0], value=line[1][line[1].index(item)])
                 c += 1
         wb.save(dest_file)
+        conf_diag = QtWidgets.QDialog(self)
+        message_label = QtWidgets.QLabel("File {} created.".format(dest_file))
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok)
+        grid = QtWidgets.QGridLayout()
+        grid.addWidget(message_label, 0, 0)
+        grid.addWidget(button_box, 1, 0)
+        conf_diag.setLayout(grid)
+        button_box.accepted.connect(conf_diag.accept)
+        conf_diag.show()
+
 
     def _swap_table_slot(self, index: QtCore.QModelIndex) -> None:
         si = self.series_combo.itemData(index, QtCore.Qt.UserRole)
