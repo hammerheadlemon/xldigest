@@ -1,3 +1,4 @@
+import reprlib
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -16,6 +17,8 @@ class SeriesItem(Base):
     start_date = Column(Date)
     end_date = Column(Date)
 
+    def __repr__(self):
+        return reprlib.repr(self.name)
 
 class Series(Base):
     __tablename__ = 'series'
@@ -23,6 +26,9 @@ class Series(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     series_items = relationship("SeriesItem")
+
+    def __repr__(self):
+        return reprlib.repr(self.name)
 
 
 class Portfolio(Base):

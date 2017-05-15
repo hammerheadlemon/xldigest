@@ -4,8 +4,8 @@ from sqlalchemy.orm import sessionmaker
 
 import xldigest.database.models as models
 
-#engine = create_engine("sqlite:///" + ':memory:')
-engine = create_engine("sqlite:///" + '/tmp/new-test.sqlite')
+engine = create_engine("sqlite:///" + ':memory:')
+#engine = create_engine("sqlite:///" + '/tmp/new-test.sqlite')
 Session = sessionmaker(bind=engine)
 
 models.create_tables(engine)
