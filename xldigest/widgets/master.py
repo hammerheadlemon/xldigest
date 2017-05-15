@@ -15,6 +15,8 @@ from xldigest.process.exceptions import NoDataToCreateMasterError
 
 from xldigest import session
 
+from openpyxl import Workbook
+
 class MasterTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data_in, session: session, parent=None):
         super().__init__(parent)
@@ -112,6 +114,9 @@ class MasterWidget(QtWidgets.QWidget):
             self.filterColumnChanged)
         self.filterCaseSensitivityCheckBox.toggled.connect(self.sortChanged)
 
+        self.export_button = QtWidgets.QPushButton("Export to Excel")
+        self.export_button.clicked.connect(self.export_master_to_excel_slot)
+
         proxyGroupBox = QtWidgets.QGroupBox("Master Data")
         proxyLayout = QtWidgets.QGridLayout()
         proxyLayout.addWidget(self.series_combo, 0, 0, 1, 1)
@@ -124,6 +129,7 @@ class MasterWidget(QtWidgets.QWidget):
         proxyLayout.addWidget(self.filterColumnCombo, 4, 1, 1, 2)
         proxyLayout.addWidget(self.filterCaseSensitivityCheckBox, 5, 0, 1, 2)
         proxyLayout.addWidget(self.sortCaseSensitivityCheckBox, 5, 2)
+        proxyLayout.addWidget(self.export_button, 6, 1)
         proxyGroupBox.setLayout(proxyLayout)
 
         mainLayout = QtWidgets.QVBoxLayout()
@@ -139,6 +145,37 @@ class MasterWidget(QtWidgets.QWidget):
         self.filterPatternLineEdit.setText("")
         self.filterCaseSensitivityCheckBox.setChecked(False)
         self.sortCaseSensitivityCheckBox.setChecked(False)
+
+    def export_master_to_excel_slot(self) -> None:
+        wb = Workbook()
+        dest_file = '/tmp/xldigest-export-master.xlsx'
+        ws = wb.active
+        ws.title = "Master Output"
+        capture = []
+        # launch a file dialog to create a new file and location to save
+
+        # set that value as target_file
+
+        rows = self.proxyModel.rowCount()
+        cols = self.proxyModel.columnCount()
+
+        for row in range(0, rows):
+            line = []
+            for col in range(3):
+                i = self.proxyModel.index(row, col)
+                line.append(self.proxyModel.data(i, QtCore.Qt.DisplayRole))
+            capture.append(tuple(line))
+
+        for h in range(1, cols + 1):
+            l = self.proxyModel.headerData(h - 1, QtCore.Qt.Horizontal, QtCore.Qt.DisplayRole)
+            ws.cell(column=h, row=1, value=l)
+
+        for line in list(enumerate(capture, 2)):
+            c = 1
+            for item in line[1]:
+                ws.cell(column=c, row=line[0], value=line[1][line[1].index(item)])
+                c += 1
+        wb.save(dest_file)
 
     def _swap_table_slot(self, index: QtCore.QModelIndex) -> None:
         si = self.series_combo.itemData(index, QtCore.Qt.UserRole)
