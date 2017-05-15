@@ -19,6 +19,7 @@ if not os.path.exists(USER_DATA_DIR):
 engine = create_engine("sqlite:///" + DB_PATH)
 xldigest.database.models.create_tables(engine)
 Session = sessionmaker(bind=engine)
+session = Session()
 
 @contextmanager
 def session_scope():

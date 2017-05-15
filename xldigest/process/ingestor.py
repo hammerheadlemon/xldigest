@@ -5,7 +5,7 @@ import uuid
 from collections import Counter
 
 from openpyxl import load_workbook
-from xldigest import Session
+from xldigest import session
 
 import xldigest.database.paths
 
@@ -47,14 +47,14 @@ class Ingestor:
     populated template file.
     """
     def __init__(self,
-                 session: Session,
+                 session: session,
                  source_dir: str=None,
                  portfolio_id: int=None,
                  series_item_id: int=None,
                  series_id: int=None,
                  project_id: int=None,
                  source_file: BICCTemplate=None) -> None:
-        self.session = session()
+        self.session = session
         self.source_dir = source_dir
         self.project = project_id
         self.portfolio = portfolio_id

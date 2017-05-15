@@ -13,7 +13,7 @@ from xldigest.process.ingestor import Ingestor
 from xldigest.process.template import BICCTemplate
 from xldigest.widgets.base_import_wizard import BaseImportWizard
 from xldigest.widgets.import_returns_tab_ui import Ui_ImportManager
-from xldigest import Session
+from xldigest import session
 
 verification_template = """
 <h1>Confirmation required</h1>
@@ -68,6 +68,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.session = session
         self.launchFileDialog.clicked.connect(self.get_return_source_files_slot)
 
         self.portfolio_model = self._pop_portfolio_dropdown()
@@ -107,7 +108,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         for filename, p_id in target_files:
             template = BICCTemplate(filename)
             i = Ingestor(
-                session=Session,
+                session=session,
                 portfolio_id=t_data['portfolio_id'],
                 project_id=p_id,
                 series_item_id=t_data['series_item_id'],
@@ -132,12 +133,12 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             project_file_name = model.data(selected_f_idx, QtCore.Qt.DisplayRole)
             project_name = model.data(selected_p_idx, QtCore.Qt.DisplayRole)
             selected_project_names.append(project_name)
-            selected_project_ids.append(get_project_id(project_name))
+            selected_project_ids.append(get_project_id(project_name, self.session))
             i += 1
         collected_data['portfolio_id'] = selected_portfolio_id
         collected_data['series_item_id'] = selected_series_item_id
         collected_data['project_file_name'] = project_file_name
-        collected_data['project_id'] = get_project_id(project_name)
+        collected_data['project_id'] = get_project_id(project_name, self.session)
         collected_data['selected_files'] = self.selected_files
         collected_data['selected_project_names'] = selected_project_names
         collected_data['selected_project_ids'] = selected_project_ids
@@ -166,7 +167,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         if warning_dialog.exec_():
             self.base_wizard = BaseImportWizard()
             if self.base_wizard.exec_():
-                session = Session()
+                session = self.session
                 self.base_wizard.populate_data()
                 data = self.base_wizard.wizard_data
                 self.verify_wizard_data(data)
@@ -185,7 +186,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         buf = StringIO()
         ctx = Context(buf, data=data)
         template.render_context(ctx)
-        return (buf.getvalue())
+        return buf.getvalue()
 
     def verify_wizard_data(self, data):
         diag = QtWidgets.QDialog(self.base_wizard)
@@ -294,12 +295,12 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.portfolio_model = QtGui.QStandardItemModel()
 
         # this lot will come from the database
-        items = portfolio_names()
+        items = portfolio_names(self.session)
 
-        for id, name in items:
+        for i, name in items:
             item_text = QtGui.QStandardItem(name)
             port_id = QtGui.QStandardItem()
-            port_id.setData(id, QtCore.Qt.UserRole)
+            port_id.setData(i, QtCore.Qt.UserRole)
             self.portfolio_model.appendRow([item_text, port_id])
         return self.portfolio_model
 
@@ -307,12 +308,12 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.series_model = QtGui.QStandardItemModel()
 
         # this lot will come from the database
-        items = series_names()
+        items = series_names(self.session)
 
-        for id, name in items:
+        for i, name in items:
             item_text = QtGui.QStandardItem(name)
             s_id = QtGui.QStandardItem()
-            s_id.setData(id, QtCore.Qt.UserRole)
+            s_id.setData(i, QtCore.Qt.UserRole)
             self.series_model.appendRow([item_text, s_id])
         return self.series_model
 
@@ -320,12 +321,12 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.series_item_model = QtGui.QStandardItemModel()
 
         # this lot will come from the database
-        items = series_items(self._selected_series_id)
+        items = series_items(self._selected_series_id, self.session)
 
-        for id, name in items:
+        for i, name in items:
             item_text = QtGui.QStandardItem(name)
             si_id = QtGui.QStandardItem()
-            si_id.setData(id, QtCore.Qt.UserRole)
+            si_id.setData(i, QtCore.Qt.UserRole)
             self.series_item_model.appendRow([item_text, si_id])
         return self.series_item_model
 
@@ -338,6 +339,7 @@ class DropDownDelegate(QtWidgets.QStyledItemDelegate):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self.session = session
 
     # Here we create the editor we want to impose upon the cell in the TableView
     # - in this case it is a combo box.
@@ -345,7 +347,7 @@ class DropDownDelegate(QtWidgets.QStyledItemDelegate):
         if index.column() == 2:
             combo = QtWidgets.QComboBox(parent)
             li = sorted(
-                project_names_in_portfolio(1))  # TODO hard-coded portfolio just now
+                project_names_in_portfolio(1, self.session))  # TODO hard-coded portfolio just now
             combo.addItems(li)
             combo.currentIndexChanged.connect(self.currentIndexChangedSlot)
             return combo
@@ -391,7 +393,7 @@ class SelectedFilesModel(QtCore.QAbstractTableModel):
                 return section + 1
 
     def flags(self, index):
-        if (index.column() == 2):
+        if index.column() == 2:
             return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable
         else:
             return QtCore.Qt.ItemIsEnabled

@@ -3,7 +3,6 @@ from typing import Any, List, Tuple
 import re
 from openpyxl import load_workbook
 
-from xldigest import Session
 from xldigest.database.models import (DatamapItem, Project, ReturnItem,
                                       SeriesItem)
 from xldigest.process.cell import Cell
@@ -53,7 +52,8 @@ class Digest:
             digest.data
     """
 
-    def __init__(self, dm: Datamap, series_item_id: int, project_id: int, session: Session) -> None:
+    def __init__(self, dm: Datamap, series_item_id: int, project_id: int, session) -> None:
+        self.session = session
         self._datamap = dm
         self._data = []  # type: List[Cell]
         self._existing_series_item_ids = \
@@ -64,7 +64,6 @@ class Digest:
 
         self.series_item_id = series_item_id
         self.project_id = project_id
-        self.session = session()
 
     @property
     def data(self) -> List[Cell]:

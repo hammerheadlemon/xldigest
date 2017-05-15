@@ -4,7 +4,7 @@ from datetime import date
 
 import os
 
-from xldigest import Session
+from xldigest import session
 from xldigest.database.models import (DatamapItem, Project, Portfolio,
                                       ReturnItem, Series, SeriesItem)
 from xldigest.process.datamap import Datamap
@@ -35,7 +35,7 @@ def _strip_trailing_whitespace(dictionary):
     return dictionary
 
 
-def import_datamap_csv(source_file, session: Session):
+def import_datamap_csv(source_file, session: session):
     """
     Import a csv-based datamap into a sqlite database.
     """
@@ -54,7 +54,7 @@ def import_datamap_csv(source_file, session: Session):
         session.commit()
 
 
-def merge_gmpp_datamap(source_file, session: Session):
+def merge_gmpp_datamap(source_file, session: session):
     """
     Merge-in relevant cell references from a GMPP-based datamap, based on
     values from the returns-to-master datamap.
@@ -75,7 +75,7 @@ def merge_gmpp_datamap(source_file, session: Session):
                     'gmpp_template_cell_reference']
 
 
-def populate_series_table(series_name, session: Session) -> None:
+def populate_series_table(series_name, session: session) -> None:
     """
     A single series: Financial Quarters
     """
@@ -83,7 +83,7 @@ def populate_series_table(series_name, session: Session) -> None:
     session.commit()
 
 
-def populate_series_item_table(session: Session, series_items: list):
+def populate_series_item_table(series_items: list, session: session):
     """
     Populate basic Quarter information as SeriesItem objects.
     """
@@ -98,7 +98,7 @@ def populate_series_item_table(session: Session, series_items: list):
     session.commit()
 
 
-def populate_portfolio_table(portfolio_name, session: Session) -> None:
+def populate_portfolio_table(portfolio_name, session: session) -> None:
     """
     Populate the Portfolio table.
     """
@@ -106,7 +106,7 @@ def populate_portfolio_table(portfolio_name, session: Session) -> None:
     session.commit()
 
 
-def populate_projects_table(portfolio_id: int, session: Session) -> None:
+def populate_projects_table(portfolio_id: int, session: session) -> None:
     """
     Populate the project table in the database. The master_transposed.csv
     file is used as the source for this.
@@ -123,14 +123,14 @@ def populate_projects_table(portfolio_id: int, session: Session) -> None:
         session.commit()
 
 
-def populate_projects_table_from_gui(portfolio_id: int, projects_list: list, session: Session) -> None:
+def populate_projects_table_from_gui(portfolio_id: int, projects_list: list, session: session) -> None:
     for p in projects_list:
         p = Project(name=p, portfolio=portfolio_id)
         session.add(p)
     session.commit()
 
 
-def _query_for_single_project_id(prj_str: str, session: Session) -> int:
+def _query_for_single_project_id(prj_str: str, session: session) -> int:
     project_id = session.query(Project.id).filter(
         Project.name == prj_str).first()[0]
     return project_id
@@ -139,7 +139,7 @@ def _query_for_single_project_id(prj_str: str, session: Session) -> int:
 def import_single_bicc_return_using_database(source_file: str,
                                              series_item_id: int,
                                              project_id: int,
-                                             session: Session) -> None:
+                                             session: session) -> None:
     """
     Import a single BICC return based on a source template. Use the datamap
     from database, rather than the csv file.
@@ -182,7 +182,7 @@ def import_single_bicc_return_using_database(source_file: str,
     session.commit()
 
 
-def import_all_returns_to_database(series_item: str, session: Session) -> None:
+def import_all_returns_to_database(series_item: str, session: session) -> None:
     """
     Runs through a directory of files and calls
     import_single_bicc_return_using_database on each one. Does not distinguish
@@ -199,7 +199,6 @@ def import_all_returns_to_database(series_item: str, session: Session) -> None:
 
 
 def main():
-    session = Session()
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",

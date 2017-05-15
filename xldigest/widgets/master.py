@@ -6,21 +6,23 @@ from PyQt5 import QtWidgets, QtCore
 
 from xldigest.database.base_queries import (
     datamap_items_in_return,
-    forumulate_data_for_master_model,
+    formulate_data_for_master_model,
     project_ids_in_returns_with_series_item_of,
     create_master_friendly_header,
     series_item_ids_in_returns
 )
 from xldigest.process.exceptions import NoDataToCreateMasterError
 
+from xldigest import session
 
 class MasterTableModel(QtCore.QAbstractTableModel):
-    def __init__(self, data_in, parent=None):
+    def __init__(self, data_in, session: session, parent=None):
         super().__init__(parent)
+        self.session = session
         self.data_in = data_in
         self.p_names_on_pop_form = list(self.data_in[0])
         self.headers = create_master_friendly_header(
-            self.p_names_on_pop_form, 1)
+            self.p_names_on_pop_form, 1, self.session)
         self.headers.insert(0, "DMI")
         self.headers.insert(1, "Key")
 
@@ -52,28 +54,28 @@ class MasterTableModel(QtCore.QAbstractTableModel):
 class MasterWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-
+        self.session = session
         self.series_combo = QtWidgets.QComboBox(self)
         self.set_series_item_combo()
         self.selected_series_item = self.series_combo.itemData(0, QtCore.Qt.UserRole)
         self.series_combo.currentIndexChanged.connect(self._swap_table_slot)
 
         project_ids = project_ids_in_returns_with_series_item_of(
-            self.selected_series_item)  # TODO to get which series_item
+            self.selected_series_item, self.session)  # TODO to get which series_item
         # FIXME - this shit is hard-coded
         try:
-            self.datamap_keys = datamap_items_in_return(1, 1)  # TODO likewise - fix hard-cde
+            self.datamap_keys = datamap_items_in_return(1, 1, self.session)  # TODO likewise - fix hard-cde
         except NoDataToCreateMasterError:
-            no_master_diag = QtWidgets.QDialog()
+            no_master_diag = QtWidgets.QDialog(self)
             if no_master_diag.exec_():
                 print("Done")
-        self.table_data = forumulate_data_for_master_model(
-            self.selected_series_item, project_ids, self.datamap_keys)
+        self.table_data = formulate_data_for_master_model(
+            self.selected_series_item, project_ids, self.datamap_keys, self.session)
 
         self.tv = QtWidgets.QTableView()
         self.tv.verticalHeader().hide()
         self.proxyModel = QtCore.QSortFilterProxyModel()
-        self.tableModel = MasterTableModel(self.table_data, self)
+        self.tableModel = MasterTableModel(self.table_data, session, self)
         self.tv.setModel(self.proxyModel)
         self.proxyModel.setSourceModel(self.tableModel)
         self.tv.setSortingEnabled(True)
@@ -141,15 +143,15 @@ class MasterWidget(QtWidgets.QWidget):
     def _swap_table_slot(self, index: QtCore.QModelIndex) -> None:
         si = self.series_combo.itemData(index, QtCore.Qt.UserRole)
         project_ids = project_ids_in_returns_with_series_item_of(
-            si)
-        self.table_data = forumulate_data_for_master_model(
-            si, project_ids, self.datamap_keys)
+            si, self.session)
+        self.table_data = formulate_data_for_master_model(
+            si, project_ids, self.datamap_keys, self.session)
         self.tableModel = MasterTableModel(self.table_data, self)
         self.proxyModel.setSourceModel(self.tableModel)
         self.tv.setModel(self.proxyModel)
 
     def set_series_item_combo(self):
-        for item in series_item_ids_in_returns():
+        for item in series_item_ids_in_returns(self.session):
             self.series_combo.addItem(item[1], item[0])
 
     def filterRegExChanged(self):
