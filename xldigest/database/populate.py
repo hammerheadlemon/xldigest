@@ -145,7 +145,6 @@ def import_single_bicc_return_using_database(source_file: str,
     from database, rather than the csv file.
     """
     # we need the project_id to build the tables
-    # TODO finish this function - prj_str used here needs to be passed
     # to this function by the calling loop
 
     template = BICCTemplate(source_file)

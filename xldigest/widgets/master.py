@@ -160,10 +160,6 @@ class MasterWidget(QtWidgets.QWidget):
         ws = wb.active
         ws.title = "Master Output"
         capture = []
-        # launch a file dialog to create a new file and location to save
-
-        # set that value as target_file
-
         rows = self.proxyModel.rowCount()
         cols = self.proxyModel.columnCount()
 
