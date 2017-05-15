@@ -113,7 +113,7 @@ def formulate_data_for_master_model(
         db_items_lst = [item[0] for item in db_items]
         collect.append(db_items_lst)
     p_dmi_pairs = [[p, d] for p in project_ids for d in dm_ids]
-    comparitor = [ReturnSequence(x, y, session) for x, y in p_dmi_pairs]
+    comparitor_pairs = [list(ReturnSequence(x, y, session)) for x, y in p_dmi_pairs]
     # sort the raw data into alphabetical order based on declared Project name
     collect = sorted(collect, key=itemgetter(0))
     # time to flip into tuples of related values ("A13", "Bound Materials",..)
