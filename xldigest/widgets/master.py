@@ -169,7 +169,7 @@ class MasterWidget(QtWidgets.QWidget):
 
         for row in range(0, rows):
             line = []
-            for col in range(3):
+            for col in range(cols):
                 i = self.proxyModel.index(row, col)
                 line.append(self.proxyModel.data(i, QtCore.Qt.DisplayRole))
             capture.append(tuple(line))
@@ -201,7 +201,7 @@ class MasterWidget(QtWidgets.QWidget):
             si, self.session)
         self.table_data = formulate_data_for_master_model(
             si, project_ids, self.datamap_keys, self.session)
-        self.tableModel = MasterTableModel(self.table_data, self)
+        self.tableModel = MasterTableModel(self.table_data, session, self)
         self.proxyModel.setSourceModel(self.tableModel)
         self.tv.setModel(self.proxyModel)
 
