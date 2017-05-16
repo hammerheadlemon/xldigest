@@ -12,6 +12,8 @@ from xldigest.process.exceptions import (
     DuplicateReturnError, ProjectNotFoundError, SeriesItemNotFoundError,
     NonExistantReturnError)
 
+from xldigest import session
+
 
 class TemplateError(Exception):
     pass
@@ -52,7 +54,7 @@ class Digest:
             digest.data
     """
 
-    def __init__(self, dm: Datamap, series_item_id: int, project_id: int, session) -> None:
+    def __init__(self, dm: Datamap, series_item_id: int, project_id: int) -> None:
         self.session = session
         self._datamap = dm
         self._data = []  # type: List[Cell]
