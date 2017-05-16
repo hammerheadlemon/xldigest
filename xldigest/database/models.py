@@ -65,7 +65,7 @@ class RetainedSourceFile(Base):
     uuid = Column(String)
 
     def __repr__(self):
-        return reprlib.repr(self.project_id, self.portfolio_id, self.series_item_id)
+        return "Retained Source File {} - {}".format(self.id, self.project_id)
 
 
 class DatamapItem(Base):
@@ -94,7 +94,7 @@ class ReturnItem(Base):
     value = Column(String)
 
     def __repr__(self):
-        return reprlib.repr(self.id, self.value)
+        return reprlib.repr(self.value)
 
 
 def create_tables(engine):
