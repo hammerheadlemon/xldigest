@@ -3,7 +3,7 @@ from contextlib import contextmanager
 import appdirs
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 import xldigest.database.models
 
@@ -18,7 +18,9 @@ if not os.path.exists(USER_DATA_DIR):
 
 engine = create_engine("sqlite:///" + DB_PATH)
 xldigest.database.models.create_tables(engine)
-Session = sessionmaker(bind=engine)
+
+session_factory = sessionmaker(bind=engine)
+Session = scoped_session(session_factory)
 session = Session()
 
 @contextmanager

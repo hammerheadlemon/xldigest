@@ -9,22 +9,21 @@ from xldigest import session
 
 import xldigest.database.paths
 
-from xldigest.database.models import (RetainedSourceFile, ReturnItem, DatamapItem,
-                                      Project, SeriesItem)
+from xldigest.database.models import (RetainedSourceFile, ReturnItem,
+                                      DatamapItem, Project, SeriesItem)
 from xldigest.process.exceptions import NoFilesInDirectoryError
 from xldigest.process.template import BICCTemplate
 from xldigest.process.datamap import Datamap
 from xldigest.process.digest import Digest
 from xldigest.process.exceptions import DuplicateReturnError
 
-
 try:
     os.listdir(xldigest.database.paths.USER_DATA_DIR)
 except FileNotFoundError:
-    print("No data directory found at: {}".format(xldigest.database.paths.USER_DATA_DIR))
+    print("No data directory found at: {}".format(
+        xldigest.database.paths.USER_DATA_DIR))
     print("Creating the directory now.")
     os.makedirs(xldigest.database.paths.USER_DATA_DIR)
-
 
 # TODO
 # There reasaon this class uses so many default params is because it's dual-
@@ -36,6 +35,7 @@ except FileNotFoundError:
 # This probably needs to be handled with a class method that acts as an
 # alternative init method.
 
+
 class Ingestor:
     """
     The key class when importing a populated template containing data bound for
@@ -46,8 +46,8 @@ class Ingestor:
     by inclusion of Ingestor(source_dir=PATH), or for ingesting a single
     populated template file.
     """
+
     def __init__(self,
-                 session: session,
                  source_dir: str=None,
                  portfolio_id: int=None,
                  series_item_id: int=None,
@@ -68,8 +68,8 @@ class Ingestor:
         project and series_item is already in the database.
         """
         data = self.session.query(RetainedSourceFile.portfolio_id,
-                             RetainedSourceFile.project_id,
-                             RetainedSourceFile.series_item_id).all()
+                                  RetainedSourceFile.project_id,
+                                  RetainedSourceFile.series_item_id).all()
         if (self.portfolio, self.project, self.series_item) in data:
             return False
         else:
@@ -80,9 +80,14 @@ class Ingestor:
         Given a project_id and series_item_id, do we already have entries in
         return_items table?
         """
-        c = Counter(self.session.query(ReturnItem.project_id, ReturnItem.series_item_id).all())
-        if True in [i[0] == (self.project, self.series_item) for i in c.items()]:
-            raise DuplicateReturnError("{} is already in the database for {}.".format(self.project, self.series_item))
+        c = Counter(
+            self.session.query(ReturnItem.project_id,
+                               ReturnItem.series_item_id).all())
+        if True in [
+                i[0] == (self.project, self.series_item) for i in c.items()
+        ]:
+            raise DuplicateReturnError("{} is already in the database for {}.".
+                                       format(self.project, self.series_item))
         else:
             return False
 
@@ -97,11 +102,11 @@ class Ingestor:
             raise
         datamap = Datamap(self.source_file)
         datamap.cell_map_from_database()
-        digest = Digest(datamap, self.series_item, self.project, self.session)
+        digest = Digest(datamap, self.series_item, self.project)
         digest.read_template()
         for cell in digest.data:
-#            cell_val_id = session.query(DatamapItem.id).filter(
-#                DatamapItem.key == cell.cell_key).all()[0][0]
+            #            cell_val_id = session.query(DatamapItem.id).filter(
+            #                DatamapItem.key == cell.cell_key).all()[0][0]
 
             return_item = ReturnItem(
                 project_id=self.project,
@@ -128,8 +133,11 @@ class Ingestor:
                 str(self.portfolio),  # portfolio first field
                 str(self.series_item),  # series_item second field
                 str(self.project),  # project_third field
-                fuuid, '.xlsx'])
-            w_path = os.path.join(xldigest.database.paths.USER_DATA_DIR, target_file_name)
+                fuuid,
+                '.xlsx'
+            ])
+            w_path = os.path.join(xldigest.database.paths.USER_DATA_DIR,
+                                  target_file_name)
             try:
                 self.import_single_return()
             except DuplicateReturnError:

@@ -3,7 +3,7 @@ import csv
 from xldigest.process.cell import Cell
 from xldigest.process.template import FormTemplate
 
-from xldigest import session_scope
+from xldigest import session
 
 from xldigest.database.models import DatamapItem
 
@@ -63,16 +63,15 @@ class Datamap:
         """Creates a cellmap from a sqlite3 database. cell_map fields are
         empty until a function is called to populate the cellmap from
         a data source."""
-        with session_scope() as session:
-            for row in session.query(DatamapItem).all():
-                self.cell_map.append(
-                    Cell(
-                        datamap_id=row.id,
-                        cell_key=row.key,
-                        cell_value=None,
-                        template_sheet=row.bicc_sheet,
-                        bg_colour=None,
-                        fg_colour=None,
-                        number_format=None,
-                        verification_list=None,
-                        cell_reference=row.bicc_cellref))
+        for row in session.query(DatamapItem).all():
+            self.cell_map.append(
+                Cell(
+                    datamap_id=row.id,
+                    cell_key=row.key,
+                    cell_value=None,
+                    template_sheet=row.bicc_sheet,
+                    bg_colour=None,
+                    fg_colour=None,
+                    number_format=None,
+                    verification_list=None,
+                    cell_reference=row.bicc_cellref))

@@ -17,7 +17,7 @@ class ReturnSequence:
 
     """
 
-    def __init__(self, project_id: int, dm_key_id: int, session: session) -> None:
+    def __init__(self, project_id: int, dm_key_id: int) -> None:
         self.project_id = project_id
         self.dm_key_id = dm_key_id
         self.session = session
@@ -32,9 +32,9 @@ class ReturnSequence:
             rows = self.session.query(
                 Project.name, Project.id, SeriesItem.name, SeriesItem.id,
                 DatamapItem.key, DatamapItem.id, ReturnItem.value).join(
-                ReturnItem, DatamapItem, SeriesItem).filter(
-                Project.id == self.project_id,
-                DatamapItem.id == self.dm_key_id)
+                    ReturnItem, DatamapItem, SeriesItem).filter(
+                        Project.id == self.project_id,
+                        DatamapItem.id == self.dm_key_id)
             return [ReturnLine._make(row) for row in rows]
         except:
             raise
@@ -55,7 +55,7 @@ class ReturnSequence:
         return self._data
 
 
-def check_db_table_duplicates(session: session):
+def check_db_table_duplicates():
     """
     Function which counts the ids of model objects and returns the list
     of any duplicates.
@@ -69,8 +69,7 @@ def check_db_table_duplicates(session: session):
 
 def link_declared_p_name_with_project(series_item_id: int,
                                       project_id: int,
-                                      dm_key: str,
-                                      session: session) -> list:
+                                      dm_key: str) -> list:
     return session.query(Project.name, ReturnItem.value).join(
         ReturnItem,
         DatamapItem).filter(ReturnItem.series_item_id == series_item_id,
@@ -78,30 +77,28 @@ def link_declared_p_name_with_project(series_item_id: int,
                             DatamapItem.key == dm_key).first()
 
 
-def link_projects_all_in_return(series_item_id: int, session: session) -> list:
-    ps = project_ids_in_returns_with_series_item_of(series_item_id, session)
+def link_projects_all_in_return(series_item_id: int) -> list:
+    ps = project_ids_in_returns_with_series_item_of(series_item_id)
     t = []
     for p in ps:
         t.append(
             link_declared_p_name_with_project(series_item_id, p,
-                                              "Project/Programme Name", session))
+                                              "Project/Programme Name"))
     return t
 
 
 def create_master_friendly_header(submitted_titles: list,
-                                  series_item_id: int, session) -> list:
+                                  series_item_id: int) -> list:
     return sorted([
         i[0]
-        for i in link_projects_all_in_return(series_item_id, session)
+        for i in link_projects_all_in_return(series_item_id)
         for t in submitted_titles if t == i[1]
     ])
 
 
-def formulate_data_for_master_model(
-        series_item_id: int,
-        project_ids: list,
-        dm_keys: list,
-        session: session) -> list:
+def formulate_data_for_master_model(series_item_id: int,
+                                    project_ids: list,
+                                    dm_keys: list) -> list:
     """
     Returns a list of (v1, v2, v3, ..) tuples where vn is the corresponding
     value in each return that matches all the project_ids for a particular
@@ -117,7 +114,7 @@ def formulate_data_for_master_model(
         db_items_lst = [item[0] for item in db_items]
         collect.append(db_items_lst)
     p_dmi_pairs = [[p, d] for p in project_ids for d in dm_ids]
-    comparitor_pairs = [list(ReturnSequence(x, y, session)) for x, y in p_dmi_pairs]
+    comparitor_pairs = [list(ReturnSequence(x, y)) for x, y in p_dmi_pairs]
     # sort the raw data into alphabetical order based on declared Project name
     collect = sorted(collect, key=itemgetter(0))
     # time to flip into tuples of related values ("A13", "Bound Materials",..)
@@ -125,7 +122,7 @@ def formulate_data_for_master_model(
     return flipped
 
 
-def quarter_data(quarter_id, session: session) -> list:
+def quarter_data(quarter_id) -> list:
     d = session.query(DatamapItem.key, ReturnItem.value, Project.id,
                       Project.name, SeriesItem.id). \
         filter(ReturnItem.project_id == Project.id). \
@@ -134,31 +131,34 @@ def quarter_data(quarter_id, session: session) -> list:
     return d
 
 
-def project_names_per_quarter(quarter_id: int, session: session) -> Set:
-    d = quarter_data(quarter_id, session)
+def project_names_per_quarter(quarter_id: int) -> Set:
+    d = quarter_data(quarter_id)
     projects_in_all_returns = [(item[2], item[3]) for item in d]
     projects_in_all_returns = set(projects_in_all_returns)
     return projects_in_all_returns
 
 
-def single_project_data(quarter_id: int, project_id: int, session: session) -> list:
-    d = quarter_data(quarter_id, session)
+def single_project_data(
+        quarter_id: int,
+        project_id: int, ) -> list:
+    d = quarter_data(quarter_id)
     project_data = [[item[0], item[1]] for item in d if item[2] == project_id]
     return project_data
 
 
-def project_names_in_portfolio(portfolio_id: int, session: session) -> list:
+def project_names_in_portfolio(portfolio_id: int) -> list:
     ps = session.query(Project.name).filter(Portfolio.id == portfolio_id).all()
     return [item[0] for item in ps]
 
 
-def portfolio_names(session: session) -> list:
+def portfolio_names() -> list:
     """You get the id as the first value in the tuple for free..."""
     pns = session.query(Portfolio.id, Portfolio.name).all()
     return [item for item in pns]
 
 
-def project_ids_in_returns_with_series_item_of(series_item_id: int, session: session) -> list:
+def project_ids_in_returns_with_series_item_of(
+        series_item_id: int, ) -> list:
     return list(
         set([
             x[0]
@@ -167,7 +167,9 @@ def project_ids_in_returns_with_series_item_of(series_item_id: int, session: ses
         ]))
 
 
-def datamap_items_in_return(series_item_id: int, project_id: int, session: session) -> list:
+def datamap_items_in_return(
+        series_item_id: int,
+        project_id: int, ) -> list:
     x = [
         item[0]
         for item in session.query(DatamapItem.key).join(ReturnItem).filter(
@@ -175,36 +177,38 @@ def datamap_items_in_return(series_item_id: int, project_id: int, session: sessi
             == project_id).all()
     ]
     if len(x) == 0:
-        raise NoDataToCreateMasterError(
-            "Check there is data for {} and {}".format(
-                series_item_id, project_id))
+        raise NoDataToCreateMasterError("Check there is data for {} and {}".
+                                        format(series_item_id, project_id))
     else:
         return x
 
 
-def projects_with_id(session: session) -> dict:
+def projects_with_id() -> dict:
     tups = session.query(Project.name, Project.id).all()
     return {tupe[0]: tupe[1] for tupe in tups}
 
 
-def series_names(session: session) -> list:
+def series_names() -> list:
     """You get the series_id for free as the first in the tuple"""
     sns = session.query(Series.id, Series.name).all()
     return [item for item in sns]
 
 
-def get_project_id(project_name: str, session: session) -> int:
+def get_project_id(project_name: str) -> int:
     i = session.query(Project.id).filter(
         Project.name == project_name).first()[0]
     return i
 
 
-def series_item_ids_in_returns(session: session) -> list:
+def series_item_ids_in_returns() -> list:
     """Returns list of tuple of series_item names and ids in all returns"""
-    return list(set(session.query(SeriesItem.id, SeriesItem.name).join(ReturnItem).all()))
+    return list(
+        set(
+            session.query(SeriesItem.id, SeriesItem.name).join(ReturnItem)
+            .all()))
 
 
-def series_items(series: int, session: session) -> list:
+def series_items(series: int) -> list:
     """
     Takes a Series id, and returns all SeriesItem objects belonging to it.
     """

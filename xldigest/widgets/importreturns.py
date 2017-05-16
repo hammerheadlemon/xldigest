@@ -108,7 +108,6 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         for filename, p_id in target_files:
             template = BICCTemplate(filename)
             i = Ingestor(
-                session=session,
                 portfolio_id=t_data['portfolio_id'],
                 project_id=p_id,
                 series_item_id=t_data['series_item_id'],
@@ -133,12 +132,12 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
             project_file_name = model.data(selected_f_idx, QtCore.Qt.DisplayRole)
             project_name = model.data(selected_p_idx, QtCore.Qt.DisplayRole)
             selected_project_names.append(project_name)
-            selected_project_ids.append(get_project_id(project_name, self.session))
+            selected_project_ids.append(get_project_id(project_name))
             i += 1
         collected_data['portfolio_id'] = selected_portfolio_id
         collected_data['series_item_id'] = selected_series_item_id
         collected_data['project_file_name'] = project_file_name
-        collected_data['project_id'] = get_project_id(project_name, self.session)
+        collected_data['project_id'] = get_project_id(project_name)
         collected_data['selected_files'] = self.selected_files
         collected_data['selected_project_names'] = selected_project_names
         collected_data['selected_project_ids'] = selected_project_ids
@@ -167,16 +166,15 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         if warning_dialog.exec_():
             self.base_wizard = BaseImportWizard()
             if self.base_wizard.exec_():
-                session = self.session
                 self.base_wizard.populate_data()
                 data = self.base_wizard.wizard_data
                 self.verify_wizard_data(data)
-                import_datamap_csv(self.base_wizard.selected_csv_file[0], session)
-                merge_gmpp_datamap(self.base_wizard.selected_gmpp_csv_file[0], session)
-                populate_portfolio_table(self.base_wizard.portfolio, session)
-                populate_series_table(self.base_wizard.series, session)
-                populate_projects_table_from_gui(1, self.base_wizard.projects, session)
-                populate_series_item_table(self.base_wizard.series_items, session)
+                import_datamap_csv(self.base_wizard.selected_csv_file[0])
+                merge_gmpp_datamap(self.base_wizard.selected_gmpp_csv_file[0])
+                populate_portfolio_table(self.base_wizard.portfolio)
+                populate_series_table(self.base_wizard.series)
+                populate_projects_table_from_gui(1, self.base_wizard.projects)
+                populate_series_item_table(self.base_wizard.series_items)
 
     def _parse_data(self, data):
         """
@@ -295,7 +293,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.portfolio_model = QtGui.QStandardItemModel()
 
         # this lot will come from the database
-        items = portfolio_names(self.session)
+        items = portfolio_names()
 
         for i, name in items:
             item_text = QtGui.QStandardItem(name)
@@ -308,7 +306,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.series_model = QtGui.QStandardItemModel()
 
         # this lot will come from the database
-        items = series_names(self.session)
+        items = series_names()
 
         for i, name in items:
             item_text = QtGui.QStandardItem(name)
@@ -321,7 +319,7 @@ class ImportReturns(QtWidgets.QWidget, Ui_ImportManager):
         self.series_item_model = QtGui.QStandardItemModel()
 
         # this lot will come from the database
-        items = series_items(self._selected_series_id, self.session)
+        items = series_items(self._selected_series_id)
 
         for i, name in items:
             item_text = QtGui.QStandardItem(name)
@@ -339,7 +337,6 @@ class DropDownDelegate(QtWidgets.QStyledItemDelegate):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.session = session
 
     # Here we create the editor we want to impose upon the cell in the TableView
     # - in this case it is a combo box.
@@ -347,7 +344,7 @@ class DropDownDelegate(QtWidgets.QStyledItemDelegate):
         if index.column() == 2:
             combo = QtWidgets.QComboBox(parent)
             li = sorted(
-                project_names_in_portfolio(1, self.session))  # TODO hard-coded portfolio just now
+                project_names_in_portfolio(1))  # TODO hard-coded portfolio just now
             combo.addItems(li)
             combo.currentIndexChanged.connect(self.currentIndexChangedSlot)
             return combo
