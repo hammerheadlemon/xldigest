@@ -121,6 +121,13 @@ def formulate_data_for_master_model(series_item_id: int,
 
 
 def collected_data(project_ids: list, series_item_id: int) -> list:
+    """
+    Collects the ReturnItem.ids for each Project in a SeriesItem. 
+    :param project_ids: 
+    :param series_item_id: 
+    :return: collected list of (Project.id, ReturnItem.value) pairs for
+    SeriesItem provided
+    """
     collect = []
     for i in list(project_ids):
         db_items = session.query(ReturnItem.value).filter(
@@ -131,7 +138,12 @@ def collected_data(project_ids: list, series_item_id: int) -> list:
     return collect
 
 
-def quarter_data(quarter_id) -> list:
+def quarter_data(quarter_id: int) -> tuple:
+    """
+    Returns a tuple of DatamapItem.key, ReturnItem.value, Project.id,
+    Project.name, SeriesItem.id values, for a particular SeriesItem.
+    :type quarter_id: object
+    """
     d = session.query(DatamapItem.key, ReturnItem.value, Project.id,
                       Project.name, SeriesItem.id). \
         filter(ReturnItem.project_id == Project.id). \
@@ -140,7 +152,7 @@ def quarter_data(quarter_id) -> list:
     return d
 
 
-def project_names_per_quarter(quarter_id: int) -> Set:
+def project_names_per_quarter(quarter_id: int) -> set:
     d = quarter_data(quarter_id)
     projects_in_all_returns = [(item[2], item[3]) for item in d]
     projects_in_all_returns = set(projects_in_all_returns)

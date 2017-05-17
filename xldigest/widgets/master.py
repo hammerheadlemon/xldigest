@@ -93,6 +93,7 @@ class MasterWidget(QtWidgets.QWidget):
             no_master_diag = QtWidgets.QDialog(self)
             if no_master_diag.exec_():
                 print("Done")
+
         self.table_data = formulate_data_for_master_model(
             self.selected_series_item, project_ids, self.datamap_keys)
 
