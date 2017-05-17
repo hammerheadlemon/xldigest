@@ -96,6 +96,12 @@ def create_master_friendly_header(submitted_titles: list,
     ])
 
 
+def comparitor_pairs(project_ids: list, dm_ids: list) -> list:
+    """WARNING: long-running function"""
+    p_dmi_pairs = [[p, d] for p in project_ids for d in dm_ids]
+    return [list(ReturnSequence(x, y)) for x, y in p_dmi_pairs]
+
+
 def formulate_data_for_master_model(series_item_id: int,
                                     project_ids: list,
                                     dm_keys: list) -> list:
@@ -106,6 +112,15 @@ def formulate_data_for_master_model(series_item_id: int,
     """
     dm_ids = session.query(DatamapItem.id).all()
     dm_ids = [i[0] for i in dm_ids]
+    collect = collected_data(project_ids, series_item_id)
+    # sort the raw data into alphabetical order based on declared Project name
+    collect = sorted(collect, key=itemgetter(0))
+    # time to flip into tuples of related values ("A13", "Bound Materials",..)
+    flipped = list(zip(dm_ids, dm_keys, *collect))
+    return flipped
+
+
+def collected_data(project_ids: list, series_item_id: int) -> list:
     collect = []
     for i in list(project_ids):
         db_items = session.query(ReturnItem.value).filter(
@@ -113,13 +128,7 @@ def formulate_data_for_master_model(series_item_id: int,
             ReturnItem.project_id == i).all()
         db_items_lst = [item[0] for item in db_items]
         collect.append(db_items_lst)
-    p_dmi_pairs = [[p, d] for p in project_ids for d in dm_ids]
-    comparitor_pairs = [list(ReturnSequence(x, y)) for x, y in p_dmi_pairs]
-    # sort the raw data into alphabetical order based on declared Project name
-    collect = sorted(collect, key=itemgetter(0))
-    # time to flip into tuples of related values ("A13", "Bound Materials",..)
-    flipped = list(zip(dm_ids, dm_keys, *collect))
-    return flipped
+    return collect
 
 
 def quarter_data(quarter_id) -> list:
