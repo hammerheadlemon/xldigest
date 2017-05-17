@@ -112,30 +112,30 @@ def formulate_data_for_master_model(series_item_id: int,
     """
     dm_ids = session.query(DatamapItem.id).all()
     dm_ids = [i[0] for i in dm_ids]
-    collect = collected_data(project_ids, series_item_id)
+    return_values = collected_data(project_ids, series_item_id)
     # sort the raw data into alphabetical order based on declared Project name
-    collect = sorted(collect, key=itemgetter(0))
+    return_values = sorted(return_values, key=itemgetter(0))
     # time to flip into tuples of related values ("A13", "Bound Materials",..)
-    flipped = list(zip(dm_ids, dm_keys, *collect))
+    flipped = list(zip(dm_ids, dm_keys, *return_values))
     return flipped
 
 
 def collected_data(project_ids: list, series_item_id: int) -> list:
     """
-    Collects the ReturnItem.ids for each Project in a SeriesItem. 
+    Collects the ReturnItem.values for each Project in a SeriesItem. 
     :param project_ids: 
     :param series_item_id: 
     :return: collected list of (Project.id, ReturnItem.value) pairs for
     SeriesItem provided
     """
-    collect = []
+    values = []
     for i in list(project_ids):
         db_items = session.query(ReturnItem.value).filter(
             ReturnItem.series_item_id == series_item_id,
             ReturnItem.project_id == i).all()
         db_items_lst = [item[0] for item in db_items]
-        collect.append(db_items_lst)
-    return collect
+        values.append(db_items_lst)
+    return values
 
 
 def quarter_data(quarter_id: int) -> tuple:

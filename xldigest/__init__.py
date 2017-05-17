@@ -16,7 +16,7 @@ DB_PATH = os.path.join(USER_DATA_DIR, 'db.sqlite')
 if not os.path.exists(USER_DATA_DIR):
     os.makedirs(USER_DATA_DIR)
 
-engine = create_engine(("sqlite:///" + DB_PATH), connect_args={'check_same_thread': False}, echo=True)
+engine = create_engine(("sqlite:///" + DB_PATH), connect_args={'check_same_thread': False}, echo=False)
 xldigest.database.models.create_tables(engine)
 
 session_factory = sessionmaker(bind=engine)

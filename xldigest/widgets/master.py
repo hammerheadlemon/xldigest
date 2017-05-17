@@ -9,13 +9,15 @@ from xldigest.database.base_queries import (
     formulate_data_for_master_model,
     project_ids_in_returns_with_series_item_of,
     create_master_friendly_header,
-    series_item_ids_in_returns
+    series_item_ids_in_returns,
+    ReturnSequence
 )
 from xldigest.process.exceptions import NoDataToCreateMasterError
 
 from xldigest import session
 
 from openpyxl import Workbook
+
 
 class MasterTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data_in, parent=None):
@@ -103,7 +105,6 @@ class MasterWidget(QtWidgets.QWidget):
         self.tableModel = MasterTableModel(self.table_data)
         self.tv.setModel(self.proxyModel)
         self.proxyModel.setSourceModel(self.tableModel)
-        self.tv.setSortingEnabled(True)
         self.tv.horizontalHeader().setStretchLastSection(False)
         col_count = self.tableModel.columnCount()
         self.tv.setColumnWidth(0, 50)
@@ -137,6 +138,9 @@ class MasterWidget(QtWidgets.QWidget):
             self.filterColumnChanged)
         self.filterCaseSensitivityCheckBox.toggled.connect(self.sortChanged)
 
+        self.tv.setSortingEnabled(True)
+
+
         self.export_button = QtWidgets.QPushButton("Export to Excel")
         self.export_button.clicked.connect(self.export_master_to_excel_slot)
 
@@ -162,7 +166,7 @@ class MasterWidget(QtWidgets.QWidget):
 
         self.setWindowTitle("xldigest Master View")
 
-        self.tv.sortByColumn(1, QtCore.Qt.AscendingOrder)
+        self.tv.sortByColumn(0, QtCore.Qt.AscendingOrder)
         self.filterColumnCombo.setCurrentIndex(1)
 
         self.filterPatternLineEdit.setText("")
