@@ -16,21 +16,9 @@ DB_PATH = os.path.join(USER_DATA_DIR, 'db.sqlite')
 if not os.path.exists(USER_DATA_DIR):
     os.makedirs(USER_DATA_DIR)
 
-engine = create_engine("sqlite:///" + DB_PATH)
+engine = create_engine(("sqlite:///" + DB_PATH), connect_args={'check_same_thread': False}, echo=True)
 xldigest.database.models.create_tables(engine)
 
 session_factory = sessionmaker(bind=engine)
 Session = scoped_session(session_factory)
 session = Session()
-
-@contextmanager
-def session_scope():
-    session = Session()
-    try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
-        raise
-    finally:
-        session.close()
