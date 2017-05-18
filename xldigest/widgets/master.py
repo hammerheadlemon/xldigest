@@ -37,6 +37,9 @@ class DatamapCellItem:
 
 
 class DatamapView:
+
+    returns_added = 0
+
     def __init__(self, series_item_id, imported_session=None):
         if imported_session:
             self.session = imported_session
@@ -63,7 +66,7 @@ class DatamapView:
         for dmi in dmis:
             self.matrix.append(DatamapCellItem(dmi, 0, count))
             count += 1
-        count = 1 #  start adding DMIs from second row down, after header
+        count = 1 #  start adding DM keys from second row down, after header
         for dm_key in dm_keys:
             self.matrix.append(DatamapCellItem(dm_key, 1, count))
             count += 1
@@ -81,13 +84,14 @@ class DatamapView:
         :return: None
         """
         return_data = self.session.query(ReturnItem.value).filter(
-            SeriesItem.id == self._series_item_id,
-            Project.id == project_id).all()
+            ReturnItem.series_item_id == self._series_item_id,
+            ReturnItem.project_id == project_id).all()
         return_data = [item[0] for item in return_data]
         count = 1 #  start adding return data from second row down, after header
         for d in return_data:
-            self.matrix.append(DatamapCellItem(d, 2, count)) # the col num must be computed
+            self.matrix.append(DatamapCellItem(d, DatamapView.returns_added + 2, count))
             count += 1
+        DatamapView.returns_added += 1
 
     def cell_data(self, x, y) -> DatamapCellItem:
         """

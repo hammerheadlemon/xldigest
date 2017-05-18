@@ -54,14 +54,26 @@ def test_datamap_view_object_base_cols(SESSION):
     assert dmo.cell_data(1, 0) == 'Key'
     assert dmo.cell_data(0, 1) == 1
     assert dmo.cell_data(0, 2) == 2
+    DatamapView.returns_added = 0
+
 
 def test_datamap_view_object_key_col(SESSION):
     dmo = DatamapView(1, SESSION)
     dmo.add_single_return(1)
     assert dmo.cell_data(1, 1) == 'Datamap Key 1'
     assert dmo.cell_data(1, 2) == 'Datamap Key 2'
+    DatamapView.returns_added = 0
 
 def test_bad_datamap_view_object_access(SESSION):
     dmo = DatamapView(1, SESSION)
     dmo.add_single_return(1)
     assert dmo.cell_data(1, 200) == None
+    DatamapView.returns_added = 0
+
+def test_add_second_return(SESSION):
+    dmo = DatamapView(1, SESSION)
+    dmo.add_single_return(1)
+    dmo.add_single_return(2)
+    assert dmo.cell_data(2, 1) == 'Return Value 1 Project 1 SeriesItem 1'
+    assert dmo.cell_data(3, 1) == 'Return Value 1 Project 2 SeriesItem 1'
+    DatamapView.returns_added = 0
