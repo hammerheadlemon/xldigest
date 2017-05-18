@@ -53,14 +53,21 @@ class DatamapView:
         ReturnItem keys (header: "Key"). Here we set these up.
         :return: 
         """
-        dmis = session.query(DatamapItem.id).all()
+        dmis = self.session.query(DatamapItem.id).all()
+        dm_keys = self.session.query(DatamapItem.key).all()
         dmis = [item[0] for item in dmis]
+        dm_keys = [item[0] for item in dm_keys]
         self.matrix.append(DatamapCellItem("DMI", 0, 0, header=True))
         self.matrix.append(DatamapCellItem("Key", 1, 0, header=True))
         count = 1 #  start adding DMIs from second row down, after header
         for dmi in dmis:
             self.matrix.append(DatamapCellItem(dmi, 0, count))
             count += 1
+        count = 1 #  start adding DMIs from second row down, after header
+        for dm_key in dm_keys:
+            self.matrix.append(DatamapCellItem(dm_key, 1, count))
+            count += 1
+
 
     def _series_item_name(self):
         name = self.session.query(SeriesItem.name).filter(
@@ -77,8 +84,10 @@ class DatamapView:
             SeriesItem.id == self._series_item_id,
             Project.id == project_id).all()
         return_data = [item[0] for item in return_data]
-
-
+        count = 1 #  start adding return data from second row down, after header
+        for d in return_data:
+            self.matrix.append(DatamapCellItem(d, 2, count)) # the col num must be computed
+            count += 1
 
     def cell_data(self, x, y) -> DatamapCellItem:
         """
@@ -87,8 +96,11 @@ class DatamapView:
         :param y: 
         :return: DatamapCellItem
         """
-        gen = (item for item in self.matrix if item.x == x and item.y == y)
-        return next(gen).data
+        try:
+            gen = (item for item in self.matrix if item.x == x and item.y == y)
+            return next(gen).data
+        except StopIteration:
+            return None
 
     def __str__(self):
         return 'DatamapView for SeriesItem {}'.format(self._series_item_name)

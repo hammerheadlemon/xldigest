@@ -47,14 +47,21 @@ def test_datamap_view_object_str(SESSION):
     dmo = DatamapView(1, SESSION)
     assert str(dmo) == "DatamapView for SeriesItem Q1 2016/17"
 
-#def test_DatamapCellItem_constructor(SESSION):
-#    dci = DatamapCellItem('Project 1', SESSION)
-
-
-def test_datamap_view_object_add_project_return_data(SESSION):
+def test_datamap_view_object_base_cols(SESSION):
     dmo = DatamapView(1, SESSION)
     dmo.add_single_return(1)
     assert dmo.cell_data(0, 0) == 'DMI'
     assert dmo.cell_data(1, 0) == 'Key'
     assert dmo.cell_data(0, 1) == 1
     assert dmo.cell_data(0, 2) == 2
+
+def test_datamap_view_object_key_col(SESSION):
+    dmo = DatamapView(1, SESSION)
+    dmo.add_single_return(1)
+    assert dmo.cell_data(1, 1) == 'Datamap Key 1'
+    assert dmo.cell_data(1, 2) == 'Datamap Key 2'
+
+def test_bad_datamap_view_object_access(SESSION):
+    dmo = DatamapView(1, SESSION)
+    dmo.add_single_return(1)
+    assert dmo.cell_data(1, 200) == None
