@@ -55,11 +55,11 @@ class DatamapView:
         """
         dmis = session.query(DatamapItem.id).all()
         dmis = [item[0] for item in dmis]
-        self.matrix.append(DatamapCellItem("DMI", 1, 1, header=True))
-        self.matrix.append(DatamapCellItem("Key", 2, 1, header=True))
-        count = 2 #  start adding DMIs from second row down, after header
+        self.matrix.append(DatamapCellItem("DMI", 0, 0, header=True))
+        self.matrix.append(DatamapCellItem("Key", 1, 0, header=True))
+        count = 1 #  start adding DMIs from second row down, after header
         for dmi in dmis:
-            self.matrix.append(DatamapCellItem(dmi, 1, count))
+            self.matrix.append(DatamapCellItem(dmi, 0, count))
             count += 1
 
     def _series_item_name(self):
