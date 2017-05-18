@@ -1,44 +1,42 @@
 from xldigest.database.base_queries import ReturnSequence, check_db_table_duplicates, link_declared_p_name_with_project
-from .sqlalchemy_fixtures import session
+from .sqlalchemy_fixtures import session as SESSION
 from ..database.models import Portfolio, Project, Series, SeriesItem
 
-session = session
+
+def test_single_portfolio(SESSION):
+    assert SESSION.query(Portfolio.id).first()[0] == 1
+    assert SESSION.query(Portfolio.name).first()[0] == "Major Portfolio"
 
 
-def test_single_portfolio(session):
-    assert session.query(Portfolio.id).first()[0] == 1
-    assert session.query(Portfolio.name).first()[0] == "Major Portfolio"
+def test_single_project(SESSION):
+    assert SESSION.query(Project.name).first()[0] == "Project 1"
+    assert SESSION.query(Project.name).all()[1][0] == "Project 2"
 
 
-def test_single_project(session):
-    assert session.query(Project.name).first()[0] == "Project 1"
-    assert session.query(Project.name).all()[1][0] == "Project 2"
+def test_single_series(SESSION):
+    assert SESSION.query(Series.name).first()[0] == "Financial Quarters"
 
 
-def test_single_series(session):
-    assert session.query(Series.name).first()[0] == "Financial Quarters"
+def test_single_series_item(SESSION):
+    assert SESSION.query(SeriesItem.name).first()[0] == "Q1 2016/17"
 
 
-def test_single_series_item(session):
-    assert session.query(SeriesItem.name).first()[0] == "Q1 2016/17"
-
-
-def test_return_sequence(session):
-    r = ReturnSequence(1, 1, session)
-    r2 = ReturnSequence(2, 2, session)
-    r3 = ReturnSequence(1, 10, session)
-    r4 = ReturnSequence(8, 68, session)
+def test_return_sequence(SESSION):
+    r = ReturnSequence(1, 1, SESSION)
+    r2 = ReturnSequence(2, 2, SESSION)
+    r3 = ReturnSequence(1, 10, SESSION)
+    r4 = ReturnSequence(8, 68, SESSION)
     assert list(r)[0] == "Return Value 1 Project 1 SeriesItem 1"
     assert list(r2)[0] == "Return Value 2 Project 2 SeriesItem 1"
     assert list(r3)[1] == "Return Value 10 Project 1 SeriesItem 2"
     assert list(r4)[1] == "Return Value 68 Project 8 SeriesItem 2"
 
 
-def test_check_db_table_duplicates(session):
-    assert check_db_table_duplicates(session) == []
+def test_check_db_table_duplicates(SESSION):
+    assert check_db_table_duplicates(SESSION) == []
 
 
-def test_link_declared_p_name_with_project(session):
+def test_link_declared_p_name_with_project(SESSION):
     assert link_declared_p_name_with_project(
-        1, 1, "Datamap Key 1" , session
+        1, 1, "Datamap Key 1" , SESSION
     )[0] == 'Project 1'

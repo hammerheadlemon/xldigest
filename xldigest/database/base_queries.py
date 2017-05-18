@@ -17,10 +17,14 @@ class ReturnSequence:
 
     """
 
-    def __init__(self, project_id: int, dm_key_id: int) -> None:
+    def __init__(self, project_id: int, dm_key_id: int, import_session=None) -> None:
+
         self.project_id = project_id
         self.dm_key_id = dm_key_id
-        self.session = session
+        if import_session:
+            self.session = import_session
+        else:
+            self.session = session
         self._data = self._collect()
 
     def _collect(self) -> list:
@@ -55,11 +59,14 @@ class ReturnSequence:
         return self._data
 
 
-def check_db_table_duplicates():
+def check_db_table_duplicates(imported_session=None):
     """
     Function which counts the ids of model objects and returns the list
-    of any duplicates.
+    of any duplicates. You may pass in a session for testing purposes.
     """
+    if imported_session:
+        session = imported_session
+
     c = [
         item for item, count in Counter(session.query(DatamapItem.id)).items()
         if count > 1
@@ -69,7 +76,11 @@ def check_db_table_duplicates():
 
 def link_declared_p_name_with_project(series_item_id: int,
                                       project_id: int,
-                                      dm_key: str) -> list:
+                                      dm_key: str,
+                                      imported_session=None) -> list:
+    if imported_session:
+        session = imported_session
+
     return session.query(Project.name, ReturnItem.value).join(
         ReturnItem,
         DatamapItem).filter(ReturnItem.series_item_id == series_item_id,
