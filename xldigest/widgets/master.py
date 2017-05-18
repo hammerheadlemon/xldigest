@@ -12,12 +12,28 @@ from xldigest.database.base_queries import (
     series_item_ids_in_returns,
     ReturnSequence
 )
-from xldigest.database.models import SeriesItem
+from xldigest.database.models import SeriesItem, ReturnItem, Project, DatamapItem
 from xldigest.process.exceptions import NoDataToCreateMasterError
 
 from xldigest import session
 
 from openpyxl import Workbook
+
+
+class DatamapCellItem:
+    def __init__(self, data: str, x: int, y: int, header=False, imported_session=None) -> None:
+        if imported_session:
+            self.session = imported_session
+        else:
+            self.session = session
+        self.data = data
+        self.header = header
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return "DatamapCellItem(\"{}\")".format(self.data)
+
 
 
 class DatamapView:
@@ -28,14 +44,53 @@ class DatamapView:
             self.session = session
         self._series_item_id = series_item_id
         self._series_item_name = self._series_item_name()
+        self.matrix = []
+        self._setup_base_matrix()
+
+    def _setup_base_matrix(self) -> None:
+        """
+        The matrix will need two base columns: DatamapItem ids (header: "DMI") and
+        ReturnItem keys (header: "Key"). Here we set these up.
+        :return: 
+        """
+        dmis = session.query(DatamapItem.id).all()
+        dmis = [item[0] for item in dmis]
+        self.matrix.append(DatamapCellItem("DMI", 1, 1, header=True))
+        self.matrix.append(DatamapCellItem("Key", 2, 1, header=True))
 
     def _series_item_name(self):
         name = self.session.query(SeriesItem.name).filter(
             SeriesItem.id == self._series_item_id).first()[0]
         return name
 
+    def add_single_return(self, project_id: id) -> None:
+        """
+        Take a project_id and its return data to the matrix.
+        :param project_id: 
+        :return: None
+        """
+        return_data = self.session.query(ReturnItem.value).filter(
+            SeriesItem.id == self._series_item_id,
+            Project.id == project_id).all()
+        return_data = [item[0] for item in return_data]
+
+
+
+    def cell_data(self, x, y) -> DatamapCellItem:
+        """
+        Return DatamapCellItem object at x, y in DatamapView matrix.
+        :param x: 
+        :param y: 
+        :return: DatamapCellItem
+        """
+        gen = (item for item in self.matrix if item.x == x and item.y == y)
+        return next(gen).data
+
     def __str__(self):
         return 'DatamapView for SeriesItem {}'.format(self._series_item_name)
+
+    def __repr__(self):
+        return "DatamapView({})".format(self._series_item_id)
 
 
 class MasterTableModel(QtCore.QAbstractTableModel):
