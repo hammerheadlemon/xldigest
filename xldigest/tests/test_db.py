@@ -1,4 +1,5 @@
 from xldigest.database.base_queries import ReturnSequence, check_db_table_duplicates, link_declared_p_name_with_project
+from xldigest.widgets.master import DatamapView
 from .sqlalchemy_fixtures import session as SESSION
 from ..database.models import Portfolio, Project, Series, SeriesItem
 
@@ -38,5 +39,10 @@ def test_check_db_table_duplicates(SESSION):
 
 def test_link_declared_p_name_with_project(SESSION):
     assert link_declared_p_name_with_project(
-        1, 1, "Datamap Key 1" , SESSION
+        1, 1, "Datamap Key 1", SESSION
     )[0] == 'Project 1'
+
+
+def test_datamap_view_object_indexable(SESSION):
+    dmo = DatamapView(1, SESSION)
+    assert str(dmo) == "DatamapView for SeriesItem Q1 2016/17"

@@ -12,11 +12,30 @@ from xldigest.database.base_queries import (
     series_item_ids_in_returns,
     ReturnSequence
 )
+from xldigest.database.models import SeriesItem
 from xldigest.process.exceptions import NoDataToCreateMasterError
 
 from xldigest import session
 
 from openpyxl import Workbook
+
+
+class DatamapView:
+    def __init__(self, series_item_id, imported_session=None):
+        if imported_session:
+            self.session = imported_session
+        else:
+            self.session = session
+        self._series_item_id = series_item_id
+        self._series_item_name = self._series_item_name()
+
+    def _series_item_name(self):
+        name = self.session.query(SeriesItem.name).filter(
+            SeriesItem.id == self._series_item_id).first()[0]
+        return name
+
+    def __str__(self):
+        return 'DatamapView for SeriesItem {}'.format(self._series_item_name)
 
 
 class MasterTableModel(QtCore.QAbstractTableModel):
@@ -63,8 +82,6 @@ class MasterTableModel(QtCore.QAbstractTableModel):
                         pass
             else:
                 return None
-
-
 
     def headerData(self, section, orientation, role):
         headers = self.headers
@@ -139,7 +156,6 @@ class MasterWidget(QtWidgets.QWidget):
         self.filterCaseSensitivityCheckBox.toggled.connect(self.sortChanged)
 
         self.tv.setSortingEnabled(True)
-
 
         self.export_button = QtWidgets.QPushButton("Export to Excel")
         self.export_button.clicked.connect(self.export_master_to_excel_slot)
