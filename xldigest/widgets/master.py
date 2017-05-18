@@ -2,22 +2,21 @@
 A Qt version of the old bcompiler master spreadsheet. Re-written for the new
 age...
 """
-from PyQt5 import QtWidgets, QtCore, QtGui
+from typing import Optional
 
+from PyQt5 import QtWidgets, QtCore, QtGui
+from openpyxl import Workbook
+
+from xldigest import session
 from xldigest.database.base_queries import (
     datamap_items_in_return,
     formulate_data_for_master_model,
     project_ids_in_returns_with_series_item_of,
     create_master_friendly_header,
-    series_item_ids_in_returns,
-    ReturnSequence
+    series_item_ids_in_returns
 )
-from xldigest.database.models import SeriesItem, ReturnItem, Project, DatamapItem
+from xldigest.database.models import SeriesItem, ReturnItem, DatamapItem
 from xldigest.process.exceptions import NoDataToCreateMasterError
-
-from xldigest import session
-
-from openpyxl import Workbook
 
 
 class DatamapCellItem:
@@ -35,12 +34,10 @@ class DatamapCellItem:
         return "DatamapCellItem(\"{}\")".format(self.data)
 
 
-
 class DatamapView:
-
     returns_added = 0
 
-    def __init__(self, series_item_id, imported_session=None):
+    def __init__(self, series_item_id: int, imported_session=None) -> None:
         if imported_session:
             self.session = imported_session
         else:
@@ -62,15 +59,14 @@ class DatamapView:
         dm_keys = [item[0] for item in dm_keys]
         self.matrix.append(DatamapCellItem("DMI", 0, 0, header=True))
         self.matrix.append(DatamapCellItem("Key", 1, 0, header=True))
-        count = 1 #  start adding DMIs from second row down, after header
+        count = 1  # start adding DMIs from second row down, after header
         for dmi in dmis:
             self.matrix.append(DatamapCellItem(dmi, 0, count))
             count += 1
-        count = 1 #  start adding DM keys from second row down, after header
+        count = 1  # start adding DM keys from second row down, after header
         for dm_key in dm_keys:
             self.matrix.append(DatamapCellItem(dm_key, 1, count))
             count += 1
-
 
     def _series_item_name(self):
         name = self.session.query(SeriesItem.name).filter(
@@ -87,13 +83,13 @@ class DatamapView:
             ReturnItem.series_item_id == self._series_item_id,
             ReturnItem.project_id == project_id).all()
         return_data = [item[0] for item in return_data]
-        count = 1 #  start adding return data from second row down, after header
+        count = 1  # start adding return data from second row down, after header
         for d in return_data:
             self.matrix.append(DatamapCellItem(d, DatamapView.returns_added + 2, count))
             count += 1
         DatamapView.returns_added += 1
 
-    def cell_data(self, x, y) -> DatamapCellItem:
+    def cell_data(self, x, y) -> Optional[DatamapCellItem]:
         """
         Return DatamapCellItem object at x, y in DatamapView matrix.
         :param x: 
