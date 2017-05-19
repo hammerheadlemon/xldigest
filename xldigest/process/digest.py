@@ -228,6 +228,7 @@ class Digest:
                     datamap_item_id=cell.datamap_id[0],
                     value=cell.cell_value)
                 self.session.add(return_item)
+            self.session.commit()
         else:
             raise DuplicateReturnError(
                 "Existing records in database with series_item_id:"

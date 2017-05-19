@@ -67,7 +67,7 @@ def test_datamap_view_object_key_col(SESSION):
 def test_bad_datamap_view_object_access(SESSION):
     dmo = DatamapView(1, SESSION)
     dmo.add_single_return(1)
-    assert dmo.cell_data(1, 200) == None
+    assert dmo.cell_data(1, 200) is None
     DatamapView.returns_added = 0
 
 def test_add_second_return(SESSION):

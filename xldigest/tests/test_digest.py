@@ -15,7 +15,6 @@ from openpyxl import load_workbook
 
 import xldigest.tests.fixtures as fixtures
 import pytest
-import sqlite3
 
 
 BICC_RETURN_MOCK = fixtures.bicc_return
@@ -140,7 +139,7 @@ def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK, SESSION):
 
 
 def test_missing_series_item(SESSION):
-    qtr_id = 10
+    qtr_id = 100
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
     datamap = Datamap(template, SESSION)
@@ -176,10 +175,6 @@ def test_both_missing_series_item_project(SESSION):
         digest.read_project_data()
 
 
-# TODO - Test failing as read_project_data() called in Digest is connecting
-# to generic Base db, not that owned by Datamap. Fixtures should override
-# declarative base with their own model if tests are to be optimal.
-@pytest.mark.skip("SEE TODO NOTE ABOVE FUNCTION")
 def test_populate_blank_form_export_new(TEST_BLANK_XLS, SESSION):
     qtr_id = 1
     pjt_id = 2
@@ -190,12 +185,12 @@ def test_populate_blank_form_export_new(TEST_BLANK_XLS, SESSION):
     output_path = digest.write_to_template(TMP_DIR)
     wb = load_workbook(output_path)
     summary_sheet = wb['Summary']
-    assert summary_sheet['A5'].value == 'P2 Q1 DM1'
+    assert summary_sheet['B1'].value == 'Return Value 1 Project 2 SeriesItem 1'
 
 
 def test_populate_blank_form_non_existing_qtr_proj_combo(TEST_BLANK_XLS, SESSION):
-    qtr_id = 3
-    pjt_id = 2
+    qtr_id = 30
+    pjt_id = 20
     template = BICCTemplate(TEST_BLANK_XLS, True)
     datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
@@ -214,22 +209,6 @@ def test_duplicate_record_on_write_to_db(BICC_RETURN_MOCK, SESSION):
     digest.read_template()
     with pytest.raises(DuplicateReturnError):
         digest.write_to_database()
-
-
-def test_successful_write_return_to_db(SESSION, BICC_RETURN_MOCK):
-    SESSION.query(ReturnItem).all().delete(synchronize_session=False)
-    qtr_id = 1
-    pjt_id = 1
-    template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, SESSION)
-    datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
-    digest.read_template()
-    digest._get_existing_return_project_and_series_item_ids()
-    digest.write_to_database()
-    test_returns = SESSION(ReturnItem.value).first()[0]
-    SESSION.commit()
-    assert test_returns[0] == "Project/Programme Name"
 
 
 def test_attempt_to_write_return_to_db_unavailable_qtr(BICC_RETURN_MOCK, SESSION):
@@ -265,7 +244,7 @@ def test_file_name_cleaner(BICC_RETURN_MOCK, SESSION):
     digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     digest.read_template()
     assert digest._generate_file_name_from_return_data(
-        qtr_id, pjt_id) == 'Project_1_Q1_2013_14'
+        qtr_id, pjt_id) == 'Project_1_Q1_2016_17'
 
 
 def test_get_project_name_from_digest(BICC_RETURN_MOCK, SESSION):
@@ -276,3 +255,18 @@ def test_get_project_name_from_digest(BICC_RETURN_MOCK, SESSION):
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     assert digest.project_name == "Project 1"
+
+
+def test_successful_write_return_to_db(SESSION, BICC_RETURN_MOCK):
+    SESSION.query(ReturnItem).filter(ReturnItem.id > 0).delete(synchronize_session=False)
+    qtr_id = 1
+    pjt_id = 1
+    template = BICCTemplate(BICC_RETURN_MOCK, False)
+    datamap = Datamap(template, SESSION)
+    datamap.cell_map_from_database()
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
+    digest.read_template()
+    digest._get_existing_return_project_and_series_item_ids()
+    digest.write_to_database()
+    test_returns = SESSION.query(ReturnItem.value).first()[0]
+    assert test_returns == "Return Value 1 Project 1 SeriesItem 1"

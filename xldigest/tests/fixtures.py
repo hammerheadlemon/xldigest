@@ -374,6 +374,7 @@ def bicc_return():
     # Summary fixture
     ws_summary = wb['Summary']
     ws_summary['A5'].value = 'Project/Programme Name'
+    ws_summary['B1'].value = 'Return Value 1 Project 1 SeriesItem 1'
     ws_summary['B5'].value = ws_summary_B5_rand[0]
     ws_summary['A8'].value = 'DfT Group'
     ws_summary['B8'].value = ws_summary_B8_rand[0]
