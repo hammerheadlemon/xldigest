@@ -54,8 +54,11 @@ class Digest:
             digest.data
     """
 
-    def __init__(self, dm: Datamap, series_item_id: int, project_id: int) -> None:
-        self.session = session
+    def __init__(self, dm: Datamap, series_item_id: int, project_id: int, import_session=None) -> None:
+        if import_session:
+            self.session = import_session
+        else:
+            self.session = session
         self._datamap = dm
         self._data = []  # type: List[Cell]
         self._existing_series_item_ids = \

@@ -6,6 +6,10 @@ from xldigest.process.exceptions import (SeriesItemNotFoundError,
                                          DuplicateReturnError,
                                          NonExistantReturnError)
 from xldigest.tests.fixtures import TMP_DIR
+from xldigest.tests.sqlalchemy_fixtures import session as SESSION
+
+from xldigest.database.models import (Project, Series, SeriesItem, Portfolio,
+                                      ReturnItem)
 
 from openpyxl import load_workbook
 
@@ -16,57 +20,53 @@ import sqlite3
 
 BICC_RETURN_MOCK = fixtures.bicc_return
 DATAMAP_MOCK = fixtures.mock_datamap_source_file
-INMEMORY_SQLITE3 = fixtures.sqlite3_db_file
 TEST_BLANK_XLS = fixtures.test_blank_xls
 
 
-def test_in_tmp_sqlite3(INMEMORY_SQLITE3):
-    conn = sqlite3.connect(INMEMORY_SQLITE3)
-    c = conn.cursor()
-    q1 = c.execute("SELECT * FROM series_items").fetchone()[1]
-    p1 = c.execute("SELECT * FROM projects").fetchone()[1]
-    assert q1 == "Q1 2013/14"
+def test_in_tmp_sqlite3(SESSION):
+    q1 = SESSION.query(SeriesItem.name).first()[0]
+    p1 = SESSION.query(Project.name).first()[0]
+    assert q1 == "Q1 2016/17"
     assert p1 == "Project 1"
 
 
-def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
+def test_digest_gets_datamap(BICC_RETURN_MOCK, DATAMAP_MOCK, SESSION):
     """Uses cell_map_from_csv() function to process the datamap text file."""
     template = BICCTemplate(BICC_RETURN_MOCK)
-    datamap = Datamap(template)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_csv(DATAMAP_MOCK)
-    digest = Digest(datamap, None, None)
+    digest = Digest(datamap, None, None, SESSION)
     assert digest.datamap.cell_map[0].cell_key == 'Project/Programme Name'
     assert digest.datamap.cell_map[2].cell_key == 'GMPP - FD Sign-Off'
 
 
-@pytest.mark.skip("Skip until we sort out why this is matching incorrectly")
-def test_digest_gets_project_from_database(INMEMORY_SQLITE3):
+def test_digest_gets_project_from_database(SESSION):
     "Get data for a single project from database."
     # P1 Q1 asserts
     qtr_id = 1
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     digest.read_project_data()
     print()
     print(digest.data[0])
     print(digest.data[1])
     print(digest.data[2])
     print(digest.data[3])
-    assert digest.data[0].cell_key == 'Project/Programme Name'
+    assert digest.data[0].cell_key == 'Datamap Key 1'
     assert digest.data[0].cell_value[
-        0] == 'P1 Q1 DM1'
-    assert digest.data[1].cell_value[0] == 'P1 Q1 DM2'
-    assert digest.data[2].cell_value[0] == 'P1 Q1 DM3'
+        0] == 'Return Value 1 Project 1 SeriesItem 1'
+    assert digest.data[1].cell_value[0] == 'Return Value 2 Project 1 SeriesItem 1'
+    assert digest.data[2].cell_value[0] == 'Return Value 3 Project 1 SeriesItem 1'
     # P1 Q2 asserts
     qtr_id = 2
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     digest.read_project_data()
     print()
     print(digest.data[0])
@@ -74,17 +74,17 @@ def test_digest_gets_project_from_database(INMEMORY_SQLITE3):
     print(digest.data[2])
     print(digest.data[3])
     assert digest.data[0].cell_value[
-        0] == 'P1 Q2 DM1'
-    assert digest.data[1].cell_value[0] == 'P1 Q2 DM2'
-    assert digest.data[2].cell_value[0] == 'P1 Q2 DM3'
+        0] == 'Return Value 1 Project 1 SeriesItem 2'
+    assert digest.data[1].cell_value[0] == 'Return Value 2 Project 1 SeriesItem 2'
+    assert digest.data[2].cell_value[0] == 'Return Value 3 Project 1 SeriesItem 2'
 
     # P2 Q1 asserts
     qtr_id = 1
     pjt_id = 2
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     digest.read_project_data()
     print()
     print(digest.data[0])
@@ -92,33 +92,33 @@ def test_digest_gets_project_from_database(INMEMORY_SQLITE3):
     print(digest.data[2])
     print(digest.data[3])
     assert digest.data[0].cell_value[
-        0] == 'P2 Q1 DM1'
-    assert digest.data[1].cell_value[0] == 'P2 Q1 DM2'
-    assert digest.data[2].cell_value[0] == 'P2 Q1 DM3'
+        0] == 'Return Value 1 Project 2 SeriesItem 1'
+    assert digest.data[1].cell_value[0] == 'Return Value 2 Project 2 SeriesItem 1'
+    assert digest.data[2].cell_value[0] == 'Return Value 3 Project 2 SeriesItem 1'
 
     # P2 Q2 asserts
     qtr_id = 2
     pjt_id = 2
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     digest.read_project_data()
     print()
     print(digest.data[0])
     print(digest.data[1])
     print(digest.data[2])
     print(digest.data[3])
-    assert digest.data[0].cell_value[0] == 'P2 Q2 DM1'
-    assert digest.data[1].cell_value[0] == 'P2 Q2 DM2'
-    assert digest.data[2].cell_value[0] == 'P2 Q2 DM3'
+    assert digest.data[0].cell_value[0] == 'Return Value 1 Project 2 SeriesItem 2'
+    assert digest.data[1].cell_value[0] == 'Return Value 2 Project 2 SeriesItem 2'
+    assert digest.data[2].cell_value[0] == 'Return Value 3 Project 2 SeriesItem 2'
 
 
-def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
+def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK, SESSION):
     template = BICCTemplate(BICC_RETURN_MOCK)
-    datamap = Datamap(template)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_csv(DATAMAP_MOCK)
-    digest = Digest(datamap, None, None)
+    digest = Digest(datamap, None, None, SESSION)
     # here we need to go through the datamap, use the cell_key and
     # cell_reference to populate the cell_value of the Cell object
     digest.read_template()
@@ -139,29 +139,29 @@ def test_digest_reads_return(BICC_RETURN_MOCK, DATAMAP_MOCK, INMEMORY_SQLITE3):
     assert digest.data[4].cell_value == 2012
 
 
-def test_missing_series_item(INMEMORY_SQLITE3):
+def test_missing_series_item(SESSION):
     qtr_id = 10
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     with pytest.raises(SeriesItemNotFoundError):
         digest.read_project_data()
 
 
-def test_missing_project(INMEMORY_SQLITE3):
+def test_missing_project(SESSION):
     qtr_id = 1
     pjt_id = 1000
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     with pytest.raises(ProjectNotFoundError):
         digest.read_project_data()
 
 
-def test_both_missing_series_item_project(INMEMORY_SQLITE3):
+def test_both_missing_series_item_project(SESSION):
     """
     This should raise SeriesItemNotFoundError, despite the fact that both
     series_item and project ids are not present.
@@ -169,9 +169,9 @@ def test_both_missing_series_item_project(INMEMORY_SQLITE3):
     qtr_id = 1000
     pjt_id = 1000
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     with pytest.raises(SeriesItemNotFoundError):
         digest.read_project_data()
 
@@ -180,107 +180,99 @@ def test_both_missing_series_item_project(INMEMORY_SQLITE3):
 # to generic Base db, not that owned by Datamap. Fixtures should override
 # declarative base with their own model if tests are to be optimal.
 @pytest.mark.skip("SEE TODO NOTE ABOVE FUNCTION")
-def test_populate_blank_form_export_new(INMEMORY_SQLITE3, TEST_BLANK_XLS):
+def test_populate_blank_form_export_new(TEST_BLANK_XLS, SESSION):
     qtr_id = 1
     pjt_id = 2
-    import pudb; pudb.set_trace()  # XXX BREAKPOINT
     template = BICCTemplate(TEST_BLANK_XLS, True)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     output_path = digest.write_to_template(TMP_DIR)
     wb = load_workbook(output_path)
     summary_sheet = wb['Summary']
     assert summary_sheet['A5'].value == 'P2 Q1 DM1'
 
 
-def test_populate_blank_form_non_existing_qtr_proj_combo(INMEMORY_SQLITE3,
-                                                         TEST_BLANK_XLS):
+def test_populate_blank_form_non_existing_qtr_proj_combo(TEST_BLANK_XLS, SESSION):
     qtr_id = 3
     pjt_id = 2
     template = BICCTemplate(TEST_BLANK_XLS, True)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     with pytest.raises(NonExistantReturnError):
         digest.write_to_template(TMP_DIR)
 
 
-def test_duplicate_record_on_write_to_db(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
+def test_duplicate_record_on_write_to_db(BICC_RETURN_MOCK, SESSION):
     qtr_id = 1
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     digest.read_template()
     with pytest.raises(DuplicateReturnError):
         digest.write_to_database()
 
 
-def test_successful_write_return_to_db(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
-    conn = sqlite3.connect(INMEMORY_SQLITE3)
-    c = conn.cursor()
-    c.execute("DELETE FROM returns")
-    conn.commit()
+def test_successful_write_return_to_db(SESSION, BICC_RETURN_MOCK):
+    SESSION.query(ReturnItem).all().delete(synchronize_session=False)
     qtr_id = 1
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     digest.read_template()
     digest._get_existing_return_project_and_series_item_ids()
     digest.write_to_database()
-    test_returns = c.execute("SELECT value FROM returns").fetchone()
-    conn.commit()
-    conn.close()
+    test_returns = SESSION(ReturnItem.value).first()[0]
+    SESSION.commit()
     assert test_returns[0] == "Project/Programme Name"
 
 
-def test_attempt_to_write_return_to_db_unavailable_qtr(INMEMORY_SQLITE3,
-                                                       BICC_RETURN_MOCK):
+def test_attempt_to_write_return_to_db_unavailable_qtr(BICC_RETURN_MOCK, SESSION):
     qtr_id = 100
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     digest.read_template()
     with pytest.raises(SeriesItemNotFoundError):
         digest.write_to_database()
 
 
-def test_attempt_to_write_return_to_db_unavailable_project(INMEMORY_SQLITE3,
-                                                           BICC_RETURN_MOCK):
+def test_attempt_to_write_return_to_db_unavailable_project(BICC_RETURN_MOCK, SESSION):
     qtr_id = 1
     pjt_id = 100
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     digest.read_template()
     with pytest.raises(ProjectNotFoundError):
         digest.write_to_database()
 
 
-def test_file_name_cleaner(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
+def test_file_name_cleaner(BICC_RETURN_MOCK, SESSION):
     qtr_id = 1
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     digest.read_template()
     assert digest._generate_file_name_from_return_data(
         qtr_id, pjt_id) == 'Project_1_Q1_2013_14'
 
 
-def test_get_project_name_from_digest(INMEMORY_SQLITE3, BICC_RETURN_MOCK):
+def test_get_project_name_from_digest(BICC_RETURN_MOCK, SESSION):
     qtr_id = 1
     pjt_id = 1
     template = BICCTemplate(BICC_RETURN_MOCK, False)
-    datamap = Datamap(template, INMEMORY_SQLITE3)
+    datamap = Datamap(template, SESSION)
     datamap.cell_map_from_database()
-    digest = Digest(datamap, qtr_id, pjt_id)
+    digest = Digest(datamap, qtr_id, pjt_id, SESSION)
     assert digest.project_name == "Project 1"

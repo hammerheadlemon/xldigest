@@ -19,7 +19,11 @@ class Datamap:
     Datamap.cell_map_from_database(). To create a base cell map from the
     template, call Datamap.cell_map_from_csv().
     """
-    def __init__(self, template: FormTemplate) -> None:
+    def __init__(self, template: FormTemplate, import_session=None) -> None:
+        if import_session:
+            self.session = import_session
+        else:
+            self.session = session
         self.cell_map = []
         self.template = template
 
@@ -63,7 +67,7 @@ class Datamap:
         """Creates a cellmap from a sqlite3 database. cell_map fields are
         empty until a function is called to populate the cellmap from
         a data source."""
-        for row in session.query(DatamapItem).all():
+        for row in self.session.query(DatamapItem).all():
             self.cell_map.append(
                 Cell(
                     datamap_id=row.id,
