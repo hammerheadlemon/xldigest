@@ -51,7 +51,7 @@ class DatamapView:
         """
         The matrix will need two base columns: DatamapItem ids (header: "DMI") and
         ReturnItem keys (header: "Key"). Here we set these up.
-        :return: 
+        :return:
         """
         dmis = self.session.query(DatamapItem.id).all()
         dm_keys = self.session.query(DatamapItem.key).all()
@@ -76,7 +76,7 @@ class DatamapView:
     def add_single_return(self, project_id: id) -> None:
         """
         Take a project_id and its return data to the matrix.
-        :param project_id: 
+        :param project_id:
         :return: None
         """
         return_data = self.session.query(ReturnItem.value).filter(
@@ -92,8 +92,8 @@ class DatamapView:
     def cell_data(self, x, y) -> Optional[DatamapCellItem]:
         """
         Return DatamapCellItem object at x, y in DatamapView matrix.
-        :param x: 
-        :param y: 
+        :param x:
+        :param y:
         :return: DatamapCellItem
         """
         try:

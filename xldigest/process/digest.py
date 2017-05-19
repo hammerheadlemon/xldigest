@@ -145,11 +145,9 @@ class Digest:
             # ONLY ACT ON CELLS THAT HAVE A CELL_REFERENCE
             if cell.cell_reference:
                 cell.cell_value = self.session.query(ReturnItem.value).filter(
-                    ReturnItem.project_id == self.project_id).filter(
-                    ReturnItem.datamap_item_id == DatamapItem.id).filter(
-                    ReturnItem.series_item_id ==
-                    self.series_item_id).filter(
-                    DatamapItem.id == cell.datamap_id[0]).first()
+                    ReturnItem.project_id == self.project_id,
+                    ReturnItem.series_item_id == self.series_item_id,
+                    ReturnItem.datamap_item_id == cell.datamap_id[0]).first()[0]
                 self.data.append(cell)
 
     def _generate_file_name_from_return_data(self,

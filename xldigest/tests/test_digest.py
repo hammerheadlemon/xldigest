@@ -55,10 +55,9 @@ def test_digest_gets_project_from_database(SESSION):
     print(digest.data[2])
     print(digest.data[3])
     assert digest.data[0].cell_key == 'Datamap Key 1'
-    assert digest.data[0].cell_value[
-        0] == 'Return Value 1 Project 1 SeriesItem 1'
-    assert digest.data[1].cell_value[0] == 'Return Value 2 Project 1 SeriesItem 1'
-    assert digest.data[2].cell_value[0] == 'Return Value 3 Project 1 SeriesItem 1'
+    assert digest.data[0].cell_value == 'Return Value 1 Project 1 SeriesItem 1'
+    assert digest.data[1].cell_value == 'Return Value 2 Project 1 SeriesItem 1'
+    assert digest.data[2].cell_value == 'Return Value 3 Project 1 SeriesItem 1'
     # P1 Q2 asserts
     qtr_id = 2
     pjt_id = 1

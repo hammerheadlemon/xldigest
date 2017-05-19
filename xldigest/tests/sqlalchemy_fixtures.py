@@ -11,7 +11,7 @@ Session = sessionmaker(bind=engine)
 models.create_tables(engine)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='session')
 def session() -> Session:
     session = Session()
 
@@ -59,4 +59,5 @@ def session() -> Session:
 
     session.commit()
     yield session
+    session.rollback()
     session.close()
