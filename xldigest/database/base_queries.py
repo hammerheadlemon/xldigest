@@ -1,62 +1,12 @@
 import reprlib
 from collections import namedtuple, Counter, Set
 from operator import itemgetter
+from typing import List, Tuple, Set
 
 from xldigest import session
 from .models import (DatamapItem, Project, ReturnItem, SeriesItem, Portfolio,
                      Series)
 from ..process.exceptions import NoDataToCreateMasterError
-
-
-class ReturnSequence:
-    """
-    Sequence of return values given a project_id and series_item_id.
-
-    >> r = ReturnSequence(1, 1) # project_id 1, datamap_item_id 1
-    >> list(r) # ['200', '300'] (there are two returns for that project in db)
-
-    """
-
-    def __init__(self, project_id: int, dm_key_id: int, import_session=None) -> None:
-
-        self.project_id = project_id
-        self.dm_key_id = dm_key_id
-        if import_session:
-            self.session = import_session
-        else:
-            self.session = session
-        self._data = self._collect()
-
-    def _collect(self) -> list:
-        ReturnLine = namedtuple('ReturnLine', [
-            'project_name', 'project_id', 'series_item_name', 'series_item_id',
-            'key_name', 'key_id', 'value'
-        ])
-        try:
-            rows = self.session.query(
-                Project.name, Project.id, SeriesItem.name, SeriesItem.id,
-                DatamapItem.key, DatamapItem.id, ReturnItem.value).join(
-                    ReturnItem, DatamapItem, SeriesItem).filter(
-                        Project.id == self.project_id,
-                        DatamapItem.id == self.dm_key_id)
-            return [ReturnLine._make(row) for row in rows]
-        except:
-            raise
-
-    def __getitem__(self, index):
-        return self.data[index].value
-
-    def __iter__(self):
-        for item in self._data:
-            yield item.value
-        return
-
-    def __repr__(self):
-        return reprlib.repr(self.data)
-
-    @property
-    def data(self) -> list:
-        return self._data
 
 
 def check_db_table_duplicates(imported_session=None):
@@ -107,12 +57,6 @@ def create_master_friendly_header(submitted_titles: list,
     ])
 
 
-def comparitor_pairs(project_ids: list, dm_ids: list) -> list:
-    """WARNING: long-running function"""
-    p_dmi_pairs = [[p, d] for p in project_ids for d in dm_ids]
-    return [list(ReturnSequence(x, y)) for x, y in p_dmi_pairs]
-
-
 def formulate_data_for_master_model(series_item_id: int,
                                     project_ids: list,
                                     dm_keys: list) -> list:
@@ -133,9 +77,9 @@ def formulate_data_for_master_model(series_item_id: int,
 
 def collected_data(project_ids: list, series_item_id: int) -> list:
     """
-    Collects the ReturnItem.values for each Project in a SeriesItem. 
-    :param project_ids: 
-    :param series_item_id: 
+    Collects the ReturnItem.values for each Project in a SeriesItem.
+    :param project_ids:
+    :param series_item_id:
     :return: collected list of (Project.id, ReturnItem.value) pairs for
     SeriesItem provided
     """
@@ -149,7 +93,7 @@ def collected_data(project_ids: list, series_item_id: int) -> list:
     return values
 
 
-def quarter_data(quarter_id: int) -> tuple:
+def quarter_data(quarter_id: int) -> List[Tuple[str, str, int, str, int]]:
     """
     Returns a tuple of DatamapItem.key, ReturnItem.value, Project.id,
     Project.name, SeriesItem.id values, for a particular SeriesItem.
@@ -163,11 +107,11 @@ def quarter_data(quarter_id: int) -> tuple:
     return d
 
 
-def project_names_per_quarter(quarter_id: int) -> set:
+def project_names_per_quarter(quarter_id: int) -> Set[Tuple[int, str]]:
     d = quarter_data(quarter_id)
     projects_in_all_returns = [(item[2], item[3]) for item in d]
-    projects_in_all_returns = set(projects_in_all_returns)
-    return projects_in_all_returns
+    projects_in_all_returns_set = set(projects_in_all_returns)
+    return projects_in_all_returns_set
 
 
 def single_project_data(

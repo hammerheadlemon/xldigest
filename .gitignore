@@ -64,3 +64,4 @@ db.sqlite*
 db.sqlite_true
 images/
 .idea/
+.mypy_cache/

@@ -34,5 +34,6 @@ class BICCTemplate(FormTemplate):
         self.sheets = []  # type:  List[str]
         self.source_file = file_name
 
-    def add_sheet(self, sheet_name: str) -> None:
+    def add_sheet(self, sheet_name: str) -> str:
         self.sheets.append(sheet_name)
+        return sheet_name

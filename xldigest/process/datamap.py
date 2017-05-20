@@ -7,6 +7,8 @@ from xldigest import session
 
 from xldigest.database.models import DatamapItem
 
+from typing import List
+
 
 class Datamap:
     """
@@ -24,7 +26,7 @@ class Datamap:
             self.session = import_session
         else:
             self.session = session
-        self.cell_map = []
+        self.cell_map: List[Cell] = []
         self.template = template
 
     def add_cell(self, cell: Cell) -> Cell:

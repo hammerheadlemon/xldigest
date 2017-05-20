@@ -2,7 +2,7 @@
 A Qt version of the old bcompiler master spreadsheet. Re-written for the new
 age...
 """
-from typing import Optional
+from typing import Optional, List
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 from openpyxl import Workbook
@@ -43,8 +43,8 @@ class DatamapView:
         else:
             self.session = session
         self._series_item_id = series_item_id
-        self._series_item_name = self._series_item_name()
-        self.matrix = []
+        self.series_item_name = self._series_item_name()
+        self.matrix: List[DatamapCellItem] = []
         self._setup_base_matrix()
 
     def _setup_base_matrix(self) -> None:
@@ -68,12 +68,12 @@ class DatamapView:
             self.matrix.append(DatamapCellItem(dm_key, 1, count))
             count += 1
 
-    def _series_item_name(self):
+    def _series_item_name(self) -> str:
         name = self.session.query(SeriesItem.name).filter(
             SeriesItem.id == self._series_item_id).first()[0]
         return name
 
-    def add_single_return(self, project_id: id) -> None:
+    def add_single_return(self, project_id: int) -> None:
         """
         Take a project_id and its return data to the matrix.
         :param project_id:
@@ -98,12 +98,12 @@ class DatamapView:
         """
         try:
             gen = (item for item in self.matrix if item.x == x and item.y == y)
-            return next(gen).data
+            return next(gen)
         except StopIteration:
             return None
 
     def __str__(self):
-        return 'DatamapView for SeriesItem {}'.format(self._series_item_name)
+        return 'DatamapView for SeriesItem {}'.format(self.series_item_name)
 
     def __repr__(self):
         return "DatamapView({})".format(self._series_item_id)

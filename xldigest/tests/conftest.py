@@ -1,13 +1,19 @@
+import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
+
+import xldigest.database.models as models
+
 import csv
-import sqlite3
 
 import os
-import pytest
 import shutil
-from openpyxl import Workbook
+
 from tempfile import gettempdir
+from openpyxl import Workbook
 
 TMP_DIR = gettempdir()
+
 
 ws_summary_B5_rand = [
     'Cookfield, Rebuild',
@@ -249,116 +255,8 @@ return_data = [
 ]
 
 
-@pytest.fixture(scope="function")
-def sqlite3_db_file():
-    db_file = os.path.join(TMP_DIR, "test.db")
-    conn = sqlite3.connect(db_file)
-    c = conn.cursor()
-
-    c.execute("DROP TABLE IF EXISTS projects")
-    c.execute("DROP TABLE IF EXISTS datamap_items")
-    c.execute("DROP TABLE IF EXISTS returns")
-    c.execute("DROP TABLE IF EXISTS portfolios")
-    c.execute("DROP TABLE IF EXISTS series")
-    c.execute("DROP TABLE IF EXISTS series_items")
-    c.execute("DROP TABLE IF EXISTS  retained_source_files")
-
-    c.execute("""CREATE TABLE projects
-              (id integer PRIMARY KEY, name text, portfolio id)""")
-    c.execute("""CREATE TABLE datamap_items
-              (id integer PRIMARY KEY,
-              key text,
-              bicc_sheet text,
-              bicc_cellref text,
-              gmpp_sheet text,
-              gmpp_cellref text,
-              bicc_ver_form text
-              )"""
-              )
-    c.execute("""CREATE TABLE returns
-              (id integer PRIMARY KEY,
-              project_id integer,
-              series_item_id integer,
-              datamap_item_id integer,
-              value text,
-              FOREIGN KEY (project_id) REFERENCES projects(id),
-              FOREIGN KEY (series_item_id) REFERENCES series_items(id),
-              FOREIGN KEY (datamap_item_id) REFERENCES datamap_items(id)
-              )""")
-
-    c.execute("""CREATE TABLE portfolios
-              (id integer PRIMARY KEY,
-              name text)"""
-              )
-
-    c.execute("""CREATE TABLE series
-              (id integer PRIMARY KEY,
-              name text)"""
-              )
-    c.execute("""CREATE TABLE series_items
-              (id integer PRIMARY KEY,
-              name text,
-              start_date text,
-              end_date text,
-              series_id integer,
-              FOREIGN KEY (series_id) REFERENCES series(id)
-              )""")
-    c.execute("""CREATE TABLE retained_source_files
-              (id integer PRIMARY KEY,
-              project_id integer,
-              portfolio_id integer,
-              series_item_id integer,
-              uuid text,
-              FOREIGN KEY (project_id) REFERENCES projects(id),
-              FOREIGN KEY (portfolio_id) REFERENCES portfolios(id),
-              FOREIGN KEY (series_item_id) REFERENCES series_items(id)
-              )""")
-
-    c.execute("INSERT INTO portfolios (name) VALUES('Tier 1 Projects')")
-    c.execute("INSERT INTO series (name) VALUES('Financial Quarters')")
-    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
-              VALUES('Q1 2013/14', '2013-04-01', '2013-06-30', 1 )""")
-    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
-              VALUES('Q2 2013/14', '2013-04-01', '2013-06-30', 1 )""")
-    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
-              VALUES('Q3 2013/14', '2013-04-01', '2013-06-30', 1 )""")
-    c.execute("""INSERT INTO series_items (name, start_date, end_date, series_id)
-              VALUES('Q5 2013/14', '2013-04-01', '2013-06-30', 1 )""")
-
-    c.execute("INSERT INTO projects (name, portfolio) VALUES('Project 1', 1)")
-    c.execute("INSERT INTO projects (name, portfolio) VALUES('Project 2', 1)")
-    c.execute("INSERT INTO projects (name, portfolio) VALUES('Project 3', 1)")
-
-#    c.execute("""INSERT INTO retained_source_files (portfolio_id, project_id, series_item_id)
-#              VALUES(1, 1, 1)""")
-
-    c.executemany(
-        ("INSERT INTO datamap_items (key, bicc_sheet, "
-         "bicc_cellref, gmpp_sheet, gmpp_cellref, bicc_ver_form) VALUES"
-         "(?, ?, ?, ?, ?, ?)"), dm_data)
-
-    c.executemany(
-        ("INSERT INTO returns (project_id, series_item_id, datamap_item_id, value)"
-         " VALUES (?, ?, ?, ?)"), return_data)
-
-    conn.commit()
-    c.close()
-    conn.close()
-    yield db_file
-    os.unlink(os.path.join(TMP_DIR, 'test.db'))
 
 
-@pytest.fixture
-def test_blank_xls():
-    wb = Workbook()
-    wb.create_sheet('Summary')
-    wb.create_sheet('Finance & Benefits')
-    wb.create_sheet('Approval & Project milestones')
-    wb.create_sheet('Resources')
-    wb.create_sheet('Assurance planning')
-    wb.create_sheet('GMPP info')
-    wb.save(os.path.join(TMP_DIR, 'test.xlsx'))
-    return os.path.join(TMP_DIR, 'test.xlsx')
 
 
 @pytest.fixture
@@ -501,6 +399,19 @@ def mock_datamap_source_file() -> None:
     os.unlink(os.path.join(TMP_DIR, 'mock_datamap.csv'))
 
 
+@pytest.fixture
+def test_blank_xls():
+    wb = Workbook()
+    wb.create_sheet('Summary')
+    wb.create_sheet('Finance & Benefits')
+    wb.create_sheet('Approval & Project milestones')
+    wb.create_sheet('Resources')
+    wb.create_sheet('Assurance planning')
+    wb.create_sheet('GMPP info')
+    wb.save(os.path.join(TMP_DIR, 'test.xlsx'))
+    return os.path.join(TMP_DIR, 'test.xlsx')
+
+
 def mock_blank_xlsx_file(
         source_dir: str,
         empty: bool=False,
@@ -533,3 +444,71 @@ def mock_blank_xlsx_file(
         if empty:
             for test_file in os.listdir(os.path.abspath(source_dir)):
                 os.unlink(os.path.join(os.path.abspath(source_dir), test_file))
+
+
+#engine = create_engine("sqlite:///" + '/tmp/new-test.sqlite')
+#Session = sessionmaker(bind=engine)
+
+
+
+@pytest.fixture(scope="function")
+def session():
+    engine = create_engine("sqlite:///" + ':memory:')
+    Session = sessionmaker(bind=engine)
+    models.create_tables(engine)
+    session = Session()
+    portfolio = models.Portfolio(name="Major Portfolio")
+    session.add(portfolio)
+
+    series = models.Series(name="Financial Quarters")
+    session.add(series)
+
+    series_item1 = models.SeriesItem(
+        name="Q1 2016/17", series=1, start_date=None, end_date=None)
+    series_item2 = models.SeriesItem(
+        name="Q2 2016/17", series=1, start_date=None, end_date=None)
+    series_item3 = models.SeriesItem(
+        name="Q3 2016/17", series=1, start_date=None, end_date=None)
+    series_item4 = models.SeriesItem(
+        name="Q4 2016/17", series=1, start_date=None, end_date=None)
+
+    session.add(series_item1)
+    session.add(series_item2)
+    session.add(series_item3)
+    session.add(series_item4)
+
+    project1 = models.Project(name="Project 1")
+    project2 = models.Project(name="Project 2")
+    project3 = models.Project(name="Project 3")
+
+    session.add(project1)
+    session.add(project2)
+    session.add(project3)
+
+    datamap_items = [models.DatamapItem(
+        key=f"Datamap Key {x}",
+        bicc_sheet="Summary",
+        bicc_cellref=f"B{x}",
+        gmpp_sheet=f"GMPP Sheet",
+        gmpp_cellref=f"G{x}",
+        bicc_ver_form="")
+        for x in range(1, 10)]
+    session.add_all(datamap_items)
+
+# TODO THIS IS NOT GIVING US ENOUGH RETURN ITEMS
+    return_items = []
+    for p in range(1, 3):
+        return_items.append([models.ReturnItem(
+            project_id=p,
+            series_item_id=y,
+            datamap_item_id=x,
+            value=f"Return Value {x} Project {p} SeriesItem {y}")
+            for y in range(1, 5)
+            for x in range(1, 10)])
+    return_items = [item for sublist in return_items for item in sublist]
+    session.add_all(return_items)
+
+    session.commit()
+    yield session
+    session.rollback()
+    session.close_all()

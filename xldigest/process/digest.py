@@ -173,7 +173,7 @@ class Digest:
                     try:
                         blank[celldata.template_sheet][
                             celldata.
-                                cell_reference].value = celldata.cell_value[0]
+                                cell_reference].value = celldata.cell_value
                     except TypeError:
                         blank[celldata.template_sheet][
                             celldata.cell_reference].value = ""

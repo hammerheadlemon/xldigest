@@ -1,5 +1,7 @@
 from PyQt5 import QtWidgets, QtCore
 
+from typing import List
+
 from xldigest.widgets.returns_tab_ui import Ui_ReturnsUI
 from xldigest.database.base_queries import (project_names_per_quarter,
                                             single_project_data)
@@ -10,7 +12,7 @@ from xldigest.database.base_queries import (project_names_per_quarter,
 class Node:
     def __init__(self, name, parent=None):
         self._name = name
-        self._children = []
+        self._children: List[Node] = []
         self._parent = parent
 
         if parent is not None:

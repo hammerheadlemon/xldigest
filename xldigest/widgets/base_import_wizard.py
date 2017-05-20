@@ -1,5 +1,7 @@
 from PyQt5 import QtWidgets, QtGui
 
+from typing import List, Dict, Any
+
 from xldigest.widgets.base_import_wizard_ui import Ui_base_import_wizard
 from xldigest.widgets.dialogs import (
     AddPortfolioDialog,
@@ -14,11 +16,11 @@ class BaseImportWizard(QtWidgets.QWizard, Ui_base_import_wizard):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.projects = []
+        self.projects: List[str] = []
         self.portfolio = None
         self.series = None
-        self.series_items = []
-        self.wizard_data = {}
+        self.series_items: List[str] = []
+        self.wizard_data: Dict[Any, Any] = {}
 
         # signals
         # --------
