@@ -85,7 +85,7 @@ class DatamapView:
         return_data = [item[0] for item in return_data]
         count = 1  # start adding return data from second row down, after header
         project_name = self.session.query(Project.name).filter(Project.id == project_id).first()[0]
-        self.matrix.append(DatamapCellItem(project_name, DatamapView.returns_added + 2, 0))
+        self.matrix.append(DatamapCellItem(project_name, DatamapView.returns_added + 2, 0, header=True))
         for d in return_data:
             self.matrix.append(DatamapCellItem(d, DatamapView.returns_added + 2, count))
             count += 1

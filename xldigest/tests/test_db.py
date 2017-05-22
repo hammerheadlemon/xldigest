@@ -72,9 +72,14 @@ def test_add_second_return(session):
 
 
 def test_project_headings_master(session):
+    """
+    These should all have a y value of zero and their header value True.
+    """
     dmo = DatamapView(1, session)
     dmo.add_single_return(1)
     dmo.add_single_return(2)
     dmo.add_single_return(3)
     assert dmo.cell_data(2, 0).data == 'A - Project 1'
     assert dmo.cell_data(3, 0).data == 'C - Project 2'
+    assert dmo.cell_data(2, 0).header is True
+    assert dmo.cell_data(3, 0).header is True
