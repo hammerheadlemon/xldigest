@@ -69,3 +69,12 @@ def test_add_second_return(session):
     assert dmo.cell_data(3, 1).data == 'Return Value 1 Project 2 SeriesItem 1'
     assert dmo.cell_data(4, 1).data == 'Return Value 1 Project 3 SeriesItem 1'
     DatamapView.returns_added = 0
+
+
+def test_project_headings_master(session):
+    dmo = DatamapView(1, session)
+    dmo.add_single_return(1)
+    dmo.add_single_return(2)
+    dmo.add_single_return(3)
+    assert dmo.cell_data(2, 0).data == 'A - Project 1'
+    assert dmo.cell_data(3, 0).data == 'C - Project 2'
