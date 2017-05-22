@@ -497,7 +497,7 @@ def session():
 
 # TODO THIS IS NOT GIVING US ENOUGH RETURN ITEMS
     return_items = []
-    for p in range(1, 3):
+    for p in range(1, 4):
         return_items.append([models.ReturnItem(
             project_id=p,
             series_item_id=y,
