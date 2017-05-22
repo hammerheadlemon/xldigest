@@ -21,7 +21,7 @@ def test_in_tmp_sqlite3(session):
     q1 = session.query(SeriesItem.name).first()[0]
     p1 = session.query(Project.name).first()[0]
     assert q1 == "Q1 2016/17"
-    assert p1 == "Project 1"
+    assert p1 == "A - Project 1"
 
 
 #@pytest.mark.skip("Flag for removal")
@@ -207,7 +207,7 @@ def test_file_name_cleaner(bicc_return, session):
     digest = Digest(datamap, qtr_id, pjt_id, session)
     digest.read_template()
     assert digest._generate_file_name_from_return_data(
-        qtr_id, pjt_id) == 'Project_1_Q1_2016_17'
+        qtr_id, pjt_id) == 'A___Project_1_Q1_2016_17'
 
 
 def test_get_project_name_from_digest(bicc_return, session):
@@ -217,7 +217,7 @@ def test_get_project_name_from_digest(bicc_return, session):
     datamap = Datamap(template, session)
     datamap.cell_map_from_database()
     digest = Digest(datamap, qtr_id, pjt_id, session)
-    assert digest.project_name == "Project 1"
+    assert digest.project_name == "A - Project 1"
 
 
 def test_successful_write_return_to_db(session, bicc_return):

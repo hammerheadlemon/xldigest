@@ -477,9 +477,11 @@ def session():
     session.add(series_item3)
     session.add(series_item4)
 
-    project1 = models.Project(name="Project 1")
-    project2 = models.Project(name="Project 2")
-    project3 = models.Project(name="Project 3")
+    # we need to test for alphabetical order in master view
+    # hence the strange project names
+    project1 = models.Project(name="A - Project 1")
+    project2 = models.Project(name="C - Project 2")
+    project3 = models.Project(name="B - Project 3")
 
     session.add(project1)
     session.add(project2)

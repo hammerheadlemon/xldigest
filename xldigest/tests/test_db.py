@@ -9,8 +9,8 @@ def test_single_portfolio(session):
 
 
 def test_single_project(session):
-    assert session.query(Project.name).first()[0] == "Project 1"
-    assert session.query(Project.name).all()[1][0] == "Project 2"
+    assert session.query(Project.name).first()[0] == "A - Project 1"
+    assert session.query(Project.name).all()[1][0] == "C - Project 2"
 
 
 def test_single_series(session):
@@ -27,7 +27,7 @@ def test_check_db_table_duplicates(session):
 
 def test_link_declared_p_name_with_project(session):
     assert link_declared_p_name_with_project(1, 1, "Datamap Key 1",
-                                             session)[0] == 'Project 1'
+                                             session)[0] == 'A - Project 1'
 
 
 def test_datamap_view_object_str(session):
