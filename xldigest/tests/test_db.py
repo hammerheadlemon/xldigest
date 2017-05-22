@@ -80,6 +80,9 @@ def test_project_headings_master(session):
     dmo.add_single_return(2)
     dmo.add_single_return(3)
     assert dmo.cell_data(2, 0).data == 'A - Project 1'
-    assert dmo.cell_data(3, 0).data == 'C - Project 2'
+    assert dmo.cell_data(3, 0).data == 'B - Project 3'
+    assert dmo.cell_data(4, 0).data == 'C - Project 2'
     assert dmo.cell_data(2, 0).header is True
     assert dmo.cell_data(3, 0).header is True
+    assert dmo.cell_data(4, 0).header is True
+    DatamapView.returns_added = 0
