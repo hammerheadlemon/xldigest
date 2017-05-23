@@ -10,11 +10,11 @@ def test_alphabet_order(session):
     # These are heading cells, added to a queue in a random order. Perhaps they
     # are in the order of a project_id, for instance, which does not necessarily
     # correlate with their project name, hence "P1", "P2", etc in their title
-    # references here.
-    heading1 = DatamapCellItem("B - P1-DCI1 Header", 2, 0, True, session)
-    heading2 = DatamapCellItem("D - P2-DCI2 Header", 3, 0, True, session)
-    heading3 = DatamapCellItem("A - P3-DCI3 Header", 4, 0, True, session)
-    heading4 = DatamapCellItem("C - P4-DCI4 Header", 5, 0, True, session)
+    # references here. Therefore their x, y values are zeroed on creation.
+    heading1 = DatamapCellItem("B - P1-DCI1 Header", 0, 0, True, session)
+    heading2 = DatamapCellItem("D - P2-DCI2 Header", 0, 0, True, session)
+    heading3 = DatamapCellItem("A - P3-DCI3 Header", 0, 0, True, session)
+    heading4 = DatamapCellItem("C - P4-DCI4 Header", 0, 0, True, session)
 
     # these are initial data cells for Project 1 - which have been added to the queue but
     # have not been sorted, therefore their y values are all 0 in
@@ -53,9 +53,26 @@ def test_alphabet_order(session):
     # whose header flag is set to True is also created by this external function
     # to sit at the top of the column (or in the headers list in the QTableVIew.
     # This is also modelled here.
-
     queue = deque([
         heading1, heading2, heading3, heading4, p1_d1, p1_d2, p1_d3, p1_d4,
         p2_d1, p2_d2, p2_d3, p2_d4, p3_d1, p3_d2, p3_d3, p3_d4, p4_d1, p4_d2,
         p4_d3, p4_d4
     ])
+
+    # we need an collection to store manipulated dmcis when they're done. This
+    # is the master_grid.
+
+    master_grid = []
+
+    # let's create a cell manipulator!
+#   manipulator = Manipulator()
+#   manipulator.execute()
+
+    # the default option for execute is to sort alphabetically, therefore
+    # we expect to see the master_grid populated with DatamapCellItem objects
+    # whose attributes represent a master matrix sorted alphabetically.
+
+    # lets first get the header objects
+    header_objs = [item for item in queue if item.header is True]
+
+    print(header_objs)
